@@ -1,0 +1,21 @@
+server:
+  error:
+    whitelabel:
+      enabled: false
+spring:
+  profiles:
+    active: dev
+  output:
+    ansi:
+      enabled: always
+logging:
+  file:
+    path: /var/log/bot/
+    name: /var/log/bot/bot.log
+
+
+otp-expiry-time: 100
+email-token-expiry-time: 86400
+
+
+

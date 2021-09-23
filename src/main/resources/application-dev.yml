@@ -1,0 +1,102 @@
+server:
+  ssl:
+    key-store: classpath:devbot.p12
+    key-store-type: PKCS12
+    key-store-password: DevBot123A
+    enabled: true
+  port: 8443
+
+spring:
+  datasource:
+    url: jdbc:postgresql://34.95.1.181:5432/botdev?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false
+    username: postgres
+    password: mDSpzAgyS6kE9s
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL95Dialect
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: 833588024301-msmd0e4faeijtlldq3asmg0kiufbrgtm.apps.googleusercontent.com
+            clientSecret: qUAKXFZWNarAANqapJr83v0E
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - email
+              - profile
+          facebook:
+            clientId: 1629032423903238
+            clientSecret: e5109995634962b6ebfb2b1c087cffd4
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - email
+              - public_profile
+        provider:
+          facebook:
+            authorizationUri: https://www.facebook.com/v3.0/dialog/oauth
+            tokenUri: https://graph.facebook.com/v3.0/oauth/access_token
+            userInfoUri: https://graph.facebook.com/v3.0/me?fields=id,first_name,middle_name,last_name,name,email,verified,is_verified,picture.width(250).height(250)
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: teambidontask@gmail.com
+    password: TWILIOapPbot123**
+    properties:
+      mail:
+        smtp:
+          auth: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+          ssl:
+            trust: smtp.gmail.com
+          starttls:
+            enable: true
+            required: true
+  liquibase:
+    url: jdbc:postgresql://34.95.1.181:5432/botdev
+    user: postgres
+    password: mDSpzAgyS6kE9s
+    enabled: true
+    change-log: db-liquibase/liquibase-changeLog.xml
+app:
+  auth:
+    tokenSecret: 926D96C90030DD58429D2751AC1BDBBC
+    tokenExpirationMsec: 259200000
+    refreshTokenExpirationMsec: 2592000000
+  oauth2:
+    # After successfully authenticating with the OAuth2 Provider,
+    # we'll be generating an auth token for the user and sending the token to the
+    # redirectUri mentioned by the client in the /oauth2/authorize request.
+    # We're not using cookies because they won't work well in mobile clients.
+    authorizedRedirectUris:
+      - http://localhost:3000/oauth2/redirect
+      - myandroidapp://oauth2/redirect
+      - myiosapp://oauth2/redirect
+
+
+#Stripe keys
+stripe:
+  keys:
+    public: pk_test_eFEon7SyzhcoiBY4E5YdmcFY00SG8Pt3GB
+    secret: sk_test_cMgHsd9RftErG9tKK09mDAn800O9bjHW0N
+    client: ca_Hm3AtRNUEccCCzTlKbNulXIAWWGKpOOj
+
+email:
+  redirection: https://dev.bidontask.com:8443
+  api-key: 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
+
+bot:
+  service-fees-factor: 0.1
+  minimum-task-amount: 30
+  currency-factor: 100
+  firebase-config: confidential/bot-firebase-configuration.json
+  firebase-database: https://bidontask.firebaseio.com
+  logoURL: https://firebasestorage.googleapis.com/v0/b/bidontask.appspot.com/o/branding%2Flogo_dark_2.png?alt=media&token=e81870db-e449-4c1c-8bbc-c64622806cb0
