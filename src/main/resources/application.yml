@@ -4,16 +4,16 @@ server:
       enabled: false
 spring:
   profiles:
-    active: dev
+    active: local
   output:
     ansi:
       enabled: always
 logging:
   file:
-    path: /var/log/bot/
-    name: /var/log/bot/bot.log
+    path: /var/log/app/
+    name: /var/log/app/app.log
 
-
+logo-url: www.google.com
 otp-expiry-time: 100
 email-token-expiry-time: 86400
 
