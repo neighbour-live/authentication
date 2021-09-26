@@ -68,6 +68,9 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Value("${email.from}")
+    private String EMAIL_FROM;
+
     @Value("${email.redirection}")
     private String EMAIL_REDIRECTION_URL;
 
@@ -533,7 +536,7 @@ public class AuthServiceImpl implements AuthService {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setTo(user.getEmail());
             mailMessage.setSubject("BidOnTask | Forgot Password Verification!");
-            mailMessage.setFrom("info@bidontask.com");
+            mailMessage.setFrom(EMAIL_FROM);
             mailMessage.setText("Hi " +user.getFirstName()+" "+user.getLastName()+ "\n"
                     +"To change your password, please send us this following code with your change password request: \n"
                     +"One Time Secret: " + otp + "\n\n\n\n Regards,\nTeam BidOnTask");
@@ -563,7 +566,7 @@ public class AuthServiceImpl implements AuthService {
                 SimpleMailMessage mailMessage = new SimpleMailMessage();
                 mailMessage.setTo(user.getEmail());
                 mailMessage.setSubject("BidOnTask | Change Password Successfully!");
-                mailMessage.setFrom("info@bidontask.com");
+                mailMessage.setFrom(EMAIL_FROM);
                 mailMessage.setText("Hi " +user.getFirstName()+" "+user.getLastName()+ "\n"
                         +"Your password has been changed successfully."
                         +"\n\n\n\n Regards,\nTeam BidOnTask");

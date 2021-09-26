@@ -20,7 +20,7 @@ public class Constants {
     public static final String ENV_DEV = "dev";
     public static final String ENV_QA = "qa";
     public static final String ENV_PROD = "prod";
-    public static final String SEND_GRID_FROM_EMAIL = "info@bidontask.com";
+    public static final String SEND_GRID_FROM_EMAIL = "test@test.com";
 
     public enum Sort {
         ASCENDING("asc"),
