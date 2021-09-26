@@ -24,7 +24,7 @@ import java.util.TimeZone;
 @EnableTransactionManagement
 @EnableScheduling
 @EnableConfigurationProperties(AppProperties.class)
-public class MiddlewareApplication {
+public class BootApp {
 
     @PostConstruct
     void init() {
@@ -32,7 +32,7 @@ public class MiddlewareApplication {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(MiddlewareApplication.class, args);
+        SpringApplication.run(BootApp.class, args);
     }
 
 }

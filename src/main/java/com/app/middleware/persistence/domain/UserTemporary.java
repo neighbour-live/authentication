@@ -23,7 +23,7 @@ public class UserTemporary extends BaseEntity {
     @Column(unique = true, name ="email")
     private String email;
 
-    @Column(unique = true, name ="password")
+    @Column(name ="password")
     private String password;
 
     @Column(unique = true, name ="phoneNumber")

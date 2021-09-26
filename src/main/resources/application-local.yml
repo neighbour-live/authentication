@@ -6,7 +6,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/users_schema?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
     username: root
-    password: root
+    password:
 
   jpa:
     show-sql: true
@@ -61,7 +61,7 @@ spring:
   liquibase:
     url: jdbc:mysql://localhost:3306/users_schema?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
     user: root
-    password: root
+    password:
     enabled: true
     change-log: db-liquibase/liquibase-changeLog.xml
 app:
