@@ -33,9 +33,9 @@
 
         CREATE TABLE `awards` (
                                   `id` bigint(20) NOT NULL,
-                                  `create_date_time` datetime DEFAULT NULL,
-                                  `update_date_time` datetime DEFAULT NULL,
-                                  `award_icon` varchar(255) NOT NULL,
+                                  `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                  `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+                                  `award_icon` varchar(255) DEFAULT NULL,
                                   `award_type` ENUM(  'STARTER',
                                                       'EARLY_USER',
                                                       'SPENT_THOUSAND_DOLLARS',
@@ -57,13 +57,13 @@
 
         CREATE TABLE `conversations` (
                                          `id` bigint(20) NOT NULL,
-                                         `create_date_time` datetime DEFAULT NULL,
-                                         `update_date_time` datetime DEFAULT NULL,
-                                         `is_active` bit(1) NOT NULL,
-                                         `is_deleted` bit(1) NOT NULL,
+                                         `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                         `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+                                         `is_active` bit(1) DEFAULT true ,
+                                         `is_deleted` bit(1) DEFAULT false,
                                          `public_id` bigint(20) NOT NULL,
-                                         `first_user_id` bigint(20) DEFAULT NULL,
-                                         `second_user_id` bigint(20) DEFAULT NULL
+                                         `first_user_id` bigint(20) NOT NULL,
+                                         `second_user_id` bigint(20) NOT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
         -- --------------------------------------------------------
@@ -74,8 +74,8 @@
 
         CREATE TABLE `firebase_logs` (
                                          `id` bigint(20) NOT NULL,
-                                         `create_date_time` datetime DEFAULT NULL,
-                                         `update_date_time` datetime DEFAULT NULL,
+                                         `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                         `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
                                          `error_msg` text DEFAULT NULL,
                                          `payload` text DEFAULT NULL,
                                          `request_id` varchar(255) DEFAULT NULL,
@@ -109,10 +109,10 @@
 
         CREATE TABLE `logs` (
                                 `id` bigint(20) NOT NULL,
-                                `create_date_time` datetime DEFAULT NULL,
-                                `update_date_time` datetime DEFAULT NULL,
+                                `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
                                 `ip_address` varchar(255) NOT NULL,
-                                `is_deleted` bit(1) NOT NULL,
+                                `is_deleted` bit(1) DEFAULT false,
                                 `request` varchar(255) DEFAULT NULL,
                                 `response` varchar(255) DEFAULT NULL,
                                 `user_public_id` bigint(20) NOT NULL
@@ -126,11 +126,11 @@
 
         CREATE TABLE `notification_types` (
                                               `id` bigint(20) NOT NULL,
-                                              `create_date_time` datetime DEFAULT NULL,
-                                              `update_date_time` datetime DEFAULT NULL,
+                                              `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                              `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
                                               `description` varchar(255) DEFAULT NULL,
                                               `icon_path` varchar(255) DEFAULT NULL,
-                                              `is_deleted` bit(1) DEFAULT NULL,
+                                              `is_deleted` bit(1) DEFAULT false ,
                                               `name` varchar(255) DEFAULT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -142,11 +142,11 @@
 
         CREATE TABLE `permission` (
                                       `id` bigint(20) NOT NULL,
-                                      `create_date_time` datetime DEFAULT NULL,
-                                      `update_date_time` datetime DEFAULT NULL,
-                                      `is_deleted` bit(1) NOT NULL,
-                                      `permission_code` varchar(255) NOT NULL,
-                                      `permission_name` varchar(255) NOT NULL
+                                      `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                      `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+                                      `is_deleted` bit(1) DEFAULT false,
+                                      `permission_code` varchar(255) DEFAULT NULL,
+                                      `permission_name` varchar(255) DEFAULT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
         -- --------------------------------------------------------
@@ -157,9 +157,9 @@
 
         CREATE TABLE `role` (
                                 `id` bigint(20) NOT NULL,
-                                `create_date_time` datetime DEFAULT NULL,
-                                `update_date_time` datetime DEFAULT NULL,
-                                `is_deleted` bit(1) NOT NULL,
+                                `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+                                `is_deleted` bit(1) DEFAULT false ,
                                 `role_name` varchar(255) NOT NULL,
                                 `role_type` ENUM('USER', 'MODERATOR', 'ADMIN')
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -172,9 +172,9 @@
 
         CREATE TABLE `role_permission` (
                                            `id` bigint(20) NOT NULL,
-                                           `is_deleted` bit(1) NOT NULL,
-                                           `permission_id` bigint(20) DEFAULT NULL,
-                                           `role_id` bigint(20) DEFAULT NULL
+                                           `is_deleted` bit(1) DEFAULT false ,
+                                           `permission_id` bigint(20) NOT NULL,
+                                           `role_id` bigint(20) NOT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
         -- --------------------------------------------------------
@@ -185,8 +185,8 @@
 
         CREATE TABLE `users` (
                                  `id` bigint(20) NOT NULL,
-                                 `create_date_time` datetime DEFAULT NULL,
-                                 `update_date_time` datetime DEFAULT NULL,
+                                 `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                 `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
                                  `access_token` varchar(255) DEFAULT NULL,
                                  `address_line` varchar(255) DEFAULT NULL,
                                  `address_type` ENUM('RESIDENTIAL', 'WORKPLACE', 'TEMPORARY', 'PERMANENT'),
@@ -234,14 +234,14 @@
 
         CREATE TABLE `user_addresses` (
                                           `id` bigint(20) NOT NULL,
-                                          `create_date_time` datetime DEFAULT NULL,
-                                          `update_date_time` datetime DEFAULT NULL,
+                                          `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                          `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
                                           `address_line` varchar(255) NOT NULL,
                                           `address_type` ENUM('RESIDENTIAL', 'WORKPLACE', 'TEMPORARY', 'PERMANENT'),
                                           `apartment_address` varchar(255) NOT NULL,
                                           `city` varchar(255) NOT NULL,
                                           `country` varchar(255) NOT NULL,
-                                          `is_deleted` bit(1) NOT NULL,
+                                          `is_deleted` bit(1) DEFAULT false,
                                           `lat` float DEFAULT NULL,
                                           `lng` float DEFAULT NULL,
                                           `postal_code` varchar(255) NOT NULL,
@@ -258,10 +258,10 @@
 
         CREATE TABLE `user_awards` (
                                        `id` bigint(20) NOT NULL,
-                                       `create_date_time` datetime DEFAULT NULL,
-                                       `update_date_time` datetime DEFAULT NULL,
-                                       `is_active` bit(1) NOT NULL,
-                                       `is_unlocked` bit(1) NOT NULL,
+                                       `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                       `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+                                       `is_active` bit(1) DEFAULT true,
+                                       `is_unlocked` bit(1) DEFAULT false,
                                        `progress` int(11) NOT NULL,
                                        `public_id` bigint(20) NOT NULL,
                                        `award_id` bigint(20) DEFAULT NULL,
@@ -276,10 +276,10 @@
 
         CREATE TABLE `user_chats` (
                                       `id` bigint(20) NOT NULL,
-                                      `create_date_time` datetime DEFAULT NULL,
-                                      `update_date_time` datetime DEFAULT NULL,
-                                      `is_active` bit(1) NOT NULL,
-                                      `is_deleted` bit(1) NOT NULL,
+                                      `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                      `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+                                      `is_active` bit(1) DEFAULT true,
+                                      `is_deleted` bit(1) DEFAULT false ,
                                       `message` varchar(255) NOT NULL,
                                       `message_attributes` varchar(255) NOT NULL,
                                       `public_id` bigint(20) NOT NULL,
@@ -296,8 +296,8 @@
 
         CREATE TABLE `user_notifications` (
                                               `id` bigint(20) NOT NULL,
-                                              `create_date_time` datetime DEFAULT NULL,
-                                              `update_date_time` datetime DEFAULT NULL,
+                                              `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                              `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
                                               `actions` varchar(255) DEFAULT NULL,
                                               `actions_info` varchar(255) DEFAULT NULL,
                                               `is_archived` bit(1) DEFAULT NULL,
@@ -320,8 +320,8 @@
 
         CREATE TABLE `user_temporary` (
                                           `id` bigint(20) NOT NULL,
-                                          `create_date_time` datetime DEFAULT NULL,
-                                          `update_date_time` datetime DEFAULT NULL,
+                                          `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                          `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
                                           `email` varchar(255) DEFAULT NULL,
                                           `password` varchar(255) DEFAULT NULL,
                                           `phone_number` varchar(255) DEFAULT NULL,
