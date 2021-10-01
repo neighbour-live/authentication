@@ -19,7 +19,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -70,7 +69,6 @@ public class AuthController {
     @ApiOperation(value = "This operation provide Access token using Refresh Token when Access Token was expired.", response = RefreshToken.class)
     public ResponseEntity<?> getAccessTokenByRefreshToken(@RequestBody RefreshToken refreshToken, HttpServletResponse httpServletResponse) throws Exception {
         try {
-            //Do Login
             refreshToken = authService.getAccessTokenByRefreshToken(refreshToken, httpServletResponse);
             //Send Response and save Log
             ResponseEntity response = GenericResponseEntity.create(StatusCode.SUCCESS, refreshToken, HttpStatus.OK);
@@ -84,12 +82,9 @@ public class AuthController {
     @PostMapping("/register")
     @ApiOperation(value = "This operation register the User into Application.")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) throws Exception {
-        //create null User for Logging;
         User user = null;
         try {
             user = authService.register(signUpRequest);
-
-            //Send Response and save Log
             ResponseEntity response = GenericResponseEntity.create(StatusMessageDTO.builder()
                     .message(AuthConstants.REGISTRATION_SUCCESSFUL)
                     .status(0)
@@ -97,7 +92,6 @@ public class AuthController {
 
             loggingService.createLog(user, signUpRequest.getIp(), response, signUpRequest);
             return response;
-
         } catch (Exception e) {
             //Send Response and save Log
             loggingService.createLog(null, signUpRequest.getIp(), e, signUpRequest);

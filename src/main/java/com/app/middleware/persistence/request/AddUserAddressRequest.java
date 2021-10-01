@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.json.JSONObject;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 @Data
@@ -25,9 +27,13 @@ public class AddUserAddressRequest {
     @NotBlank
     private String userPublicId;
 
-    private float lat;
+    @Min(-90)
+    @Max(90)
+    private Double lat;
+    @Min(-180)
+    @Max(180)
+    private Double lng;
 
-    private float lng;
 
     @NotBlank
     private String apartmentAddress;

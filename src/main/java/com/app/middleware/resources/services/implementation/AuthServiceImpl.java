@@ -137,25 +137,68 @@ public class AuthServiceImpl implements AuthService {
     public User register(SignUpRequest signUpRequest) throws Exception {
 
         User user = new User();
+        UserTemporary userTemporary = userTemporaryService.findByPublicId(PublicIdGenerator.decodePublicId(signUpRequest.getPublicId()));
 
-        UserTemporary userTemporary = userTemporaryService.findByPublicId(user.getPublicId());
+        user.setPublicId(userTemporary.getPublicId());
+        user.setPhoneNumber(userTemporary.getPhoneNumber());
+        user.setUserName(userTemporary.getUserName());
+        user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+
+        if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.LOCAL)){
+
+            user.setProvider(AuthProvider.LOCAL);
+            if(!userTemporary.getEmail().isEmpty() && userTemporary.getEmail() !=null){
+                user.setEmail(userTemporary.getEmail());
+                user.setFbId("");
+                user.setGgId("");
+            } else throw new Exception("For LOCAL Provider a valid email is required");
+
+            if(userTemporary.getEmailVerified() && userTemporary.getPhoneVerified()){
+                user.setPhoneVerified(userTemporary.getPhoneVerified());
+                user.setEmailVerified(userTemporary.getEmailVerified());
+            } else throw new Exception("For LOCAL Provider a verified email and phone number is required");
+
+        } else if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.FACEBOOK)) {
+
+            user.setProvider(AuthProvider.FACEBOOK);
+            user.setGgId("");
+            if(!signUpRequest.getFbId().isEmpty() && signUpRequest.getFbId() !=null){
+                user.setFbId(signUpRequest.getFbId());
+                user.setEmail(signUpRequest.getFbId() + "@fb.com");
+            } else throw new Exception("For FACEBOOK Provider fbId is required");
+
+            if(userTemporary.getPhoneVerified()){
+                user.setPhoneVerified(userTemporary.getPhoneVerified());
+                user.setEmailVerified(true);
+            } else throw new Exception("For FACEBOOK Provider a verified phone number is required");
+
+        } else if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.GOOGLE)) {
+
+            user.setProvider(AuthProvider.GOOGLE);
+            user.setFbId("");
+            if(!signUpRequest.getGgId().isEmpty() && signUpRequest.getGgId() != null){
+                user.setGgId(signUpRequest.getGgId());
+                user.setEmail(signUpRequest.getGgId());
+            } else throw new Exception("For GOOGLE Provider fbId is required");
+
+            if(userTemporary.getPhoneVerified()){
+                user.setPhoneVerified(userTemporary.getPhoneVerified());
+                user.setEmailVerified(true);
+            } else throw new Exception("For GOOGLE Provider a verified phone number is required");
+
+        } else {
+            throw new Exception("Provider can only be LOCAL, FACEBOOK or GOOGLE");
+        }
 
         user.setFirstName(signUpRequest.getFirstName());
         user.setLastName(signUpRequest.getLastName());
-        user.setEmail(signUpRequest.getEmail().toLowerCase());
-        user.setUserName(signUpRequest.getUserName());
-        user.setProvider(AuthProvider.valueOf(signUpRequest.getProvider()));
         user.setImageUrl(signUpRequest.getImageUrl());
-        user.setPhoneNumber(signUpRequest.getPhoneNumber());
-        user.setPublicId(PublicIdGenerator.generatePublicId());
-        user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setFirebaseKey(signUpRequest.getFirebaseKey());
-
+        user.setIp(signUpRequest.getIp());
+        user.setDob(signUpRequest.getDob());
 
         user.setAddressLine(signUpRequest.getAddressLine());
         user.setApartmentAddress(signUpRequest.getApartmentAddress());
-        user.setIp(signUpRequest.getIp());
-        user.setDob(signUpRequest.getDob());
         user.setPostalCode(signUpRequest.getPostalCode());
         user.setCity(signUpRequest.getCity());
         user.setState(signUpRequest.getState());
@@ -164,24 +207,10 @@ public class AuthServiceImpl implements AuthService {
         user.setLat(signUpRequest.getLat());
         user.setLng(signUpRequest.getLng());
 
-
-        //flags
         user.setIsBlocked(false);
         user.setIsDeleted(false);
         user.setIsSuspended(false);
-        // if fb or gg id is present
-        if(!signUpRequest.getFbId().equals(null) && !signUpRequest.getFbId().isEmpty() ) {
-            user.setFbId(signUpRequest.getFbId());
-            user.setEmail(signUpRequest.getFbId() + "@fb.com");
 
-        } else if (!signUpRequest.getGgId().equals(null) && !signUpRequest.getGgId().isEmpty())
-        {
-            user.setGgId(signUpRequest.getGgId());
-            user.setEmail(signUpRequest.getGgId());
-        }
-
-        user.setEmailVerified(signUpRequest.isEmailVerified());
-        user.setPhoneVerified(signUpRequest.isPhoneVerified());
         user.setRole(roleRepository.findByRoleType(RoleType.USER));
 
         UserAddress userAddress = UserAddress.builder()
@@ -198,7 +227,6 @@ public class AuthServiceImpl implements AuthService {
                 .user(user)
                 .build();
 
-
         user = userRepository.save(user);
         userAddress = userAddressService.saveAddress(userAddress);
 
@@ -207,73 +235,8 @@ public class AuthServiceImpl implements AuthService {
         mailMessage.setTo(user.getEmail());
         mailMessage.setSubject("Welcome to Neighbour Live! ");
         mailMessage.setFrom(EMAIL_FROM);
-        mailMessage.setText("Welcome " + user.getFirstName() + " " + user.getLastName() + "\n"
-                +"We really Appreciate the valuable addition of you into our growing community. \n");
-
+        mailMessage.setText("Welcome " + user.getFirstName() + " " + user.getLastName() + "\n" +"We really Appreciate the valuable addition of you into our growing community. \n");
         emailService.sendEmail(mailMessage);
-//            EmailNotificationDto emailNotificationDto = EmailNotificationDto.builder()
-//                    .to(user.getEmail())
-//                    .template(Constants.EmailTemplate.WELCOME_TEMPLATE.value())
-//                    .build();
-//            emailService.sendEmailFromExternalApi(emailNotificationDto);
-//
-//            sendEmailVerification(user.getEmail(), user);
-
-//            Map<String,String> actionsInfo =  new HashMap<>();
-//            actionsInfo.put("userPublicId", PublicIdGenerator.encodedPublicId(user.getPublicId()));
-//
-//            UserNotificationRequest userNotificationRequest = UserNotificationRequest.builder()
-//                    .notificationType(NotificationEnum.VERIFICATION.toString())
-//                    .target("INDIVIDUAL")
-//                    .title("Email Verification!")
-//                    .body("Verify your email and be noticeable to the Neighbour community.!")
-//                    .imageUrl(LOGO_URL)
-//                    .actions(NotificationAction.HOME.name())
-//                    .actionsInfo(actionsInfo)
-//                    .firebaseKey(user.getFirebaseKey())
-//                    .build();
-//
-//            notificationService.postUserNotification(userNotificationRequest, user);
-//
-//            userNotificationRequest = UserNotificationRequest.builder()
-//                    .notificationType(NotificationEnum.VERIFICATION.toString())
-//                    .target("INDIVIDUAL")
-//                    .title("Phone Verification!")
-//                    .body("Verify your phone number and be noticeable to the Neighbour community.!")
-//                    .imageUrl(LOGO_URL)
-//                    .actions(NotificationAction.HOME.name())
-//                    .actionsInfo(actionsInfo)
-//                    .firebaseKey(user.getFirebaseKey())
-//                    .build();
-//
-//            notificationService.postUserNotification(userNotificationRequest, user);
-//
-//            userNotificationRequest = UserNotificationRequest.builder()
-//                    .notificationType(NotificationEnum.VERIFICATION.toString())
-//                    .target("INDIVIDUAL")
-//                    .title("Wallet Verification!")
-//                    .body("Verify your Wallet information and be noticeable to the Neighbour community.!")
-//                    .imageUrl(LOGO_URL)
-//                    .actions(NotificationAction.HOME.name())
-//                    .actionsInfo(actionsInfo)
-//                    .firebaseKey(user.getFirebaseKey())
-//                    .build();
-//
-//            notificationService.postUserNotification(userNotificationRequest, user);
-//
-//            userNotificationRequest = UserNotificationRequest.builder()
-//                    .notificationType(NotificationEnum.VERIFICATION.toString())
-//                    .target("INDIVIDUAL")
-//                    .title("Background Verification!")
-//                    .body("Get a background check by Sterling, our 3rd Party Partner to stand out among other users.!")
-//                    .imageUrl(LOGO_URL)
-//                    .actions(NotificationAction.HOME.name())
-//                    .actionsInfo(actionsInfo)
-//                    .firebaseKey(user.getFirebaseKey())
-//                    .build();
-//
-//            notificationService.postUserNotification(userNotificationRequest, user);
-
 
         return user;
     }
@@ -295,14 +258,11 @@ public class AuthServiceImpl implements AuthService {
         userTemporary.setEmailToken(token);
         userTemporary = userTemporaryService.save(userTemporary);
 
-        //sending Welcome Email
-
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(user.getEmail());
         mailMessage.setSubject("Neighbour Live | Email Verification! ");
         mailMessage.setFrom(EMAIL_FROM);
-        mailMessage.setText("Welcome " +user.getFirstName()+" "+user.getLastName()+ "\n"
-                +"To verify your email, please use the following code: "+ otp);
+        mailMessage.setText("Welcome " +user.getFirstName()+" "+user.getLastName()+ "\n" +"To verify your email, please use the following code: "+ otp);
 
         return userTemporary;
     }
@@ -330,7 +290,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
-    public boolean sendEmailVerification(String email, User user) throws ResourceNotFoundException, IOException {
+    public boolean sendEmailVerification(String email, User user) throws ResourceNotFoundException {
 
         UserTemporary userTemporary = userTemporaryService.findByUser(user);
         if(userTemporary == null) {
@@ -341,7 +301,6 @@ public class AuthServiceImpl implements AuthService {
         userTemporary = userTemporaryService.save(userTemporary);
 
         String token = Utility.generateSafeToken() + UUID.randomUUID();
-
         token = "0000";
         user.setEmailVerificationToken(token);
         user = userRepository.save(user);
@@ -352,8 +311,7 @@ public class AuthServiceImpl implements AuthService {
         mailMessage.setTo(user.getEmail());
         mailMessage.setSubject("Neighbour Live | Email Verification! ");
         mailMessage.setFrom(EMAIL_FROM);
-        mailMessage.setText("Welcome " +user.getFirstName()+" "+user.getLastName()+ "\n"
-                +"To verify your email, please use the following code: "+ token);
+        mailMessage.setText("Welcome " +user.getFirstName()+" "+user.getLastName()+ "\n" +"To verify your email, please use the following code: "+ token);
         return true;
     }
 
@@ -406,6 +364,28 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
+    public UserTemporary confirmPhonePreRegister(String phoneNumber, String token, String otp) throws Exception {
+        UserTemporary userTemporary = userTemporaryService.findByPhoneNumber(phoneNumber);
+        if(userTemporary == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, phoneNumber);
+        if(userTemporary.getPhoneToken().equals(token) && userTemporary.getPhoneCode().equals(otp))
+        {
+            //check if OTP is expired
+            ZonedDateTime timeNow = ZonedDateTime.now();
+            if(userTemporary.getUpdateDateTime().plusSeconds(Long.parseLong(OTP_EXPIRY_TIME)).isBefore(timeNow)){
+                throw new Exception("Phone Code expired, please try again.");
+            }
+
+            userTemporary.setPhoneToken(null);
+            userTemporary.setPhoneCode(null);
+            userTemporary.setPhoneVerified(true);
+            userTemporary = userTemporaryService.save(userTemporary);
+            return userTemporary;
+        }
+        return null;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Override
     public String sendPhoneVerificationOTP(String phoneNumber, User user) throws Exception {
 
         UserTemporary userTemporary = userTemporaryService.findByUser(user);
@@ -430,40 +410,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
-    public UserTemporary confirmPhonePreRegister(String phoneNumber, String token, String otp) throws Exception {
-        UserTemporary userTemporary = userTemporaryService.findByPhoneNumber(phoneNumber);
-        if(userTemporary == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, phoneNumber);
-        if(userTemporary.getPhoneToken().equals(token) && userTemporary.getPhoneCode().equals(otp))
-        {
-            //check if OTP is expired
-            ZonedDateTime timeNow = ZonedDateTime.now();
-            if(userTemporary.getUpdateDateTime().plusSeconds(Long.parseLong(OTP_EXPIRY_TIME)).isBefore(timeNow)){
-                throw new Exception("Phone Code expired, please try again.");
-            }
-
-            userTemporary.setPhoneToken(null);
-            userTemporary.setPhoneCode(null);
-            userTemporary.setPhoneVerified(true);
-            userTemporary = userTemporaryService.save(userTemporary);
-            return userTemporary;
-        }
-        return null;
-    }
-
-    @Override
-    public UserTemporary confirmUserNamePreRegister(String userName, String publicId) throws Exception {
-        if(checkUserNameExist(userName)){
-            UserTemporary userTemporary = userTemporaryService.findByPublicId(PublicIdGenerator.decodePublicId(publicId));
-            userTemporary.setUserName(userName);
-            userTemporary = userTemporaryService.save(userTemporary);
-            return userTemporary;
-        } else {
-            throw new Exception("UserName does not exist, please try again");
-        }
-    }
-
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    @Override
     public User confirmPhoneNumber(String token, String otp) throws Exception {
         User user = userRepository.findByPhoneVerificationToken(token);
         if(user == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, otp);
@@ -482,6 +428,18 @@ public class AuthServiceImpl implements AuthService {
             return user;
         }
         return null;
+    }
+
+    @Override
+    public UserTemporary confirmUserNamePreRegister(String userName, String publicId) throws Exception {
+        if(checkUserNameExist(userName)){
+            UserTemporary userTemporary = userTemporaryService.findByPublicId(PublicIdGenerator.decodePublicId(publicId));
+            userTemporary.setUserName(userName);
+            userTemporary = userTemporaryService.save(userTemporary);
+            return userTemporary;
+        } else {
+            throw new Exception("UserName does not exist, please try again");
+        }
     }
 
     @Override
@@ -704,7 +662,6 @@ public class AuthServiceImpl implements AuthService {
                 throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_OTP);
             }
 
-
         } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH);
     }
 
@@ -760,11 +717,9 @@ public class AuthServiceImpl implements AuthService {
 
             refreshTokenDto.setToken(tokenProvider.createAccessTokenByRefreshToken(userId, permissions, roleType));
         } else{
-            httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                    "Unauthorized");
+            httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Unauthorized");
         }
         return refreshTokenDto;
     }
-
 
 }

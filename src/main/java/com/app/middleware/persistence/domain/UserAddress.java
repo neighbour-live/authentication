@@ -51,10 +51,10 @@ public class UserAddress extends BaseEntity implements Serializable {
     private String postalCode;
 
     @Column(name ="lat")
-    private float  lat;
+    private Double  lat;
 
     @Column(name ="lng")
-    private float  lng;
+    private Double  lng;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @Builder.Default

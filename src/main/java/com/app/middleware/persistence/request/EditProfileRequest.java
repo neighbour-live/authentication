@@ -36,10 +36,13 @@ public class EditProfileRequest {
     private String bio;
     private String tagLine;
 
+    @Min(-90)
+    @Max(90)
+    private Double lat;
+    @Min(-180)
+    @Max(180)
+    private Double lng;
 
-    //change for stripe connect
-    private float lat;
-    private float lng;
     private String postalCode;
     private String city;
     private String state;

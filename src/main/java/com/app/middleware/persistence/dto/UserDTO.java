@@ -34,8 +34,8 @@ public class UserDTO {
     private String state;
     private String country;
     private String ip;
-    private float lat;
-    private float lng;
+    private Double lat;
+    private Double lng;
     private String apartmentAddress;
 
     private boolean emailVerified;

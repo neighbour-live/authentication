@@ -18,8 +18,8 @@ public class UserResidentialAddressDTO {
     private boolean isDeleted = false;
     private String addressType;
     private String userPublicId;
-    private float lat;
-    private float lng;
+    private Double lat;
+    private Double lng;
     private String addressLine;
     private String apartmentAddress;
     private String country;
