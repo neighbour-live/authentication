@@ -450,6 +450,18 @@ public class AuthServiceImpl implements AuthService {
         return null;
     }
 
+    @Override
+    public UserTemporary confirmUserNamePreRegister(String userName, String publicId) throws Exception {
+        if(checkUserNameExist(userName)){
+            UserTemporary userTemporary = userTemporaryService.findByPublicId(PublicIdGenerator.decodePublicId(publicId));
+            userTemporary.setUserName(userName);
+            userTemporary = userTemporaryService.save(userTemporary);
+            return userTemporary;
+        } else {
+            throw new Exception("UserName does not exist, please try again");
+        }
+    }
+
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public User confirmPhoneNumber(String token, String otp) throws Exception {
@@ -485,29 +497,29 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Boolean checkEmailExist(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
-        if(user.isPresent() == false){
-            return false;
+        User user = userRepository.findByEmailIgnoreCase(email);
+        if(user == null){
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
     public Boolean checkPhoneExist(String phone) {
         User user = userRepository.findByPhoneNumber(phone);
         if(user == null){
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
     public Boolean checkUserNameExist(String userName) {
         User user = userRepository.findByUserName(userName);
         if(user == null){
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)

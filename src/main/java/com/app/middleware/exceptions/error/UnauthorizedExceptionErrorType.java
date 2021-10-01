@@ -5,7 +5,7 @@ import org.springframework.util.StringUtils;
 public enum UnauthorizedExceptionErrorType implements ErrorEnum {
 
     // ------- UnauthorizedExceptionErrorType : 5000 -------- //
-    UNAUTHORIZED_ACTION(5001, "User in not authorized to Perform this Action"),
+    UNAUTHORIZED_ACTION(5001, "User is not authorized to Perform this Action"),
     ;
 
     private Integer errorCode;

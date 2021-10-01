@@ -22,7 +22,6 @@ public class UserTemporaryServiceImpl implements UserTemporaryService {
     @Override
     public UserTemporary findByUser(User user) throws ResourceNotFoundException {
         UserTemporary userTemporary =  userTempRepository.findByPublicId(user.getPublicId());
-        if(userTemporary == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_TEMPORARY_NOT_FOUND_WITH_PUBLIC_ID, PublicIdGenerator.encodedPublicId(user.getPublicId()));
         return  userTemporary;
     }
 

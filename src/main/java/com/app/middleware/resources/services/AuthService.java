@@ -56,4 +56,5 @@ public interface AuthService {
 
     Boolean checkUserNameExist(String userName);
 
+    UserTemporary confirmUserNamePreRegister(String userName, String publicId) throws Exception;
 }

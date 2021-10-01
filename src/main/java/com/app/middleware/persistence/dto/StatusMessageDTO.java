@@ -14,5 +14,4 @@ import lombok.NoArgsConstructor;
 public class StatusMessageDTO {
     private Integer status;
     private String message;
-    private UserTemporaryDTO userTemporary;
 }

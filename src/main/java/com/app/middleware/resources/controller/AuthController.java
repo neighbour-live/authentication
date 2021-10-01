@@ -161,7 +161,6 @@ public class AuthController {
         }
     }
     @PostMapping("/send-email-code")
-    @PreAuthorize("hasRole('USER')")
     @ApiOperation(value = "This operation is used to send email verification.")
     public ResponseEntity<?> sendEmailCodePreRegister(@RequestParam("email") String email, @RequestParam("publicId") String publicId) throws Exception {
         try {
@@ -170,45 +169,16 @@ public class AuthController {
             UserTemporary userTemporary = authService.sendEmailCodePreRegister(email, user);
             return GenericResponseEntity.create(StatusMessageDTO.builder()
                     .message(AuthConstants.VERIFICATION_EMAIL_SENT + email)
-                    .userTemporary(UserMapper.createUserTemporaryDTOLazy(userTemporary))
                     .status(0)
-                    .build(), HttpStatus.CREATED);
+                    .build(),
+                    UserMapper.createUserTemporaryDTOLazy(userTemporary),
+                    HttpStatus.CREATED);
         } catch (Exception e) {
             return ExceptionUtil.handleException(e);
         }
     }
 
-    @PostMapping("/send-phone-code")
-    @PreAuthorize("hasRole('USER')")
-    @ApiOperation(value = "This operation is used to send phone verification.")
-    public ResponseEntity<?> sendPhoneCodePreRegister(@RequestParam("phoneNumber") String phoneNumber) throws Exception {
-        try {
-            User user = new User();
-            user.setPublicId(PublicIdGenerator.generatePublicId());
-            UserTemporary userTemporary = authService.sendPhoneCodePreRegister(phoneNumber, user);
-            return GenericResponseEntity.create(StatusMessageDTO.builder()
-                    .message(AuthConstants.VERIFICATION_OTP_SENT)
-                    .userTemporary(UserMapper.createUserTemporaryDTOLazy(userTemporary))
-                    .status(0)
-                    .build(), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return ExceptionUtil.handleException(e);
-        }
-    }
-
-    @PostMapping("/confirm-phone")
-    @PreAuthorize("hasRole('USER')")
-    @ApiOperation(value = "This operation is used to confirm phone number.")
-    public ResponseEntity<?> confirmPhonePreRegister(@RequestParam("phoneNumber") String phoneNumber, @RequestParam("phoneCode") String phoneCode, @RequestParam("phoneToken") String phoneToken) throws Exception {
-        try {
-            UserTemporary userTemporary = authService.confirmPhonePreRegister(phoneNumber, phoneToken, phoneCode);
-            return GenericResponseEntity.create(StatusCode.SUCCESS, UserMapper.createUserTemporaryDTOLazy(userTemporary), HttpStatus.OK);
-        } catch (Exception e) {
-            return ExceptionUtil.handleException(e);
-        }
-    }
-
-    @GetMapping("/confirm-email")
+    @PostMapping("/confirm-email")
     @ApiOperation(value = "This operation is used to confirm User Email.")
     public ResponseEntity<?> confirmEmailPreRegister(@RequestParam("email") String email, @RequestParam("emailCode") String emailCode, @RequestParam("emailToken") String emailToken) throws Exception {
 
@@ -242,6 +212,35 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/send-phone-code")
+    @ApiOperation(value = "This operation is used to send phone verification.")
+    public ResponseEntity<?> sendPhoneCodePreRegister(@RequestParam("phoneNumber") String phoneNumber) throws Exception {
+        try {
+            User user = new User();
+            user.setPublicId(PublicIdGenerator.generatePublicId());
+            UserTemporary userTemporary = authService.sendPhoneCodePreRegister(phoneNumber, user);
+            return GenericResponseEntity.create(StatusMessageDTO.builder()
+                    .message(AuthConstants.VERIFICATION_OTP_SENT)
+                    .status(0)
+                    .build(),
+                    UserMapper.createUserTemporaryDTOLazy(userTemporary),
+                    HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ExceptionUtil.handleException(e);
+        }
+    }
+
+    @PostMapping("/confirm-phone")
+    @ApiOperation(value = "This operation is used to confirm phone number.")
+    public ResponseEntity<?> confirmPhonePreRegister(@RequestParam("phoneNumber") String phoneNumber, @RequestParam("phoneCode") String phoneCode, @RequestParam("phoneToken") String phoneToken) throws Exception {
+        try {
+            UserTemporary userTemporary = authService.confirmPhonePreRegister(phoneNumber, phoneToken, phoneCode);
+            return GenericResponseEntity.create(StatusCode.SUCCESS, UserMapper.createUserTemporaryDTOLazy(userTemporary), HttpStatus.OK);
+        } catch (Exception e) {
+            return ExceptionUtil.handleException(e);
+        }
+    }
+
     @GetMapping("/check-phone")
     @ApiOperation(value = "This operation is used to check User Phone Number either it's existing or new.")
     public ResponseEntity<?> checkPhone(@RequestParam("phone") String phone) throws Exception {
@@ -253,7 +252,6 @@ public class AuthController {
 
         try {
             Boolean checker = authService.checkPhoneExist(phone);
-
             ResponseEntity response = GenericResponseEntity.create(StatusCode.SUCCESS, checker, HttpStatus.OK);
             loggingService.createLog(null, req.getRemoteAddr(), request, response);
             return response;
@@ -266,25 +264,35 @@ public class AuthController {
     }
 
     @GetMapping("/check-username")
-    @ApiOperation(value = "This operation is used to check username either it's existing or new.")
-    public ResponseEntity<?> checkUserName(@RequestParam("username") String username) throws Exception {
+    @ApiOperation(value = "This operation is used to check userName either it's existing or new.")
+    public ResponseEntity<?> checkUserName(@RequestParam("userName") String userName) throws Exception {
 
         HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         List<String> request = new ArrayList<>();
-        request.add(username);
+        request.add(userName);
         request.add(req.getRemoteAddr());
 
         try {
-            Boolean checker = authService.checkUserNameExist(username);
-
+            Boolean checker = authService.checkUserNameExist(userName);
             ResponseEntity response = GenericResponseEntity.create(StatusCode.SUCCESS, checker, HttpStatus.OK);
             loggingService.createLog(null, req.getRemoteAddr(), request, response);
             return response;
-
         } catch (Exception e) {
             //Send Response and save Log
             loggingService.createLog(null, req.getRemoteAddr(), request, e);
             return ExceptionUtil.handleException(e);
         }
     }
+
+    @PostMapping("/confirm-username")
+    @ApiOperation(value = "This operation is used to confirm username")
+    public ResponseEntity<?> confirmUserNamePreRegister(@RequestParam("userName") String userName, @RequestParam("publicId") String publicId) throws Exception {
+        try {
+            UserTemporary userTemporary = authService.confirmUserNamePreRegister(userName, publicId);
+            return GenericResponseEntity.create(StatusCode.SUCCESS, UserMapper.createUserTemporaryDTOLazy(userTemporary), HttpStatus.OK);
+        } catch (Exception e) {
+            return ExceptionUtil.handleException(e);
+        }
+    }
+
 }

@@ -34,11 +34,18 @@ public class AuthorizationAspect {
 
     private List<String> openUrls = Arrays.asList(
             "/auth/register",
+            "/auth/login",
+//            --------------------
             "/auth/check-email",
             "/auth/check-phone",
-            "/auth/forgot-password",
-            "/auth/login",
+            "/auth/check-username",
+            "/auth/send-email-code",
             "/auth/confirm-email",
+            "/auth/send-phone-code",
+            "/auth/confirm-phone",
+            "/auth/confirm-username",
+            "/auth/forgot-password",
+//            --------------------
             "/error",
             "/v2/api-docs",
             "/swagger-ui",
@@ -48,6 +55,15 @@ public class AuthorizationAspect {
     private List<String> userUrls = Arrays.asList(
             "/auth/change-password",
             "/auth/refresh-token",
+//            ---------------------
+            "/user/confirm-phone-number",
+            "/user/edit-profile",
+            "/user/logout",
+            "/user/me",
+            "/user/profile-completion",
+            "/user/send-email-verification",
+            "/user/send-phone-verification-otp",
+            "/user/verification-status",
             "/bid",
             "/bid/status/([a-zA-Z0-9]+)",
             "/bid/([a-zA-Z0-9]+)",
@@ -75,14 +91,6 @@ public class AuthorizationAspect {
             "/user-wallet/redeem",
             "/user-wallet/transaction/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
             "/user-wallet/transactions",
-            "/user/confirm-phone-number",
-            "/user/edit-profile",
-            "/user/logout",
-            "/user/me",
-            "/user/profile-completion",
-            "/user/send-email-verification",
-            "/user/send-phone-verification-otp",
-            "/user/verification-status",
             "/awards",
             "/awards/user-award",
             "/awards/user-award/([a-zA-Z0-9]+)",
@@ -123,6 +131,14 @@ public class AuthorizationAspect {
     private List<String> moderatorUrls = Arrays.asList(
             "/auth/change-password",
             "/auth/refresh-token",
+            "/user/confirm-phone-number",
+            "/user/edit-profile",
+            "/user/logout",
+            "/user/me",
+            "/user/profile-completion",
+            "/user/send-email-verification",
+            "/user/send-phone-verification-otp",
+            "/user/verification-status",
             "/bid",
             "/bid/status/([a-zA-Z0-9]+)",
             "/bid/([a-zA-Z0-9]+)",
@@ -150,14 +166,6 @@ public class AuthorizationAspect {
             "/user-wallet/redeem",
             "/user-wallet/transaction/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
             "/user-wallet/transactions",
-            "/user/confirm-phone-number",
-            "/user/edit-profile",
-            "/user/logout",
-            "/user/me",
-            "/user/profile-completion",
-            "/user/send-email-verification",
-            "/user/send-phone-verification-otp",
-            "/user/verification-status",
             "/awards",
             "/awards/user-award",
             "/awards/user-award/([a-zA-Z0-9]+)",
@@ -203,7 +211,7 @@ public class AuthorizationAspect {
             "|| @annotation(org.springframework.web.bind.annotation.PatchMapping) " +
             "|| @annotation(org.springframework.web.bind.annotation.DeleteMapping) " +
             "|| @annotation(org.springframework.web.bind.annotation.PutMapping) && args(..)" )
-    public void requestAccessLog() throws UnauthorizedException {
+    public void requestAccessLog() throws Exception {
 
         HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
@@ -232,7 +240,7 @@ public class AuthorizationAspect {
             }
 
             if(throwException){
-                throw new UnauthorizedException(UnauthorizedExceptionErrorType.UNAUTHORIZED_ACTION);
+                throw new Exception("User un-authorized to perform this action");
             }
         }
 
