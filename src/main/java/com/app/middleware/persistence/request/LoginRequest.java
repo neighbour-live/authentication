@@ -15,12 +15,18 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LoginRequest {
-    @NotBlank
+
     @Email(message = "Bad email format.")
     private String email;
+
+    private String username;
+    private String phone;
 
     @NotBlank
     private String password;
 
+    private boolean phoneLogin;
+    private boolean emailLogin;
+    private boolean userNameLogin;
     private String firebaseKey;
 }

@@ -35,7 +35,7 @@
                                   `id` bigint(20) NOT NULL,
                                   `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
                                   `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
-                                  `award_icon` varchar(255) DEFAULT NULL,
+                                  `award_icon` TEXT DEFAULT NULL,
                                   `award_type` ENUM(  'STARTER',
                                                       'EARLY_USER',
                                                       'SPENT_THOUSAND_DOLLARS',
@@ -113,8 +113,8 @@
                                 `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
                                 `ip_address` varchar(255) NOT NULL,
                                 `is_deleted` bit(1) DEFAULT false,
-                                `request` varchar(255) DEFAULT NULL,
-                                `response` varchar(255) DEFAULT NULL,
+                                `request` TEXT DEFAULT NULL,
+                                `response` TEXT DEFAULT NULL,
                                 `user_public_id` bigint(20) NOT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -129,7 +129,7 @@
                                               `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
                                               `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
                                               `description` varchar(255) DEFAULT NULL,
-                                              `icon_path` varchar(255) DEFAULT NULL,
+                                              `icon_path` TEXT DEFAULT NULL,
                                               `is_deleted` bit(1) DEFAULT false ,
                                               `name` varchar(255) DEFAULT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -198,6 +198,7 @@
                                  `currency` varchar(255) DEFAULT NULL,
                                  `dob` varchar(255) DEFAULT NULL,
                                  `email` varchar(255) DEFAULT NULL,
+                                 `user_name` varchar(255) DEFAULT NULL,
                                  `email_token_creation_time` datetime DEFAULT NULL,
                                  `email_verification_token` varchar(255) DEFAULT NULL,
                                  `email_verified` bit(1) DEFAULT NULL,
@@ -219,9 +220,11 @@
                                  `phone_verified` bit(1) DEFAULT NULL,
                                  `postal_code` varchar(255) DEFAULT NULL,
                                  `provider` varchar(255) DEFAULT NULL,
-                                 `provider_id` varchar(255) DEFAULT NULL,
+                                 `provider_id` ENUM('LOCAL','FACEBOOK','GOOGLE') DEFAULT 'LOCAL',
                                  `public_id` bigint(20) DEFAULT NULL,
                                  `refresh_token` varchar(255) DEFAULT NULL,
+                                 `fb_id` varchar(255) DEFAULT NULL,
+                                 `gg_id` varchar(255) DEFAULT NULL,
                                  `state` varchar(255) DEFAULT NULL,
                                  `role_id` bigint(20) DEFAULT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -280,8 +283,8 @@
                                       `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
                                       `is_active` bit(1) DEFAULT true,
                                       `is_deleted` bit(1) DEFAULT false ,
-                                      `message` varchar(255) NOT NULL,
-                                      `message_attributes` varchar(255) NOT NULL,
+                                      `message` TEXT NOT NULL,
+                                      `message_attributes` TEXT NOT NULL,
                                       `public_id` bigint(20) NOT NULL,
                                       `conversation_public_id` bigint(20) DEFAULT NULL,
                                       `receiver_public_id` bigint(20) DEFAULT NULL,
@@ -298,8 +301,8 @@
                                               `id` bigint(20) NOT NULL,
                                               `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
                                               `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
-                                              `actions` varchar(255) DEFAULT NULL,
-                                              `actions_info` varchar(255) DEFAULT NULL,
+                                              `actions` TEXT DEFAULT NULL,
+                                              `actions_info` TEXT DEFAULT NULL,
                                               `is_archived` bit(1) DEFAULT NULL,
                                               `is_deleted` bit(1) DEFAULT NULL,
                                               `is_read` bit(1) DEFAULT NULL,
@@ -323,6 +326,7 @@
                                           `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
                                           `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
                                           `email` varchar(255) DEFAULT NULL,
+                                          `user_name` varchar(255) DEFAULT NULL,
                                           `password` varchar(255) DEFAULT NULL,
                                           `phone_number` varchar(255) DEFAULT NULL,
                                           `user_public_id` bigint(20) DEFAULT NULL
@@ -395,6 +399,7 @@
         ALTER TABLE `users`
             ADD PRIMARY KEY (`id`),
                   ADD UNIQUE KEY `UK_user_email` (`email`) USING BTREE,
+                  ADD UNIQUE KEY `UK_user_user_name` (`user_name`) USING BTREE,
                   ADD UNIQUE KEY `UK_user_refresh_token` (`refresh_token`) USING BTREE,
                   ADD UNIQUE KEY `UK_user_phone` (`phone_number`) USING BTREE,
                   ADD UNIQUE KEY `UK_user_access_token` (`access_token`) USING BTREE,
@@ -445,6 +450,7 @@
             ADD PRIMARY KEY (`id`),
               ADD UNIQUE KEY `UK_user_temporary_phone` (`phone_number`) USING BTREE,
               ADD UNIQUE KEY `UK_user_temporary_email` (`email`) USING BTREE,
+              ADD UNIQUE KEY `UK_user_temporary_user_name` (`user_name`) USING BTREE,
               ADD KEY `FK_user_temporary_user_id` (`user_public_id`) USING BTREE,
               ADD KEY `INDEX_user_temporary_password` (`password`) USING BTREE;
 

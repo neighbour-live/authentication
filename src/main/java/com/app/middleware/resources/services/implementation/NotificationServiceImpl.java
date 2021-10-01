@@ -152,7 +152,7 @@ public class NotificationServiceImpl implements NotificationService {
         Map<String, String> pushData = new HashMap<>();
         pushData.put("messageId", "msgId");
         pushData.put("text", "text");
-        pushData.put("user", "BidOnTask");
+        pushData.put("user", "Neighbour");
         return pushData;
     }
 

@@ -21,6 +21,9 @@ public class UserMapper {
                 .accessToken(user.getAccessToken())
                 .refreshToken(user.getRefreshToken())
                 .email(user.getEmail())
+                .userName(user.getUserName())
+                .fbId((user.getFbId() == null) ? "": user.getFbId())
+                .ggId((user.getGgId() == null) ? "": user.getGgId())
                 .phoneNumber(user.getPhoneNumber())
                 .imageUrl(user.getImageUrl())
                 .emailVerified(user.getEmailVerified())
@@ -54,6 +57,7 @@ public class UserMapper {
                 .publicId(PublicIdGenerator.encodedPublicId(user.getPublicId()))
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
+                .userName(user.getUserName())
                 .imageUrl(user.getImageUrl())
                 .build();
 

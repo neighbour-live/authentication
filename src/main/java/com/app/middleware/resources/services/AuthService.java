@@ -44,4 +44,6 @@ public interface AuthService {
     boolean logout(User user);
 
     RefreshToken getAccessTokenByRefreshToken(RefreshToken refreshToken, HttpServletResponse httpServletResponse) throws Exception;
+
+    Boolean checkUserNameExist(String userName);
 }

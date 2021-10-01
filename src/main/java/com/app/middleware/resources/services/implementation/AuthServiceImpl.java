@@ -86,54 +86,50 @@ public class AuthServiceImpl implements AuthService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public User login(LoginRequest loginRequest) throws Exception {
-        Optional<User> u = userRepository.findByEmail(loginRequest.getEmail().toLowerCase());
-        if(!u.isPresent()) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, loginRequest.getEmail());
+        User user = new User();
+        if((loginRequest.isPhoneLogin() && loginRequest.isUserNameLogin()) || (loginRequest.isPhoneLogin() && loginRequest.isEmailLogin())
+                || (loginRequest.isUserNameLogin() && loginRequest.isEmailLogin()))
+        {
+            throw new Exception("cannot login!");
+        }
+
+        if(loginRequest.isUserNameLogin()){
+            user = userRepository.findByUserName(loginRequest.getUsername());
+            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, loginRequest.getUsername());
+        } else if(loginRequest.isEmailLogin()){
+            user = userRepository.findByEmailIgnoreCase(loginRequest.getEmail().toLowerCase());
+            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, loginRequest.getEmail());
+        } else if(loginRequest.isPhoneLogin()){
+            user = userRepository.findByPhoneNumber(loginRequest.getPhone());
+            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, loginRequest.getPhone());
+        }
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
+                        user.getEmail(),
                         loginRequest.getPassword()
                 )
         );
 
         List<String> permissions = new ArrayList<>();
         String roleType = "";
-        if(!ObjectUtils.isNull(u.get().getRole())){
-            roleType = u.get().getRole().getRoleType().toString();
-            u.get().getRole().getRolePermissions().forEach(rolePermission -> {
+        if(!ObjectUtils.isNull(user.getRole())){
+            roleType = user.getRole().getRoleType().toString();
+            user.getRole().getRolePermissions().forEach(rolePermission -> {
                 permissions.add(rolePermission.getPermission().getPermissionCode());
             });
         }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = tokenProvider.createToken(authentication, permissions, roleType);
-        User user = new User();
         if(!ObjectUtils.isNull(token)){
-            user = userRepository.findByEmailIgnoreCase(loginRequest.getEmail());
             user.setAccessToken(token);
             user.setRefreshToken(tokenProvider.createRefreshToken(user.getId(), permissions, roleType));
             user.setFirebaseKey(loginRequest.getFirebaseKey());
             user = userRepository.save(user);
-
-//            //TEST NOTIFICATION
-//            Map<String,String> actionsInfo =  new HashMap<>();
-//            actionsInfo.put("userPublicId", PublicIdGenerator.encodedPublicId(user.getPublicId()));
-//
-//            UserNotificationRequest userNotificationRequest = UserNotificationRequest.builder()
-//                    .notificationType(NotificationEnum.LOGIN.toString())
-//                    .target("INDIVIDUAL")
-//                    .title("WELCOME TO BOT!")
-//                    .body("LOGIN SUCCESSFULLY!")
-//                    .imageUrl(LOGO_URL)
-//                    .actions(NotificationAction.HOME.name())
-//                    .actionsInfo(actionsInfo)
-//                    .firebaseKey(loginRequest.getFirebaseKey())
-//                    .build();
-//
-//            UserNotification userNotification = notificationService.postUserNotification(userNotificationRequest, user);
-
-            user = userRepository.save(user);
+            return user;
         }
-        return user;
+        throw new Exception("cannot login!");
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -144,9 +140,10 @@ public class AuthServiceImpl implements AuthService {
         user.setFirstName(signUpRequest.getFirstName());
         user.setLastName(signUpRequest.getLastName());
         user.setEmail(signUpRequest.getEmail().toLowerCase());
-        user.setProvider(AuthProvider.local);
+        user.setUserName(signUpRequest.getUserName());
+        user.setProvider(AuthProvider.valueOf(signUpRequest.getProvider()));
         user.setImageUrl(signUpRequest.getImageUrl());
-        user.setPhoneNumber(signUpRequest.getPhoneNumber().toString());
+        user.setPhoneNumber(signUpRequest.getPhoneNumber());
         user.setPublicId(PublicIdGenerator.generatePublicId());
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setFirebaseKey(signUpRequest.getFirebaseKey());
@@ -169,8 +166,19 @@ public class AuthServiceImpl implements AuthService {
         user.setIsBlocked(false);
         user.setIsDeleted(false);
         user.setIsSuspended(false);
-        user.setEmailVerified(false);
-        user.setPhoneVerified(false);
+        // if fb or gg id is present
+        if(!signUpRequest.getFbId().equals(null) && !signUpRequest.getFbId().isEmpty() ) {
+            user.setFbId(signUpRequest.getFbId());
+            user.setEmail(signUpRequest.getFbId() + "@fb.com");
+
+        } else if (!signUpRequest.getGgId().equals(null) && !signUpRequest.getGgId().isEmpty())
+        {
+            user.setGgId(signUpRequest.getGgId());
+            user.setEmail(signUpRequest.getGgId());
+        }
+
+        user.setEmailVerified(signUpRequest.isEmailVerified());
+        user.setPhoneVerified(signUpRequest.isPhoneVerified());
         user.setRole(roleRepository.findByRoleType(RoleType.USER));
 
         UserAddress userAddress = UserAddress.builder()
@@ -193,15 +201,22 @@ public class AuthServiceImpl implements AuthService {
         //saving user's default address
         userAddress = userAddressService.saveAddress(userAddress);
 
-        try {
-            //sending Welcome Email
-            EmailNotificationDto emailNotificationDto = EmailNotificationDto.builder()
-                    .to(user.getEmail())
-                    .template(Constants.EmailTemplate.WELCOME_TEMPLATE.value())
-                    .build();
-            emailService.sendEmailFromExternalApi(emailNotificationDto);
+        //sending Welcome Email
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setSubject("Welcome to Neighbour Live! ");
+        mailMessage.setFrom(EMAIL_FROM);
+        mailMessage.setText("Welcome " + user.getFirstName() + " " + user.getLastName() + "\n"
+                +"We really Appreciate the valuable addition of you into our growing community. \n");
 
-            sendEmailVerification(user.getEmail(), user);
+        emailService.sendEmail(mailMessage);
+//            EmailNotificationDto emailNotificationDto = EmailNotificationDto.builder()
+//                    .to(user.getEmail())
+//                    .template(Constants.EmailTemplate.WELCOME_TEMPLATE.value())
+//                    .build();
+//            emailService.sendEmailFromExternalApi(emailNotificationDto);
+//
+//            sendEmailVerification(user.getEmail(), user);
 
 //            Map<String,String> actionsInfo =  new HashMap<>();
 //            actionsInfo.put("userPublicId", PublicIdGenerator.encodedPublicId(user.getPublicId()));
@@ -210,7 +225,7 @@ public class AuthServiceImpl implements AuthService {
 //                    .notificationType(NotificationEnum.VERIFICATION.toString())
 //                    .target("INDIVIDUAL")
 //                    .title("Email Verification!")
-//                    .body("Verify your email and be noticeable to the BidOnTask community.!")
+//                    .body("Verify your email and be noticeable to the Neighbour community.!")
 //                    .imageUrl(LOGO_URL)
 //                    .actions(NotificationAction.HOME.name())
 //                    .actionsInfo(actionsInfo)
@@ -223,7 +238,7 @@ public class AuthServiceImpl implements AuthService {
 //                    .notificationType(NotificationEnum.VERIFICATION.toString())
 //                    .target("INDIVIDUAL")
 //                    .title("Phone Verification!")
-//                    .body("Verify your phone number and be noticeable to the BidOnTask community.!")
+//                    .body("Verify your phone number and be noticeable to the Neighbour community.!")
 //                    .imageUrl(LOGO_URL)
 //                    .actions(NotificationAction.HOME.name())
 //                    .actionsInfo(actionsInfo)
@@ -236,7 +251,7 @@ public class AuthServiceImpl implements AuthService {
 //                    .notificationType(NotificationEnum.VERIFICATION.toString())
 //                    .target("INDIVIDUAL")
 //                    .title("Wallet Verification!")
-//                    .body("Verify your Wallet information and be noticeable to the BidOnTask community.!")
+//                    .body("Verify your Wallet information and be noticeable to the Neighbour community.!")
 //                    .imageUrl(LOGO_URL)
 //                    .actions(NotificationAction.HOME.name())
 //                    .actionsInfo(actionsInfo)
@@ -258,10 +273,6 @@ public class AuthServiceImpl implements AuthService {
 //
 //            notificationService.postUserNotification(userNotificationRequest, user);
 
-
-        } catch (IOException | ResourceNotFoundException e) {
-            e.printStackTrace();
-        }
 
         return user;
     }
@@ -312,14 +323,22 @@ public class AuthServiceImpl implements AuthService {
         user = userRepository.save(user);
 
         //sending Welcome Email
-        Map<String, String> placeHolders = new HashMap<String, String>();
-        placeHolders.put("dynamic_url", EMAIL_REDIRECTION_URL+"/auth/confirm-email?token="+token);
-        EmailNotificationDto emailNotificationDto = EmailNotificationDto.builder()
-                .to(user.getEmail())
-                .template(Constants.EmailTemplate.DYNAMIC_EMAIL_VERIFICATION_TEMPLATE.value())
-                .placeHolders(placeHolders)
-                .build();
-        emailService.sendEmailFromExternalApi(emailNotificationDto);
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setSubject("Neighbour Live | Email Verification! ");
+        mailMessage.setFrom(EMAIL_FROM);
+        mailMessage.setText("Welcome " +user.getFirstName()+" "+user.getLastName()+ "\n"
+                +"To verify your email, please click on the following link: \n"
+                +EMAIL_REDIRECTION_URL+"/auth/confirm-email?token="+token);
+//        Map<String, String> placeHolders = new HashMap<String, String>();
+//        placeHolders.put("dynamic_url", EMAIL_REDIRECTION_URL+"/auth/confirm-email?token="+token);
+//        EmailNotificationDto emailNotificationDto = EmailNotificationDto.builder()
+//                .to(user.getEmail())
+//                .template(Constants.EmailTemplate.DYNAMIC_EMAIL_VERIFICATION_TEMPLATE.value())
+//                .placeHolders(placeHolders)
+//                .build();
+//        emailService.sendEmailFromExternalApi(emailNotificationDto);
 
         return true;
     }
@@ -337,6 +356,7 @@ public class AuthServiceImpl implements AuthService {
 
         if(user.getPhoneNumber().equals(phoneNumber)){
             String otp = Utility.generateOTP();
+            otp = "0000"; //temporary
             String token = Utility.generateSafeToken() + UUID.randomUUID();
             user.setPhoneVerificationToken(token);
             user.setPhoneVerificationOTP(otp);
@@ -392,6 +412,15 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public Boolean checkPhoneExist(String phone) {
         User user = userRepository.findByPhoneNumber(phone);
+        if(user == null){
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public Boolean checkUserNameExist(String userName) {
+        User user = userRepository.findByUserName(userName);
         if(user == null){
             return false;
         }
@@ -494,7 +523,7 @@ public class AuthServiceImpl implements AuthService {
 
         //Only Update password if requested
         if(editProfileRequest.getUpdatePassword() == 1 && !editProfileRequest.getPassword().equals(null)){
-            if(user.getProvider().equals(AuthProvider.local)){
+            if(user.getProvider().equals(AuthProvider.LOCAL)){
                 if(passwordEncoder.encode(editProfileRequest.getPassword()).equals(user.getPassword())){
                     throw new Exception("New password is similar to last password, try something else for change");
                 }
@@ -505,7 +534,7 @@ public class AuthServiceImpl implements AuthService {
             } else{
                 userTemporary.setPassword(user.getPassword());
                 user.setPassword(passwordEncoder.encode(editProfileRequest.getPassword()));
-                user.setProvider(AuthProvider.local);
+                user.setProvider(AuthProvider.LOCAL);
                 user.setProviderId(null);
             }
 
@@ -528,18 +557,18 @@ public class AuthServiceImpl implements AuthService {
     public boolean forgotPasswordRequest(String email) throws Exception {
         if(checkEmailExist(email)){
             User user  = userRepository.findUserByEmail(email);
-            if(!user.getProvider().equals(AuthProvider.local)){
-                throw new Exception("Cannot change your "+user.getProvider().toString()+" password using BidOnTask.");
+            if(!user.getProvider().equals(AuthProvider.LOCAL)){
+                throw new Exception("Cannot change your "+user.getProvider().toString()+" password using Neighbour.");
             }
             String otp = Utility.generateOTP();
 
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setTo(user.getEmail());
-            mailMessage.setSubject("BidOnTask | Forgot Password Verification!");
+            mailMessage.setSubject("Neighbour | Forgot Password Verification!");
             mailMessage.setFrom(EMAIL_FROM);
             mailMessage.setText("Hi " +user.getFirstName()+" "+user.getLastName()+ "\n"
                     +"To change your password, please send us this following code with your change password request: \n"
-                    +"One Time Secret: " + otp + "\n\n\n\n Regards,\nTeam BidOnTask");
+                    +"One Time Secret: " + otp + "\n\n\n\n Regards,\nTeam Neighbour");
 
             user.setPhoneVerificationOTP(otp);
             userRepository.save(user);
@@ -554,8 +583,8 @@ public class AuthServiceImpl implements AuthService {
         if(checkEmailExist(email)){
             User user  = userRepository.findUserByEmail(email);
 
-            if(!user.getProvider().equals(AuthProvider.local)){
-                throw new Exception("Cannot change your "+user.getProvider().toString()+" password using BidOnTask.");
+            if(!user.getProvider().equals(AuthProvider.LOCAL)){
+                throw new Exception("Cannot change your "+user.getProvider().toString()+" password using Neighbour.");
             }
 
             if(passwordEncoder.matches(newPassword, user.getPassword())){
@@ -565,11 +594,11 @@ public class AuthServiceImpl implements AuthService {
             if(user.getPhoneVerificationOTP().equals(String.valueOf(otp)) && !passwordEncoder.matches(newPassword, user.getPassword())){
                 SimpleMailMessage mailMessage = new SimpleMailMessage();
                 mailMessage.setTo(user.getEmail());
-                mailMessage.setSubject("BidOnTask | Change Password Successfully!");
+                mailMessage.setSubject("Neighbour | Change Password Successfully!");
                 mailMessage.setFrom(EMAIL_FROM);
                 mailMessage.setText("Hi " +user.getFirstName()+" "+user.getLastName()+ "\n"
                         +"Your password has been changed successfully."
-                        +"\n\n\n\n Regards,\nTeam BidOnTask");
+                        +"\n\n\n\n Regards,\nTeam Neighbour");
 
                 user.setPhoneVerificationOTP(null);
                 user.setPassword(passwordEncoder.encode(newPassword));
@@ -589,7 +618,7 @@ public class AuthServiceImpl implements AuthService {
         int profileCompletionPercentage = 0;
 
         //If Valid user - score +20
-        if(user.getProvider().equals(AuthProvider.google) || user.getProvider().equals(AuthProvider.local) || user.getProvider().equals(AuthProvider.facebook)){
+        if(user.getProvider().equals(AuthProvider.GOOGLE) || user.getProvider().equals(AuthProvider.LOCAL) || user.getProvider().equals(AuthProvider.FACEBOOK)){
             profileCompletionPercentage += 40;
         }
 
@@ -641,4 +670,6 @@ public class AuthServiceImpl implements AuthService {
         }
         return refreshTokenDto;
     }
+
+
 }

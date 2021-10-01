@@ -23,6 +23,9 @@ public class UserTemporary extends BaseEntity {
     @Column(unique = true, name ="email")
     private String email;
 
+    @Column(unique = true, name ="user_name")
+    private String userName;
+
     @Column(name ="password")
     private String password;
 

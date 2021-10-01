@@ -17,6 +17,9 @@ public class UserDTO {
     private String lastName;
     private String phoneNumber;
     private String email;
+    private String userName;
+    private String fbId;
+    private String ggId;
     private String accessToken;
     private String refreshToken;
     private String dob;

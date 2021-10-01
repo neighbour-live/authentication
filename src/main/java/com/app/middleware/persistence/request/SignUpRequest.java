@@ -34,7 +34,13 @@ public class SignUpRequest {
     private String email;
 
     @NotBlank
+    private String userName;
+
+    @NotBlank
     private String password;
+
+    @NotBlank(message = "can only be LOCAL, FACEBOOK or GOOGLE")
+    private String provider;
 
     @Length(max = 11, min = 11)
     @Pattern(regexp = "[0-9]{11}", message = "Phone number should be 11 digits long.")
@@ -60,7 +66,7 @@ public class SignUpRequest {
     private String country;
 
     @Length(max = 15, min = 7)
-    @Pattern(regexp = "((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)", message = "i.p. should be in format abc.efg.uvw.xyz")
+    @Pattern(regexp = "((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)", message = "i.p. should be in format 000.000.000.000")
     @NotBlank
     private String ip;
 
@@ -69,10 +75,14 @@ public class SignUpRequest {
     private String dob;
 
     private float lat;
-
     private float lng;
-
     private String apartmentAddress;
 
     private String firebaseKey;
+
+    private String fbId;
+    private String ggId;
+
+    private boolean phoneVerified;
+    private boolean emailVerified;
 }

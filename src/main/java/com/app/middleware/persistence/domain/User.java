@@ -44,6 +44,15 @@ public class User extends BaseEntity  implements Serializable{
     @Column(name ="email", unique = true)
     private String email;
 
+    @Column(name ="user_name", unique = true)
+    private String userName;
+
+    @Column(name ="fb_id", unique = true)
+    private String fbId;
+
+    @Column(name ="gg_id", unique = true)
+    private String ggId;
+
     @Column(name ="phone_number", unique = true)
     private String phoneNumber;
 

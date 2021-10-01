@@ -16,5 +16,6 @@ public class UserMinimalDetailsDTO {
     private String publicId;
     private String firstName;
     private String lastName;
+    private String userName;
     private String imageUrl;
 }

@@ -223,4 +223,27 @@ public class AuthController {
             return ExceptionUtil.handleException(e);
         }
     }
+
+    @GetMapping("/check-username")
+    @ApiOperation(value = "This operation is used to check username either it's existing or new.")
+    public ResponseEntity<?> checkUserName(@RequestParam("username") String username) throws Exception {
+
+        HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        List<String> request = new ArrayList<>();
+        request.add(username);
+        request.add(req.getRemoteAddr());
+
+        try {
+            Boolean checker = authService.checkUserNameExist(username);
+
+            ResponseEntity response = GenericResponseEntity.create(StatusCode.SUCCESS, checker, HttpStatus.OK);
+            loggingService.createLog(null, req.getRemoteAddr(), request, response);
+            return response;
+
+        } catch (Exception e) {
+            //Send Response and save Log
+            loggingService.createLog(null, req.getRemoteAddr(), request, e);
+            return ExceptionUtil.handleException(e);
+        }
+    }
 }
