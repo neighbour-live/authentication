@@ -1,9 +1,11 @@
 package com.app.middleware.persistence.mapper;
 
 import com.app.middleware.persistence.domain.User;
+import com.app.middleware.persistence.domain.UserTemporary;
 import com.app.middleware.persistence.dto.ChatRecipientDTO;
 import com.app.middleware.persistence.dto.UserDTO;
 import com.app.middleware.persistence.dto.UserMinimalDetailsDTO;
+import com.app.middleware.persistence.dto.UserTemporaryDTO;
 import com.app.middleware.utility.id.PublicIdGenerator;
 
 import java.time.format.DateTimeFormatter;
@@ -68,6 +70,21 @@ public class UserMapper {
         List<UserMinimalDetailsDTO> userMinimalDetailsDTOS = new ArrayList<>();
         users.forEach(user -> userMinimalDetailsDTOS.add(createUserMinimalDetailsDTOLazy(user)));
         return userMinimalDetailsDTOS;
+    }
+
+    public static UserTemporaryDTO createUserTemporaryDTOLazy(UserTemporary userTemporary) {
+        UserTemporaryDTO userTemporaryDTO = UserTemporaryDTO.builder()
+                .publicId(PublicIdGenerator.encodedPublicId(userTemporary.getPublicId()))
+                .userName(userTemporary.getUserName() == null ? "" : userTemporary.getUserName() )
+                .phoneNumber(userTemporary.getPhoneNumber() == null ? "" : userTemporary.getPhoneNumber())
+                .phoneToken(userTemporary.getPhoneToken() == null ? "" : userTemporary.getPhoneToken())
+                .email(userTemporary.getEmail() == null ? "" : userTemporary.getEmail())
+                .emailToken(userTemporary.getEmailToken() == null ? "" :  userTemporary.getEmailToken())
+                .emailVerified(userTemporary.getEmailVerified())
+                .phoneVerified(userTemporary.getPhoneVerified())
+                .build();
+
+        return userTemporaryDTO;
     }
 
     public static ChatRecipientDTO createChatRecipientDTOLazy(User user) {

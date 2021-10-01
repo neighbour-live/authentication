@@ -3,6 +3,7 @@ package com.app.middleware.resources.services;
 
 import com.app.middleware.exceptions.type.ResourceNotFoundException;
 import com.app.middleware.persistence.domain.User;
+import com.app.middleware.persistence.domain.UserTemporary;
 import com.app.middleware.persistence.request.EditProfileRequest;
 import com.app.middleware.persistence.request.LoginRequest;
 import com.app.middleware.persistence.request.RefreshToken;
@@ -23,9 +24,17 @@ public interface AuthService {
 
     boolean sendEmailVerification(String email, User user) throws ResourceNotFoundException, IOException;
 
+    UserTemporary sendEmailCodePreRegister(String email, User user) throws ResourceNotFoundException, IOException;
+
+    UserTemporary confirmEmailPreRegister(String email, String emailToken, String emailCode) throws Exception;
+
     String sendPhoneVerificationOTP(String phoneNumber, User user) throws Exception;
 
+    UserTemporary sendPhoneCodePreRegister(String phoneNumber, User user) throws Exception;
+
     User confirmPhoneNumber(String token, String otp) throws Exception;
+
+    UserTemporary confirmPhonePreRegister(String phoneNumber, String token, String otp) throws Exception;
 
     HashMap<Object, Boolean> getUserVerificationStatus(String publicId) throws ResourceNotFoundException;
 
@@ -46,4 +55,5 @@ public interface AuthService {
     RefreshToken getAccessTokenByRefreshToken(RefreshToken refreshToken, HttpServletResponse httpServletResponse) throws Exception;
 
     Boolean checkUserNameExist(String userName);
+
 }

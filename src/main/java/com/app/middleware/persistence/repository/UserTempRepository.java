@@ -9,12 +9,11 @@ import java.util.Collection;
 
 public interface UserTempRepository extends JpaRepository<UserTemporary,Long> {
 
-	UserTemporary findByUser(User user);
-
 	UserTemporary findByPhoneNumber(String phone);
 
 	UserTemporary findByEmailIgnoreCase(String email);
 
     Collection<UserTemporary> findAllByUpdateDateTimeBefore(ZonedDateTime updateDateTime);
 
+    UserTemporary findByPublicId(Long publicId);
 }

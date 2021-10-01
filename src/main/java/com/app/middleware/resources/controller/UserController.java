@@ -53,7 +53,7 @@ public class UserController {
 
     }
 
-    @PostMapping("/send-email-verification")
+    @PostMapping("/send-email-code")
     @PreAuthorize("hasRole('USER')")
     @ApiOperation(value = "This operation is used to send email verification.")
     public ResponseEntity<?> sendEmailVerification(@RequestParam("email") String email, @RequestParam("publicId") String publicId) throws Exception {
@@ -69,7 +69,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/send-phone-verification-otp")
+    @PostMapping("/send-phone-code")
     @PreAuthorize("hasRole('USER')")
     @ApiOperation(value = "This operation is used to send phone verification.")
     public ResponseEntity<?> sendPhoneVerificationOTP(@RequestParam("phoneNumber") String phoneNumber, @RequestParam("publicId") String publicId) throws Exception {

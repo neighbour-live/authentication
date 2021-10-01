@@ -20,8 +20,17 @@ public class UserTemporary extends BaseEntity {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Column(unique = true, updatable = false, nullable = false ,name="public_id")
+    private Long publicId;
+
     @Column(unique = true, name ="email")
     private String email;
+
+    @Column(name ="email_code")
+    private String emailCode;
+
+    @Column(name ="email_token")
+    private String emailToken;
 
     @Column(unique = true, name ="user_name")
     private String userName;
@@ -32,10 +41,19 @@ public class UserTemporary extends BaseEntity {
     @Column(unique = true, name ="phoneNumber")
     private String phoneNumber;
 
-    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @Column(name ="phone_code")
+    private String phoneCode;
+
+    @Column(name ="phone_token")
+    private String phoneToken;
+
+    @Column(name ="email_verified")
     @Builder.Default
-    @JoinColumn(name="user_public_id", referencedColumnName="public_id")
-    private User user;
+    private Boolean emailVerified = false;
+
+    @Column(name ="phone_verified")
+    @Builder.Default
+    private Boolean phoneVerified = false;
 
     public UserTemporary() {}
 }

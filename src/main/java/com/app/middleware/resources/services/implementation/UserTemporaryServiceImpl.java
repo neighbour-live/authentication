@@ -21,7 +21,7 @@ public class UserTemporaryServiceImpl implements UserTemporaryService {
 
     @Override
     public UserTemporary findByUser(User user) throws ResourceNotFoundException {
-        UserTemporary userTemporary =  userTempRepository.findByUser(user);
+        UserTemporary userTemporary =  userTempRepository.findByPublicId(user.getPublicId());
         if(userTemporary == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_TEMPORARY_NOT_FOUND_WITH_PUBLIC_ID, PublicIdGenerator.encodedPublicId(user.getPublicId()));
         return  userTemporary;
     }
@@ -43,7 +43,9 @@ public class UserTemporaryServiceImpl implements UserTemporaryService {
     @Override
     public UserTemporary createTempUser(User user) {
         UserTemporary userTemporary = new UserTemporary();
-        userTemporary.setUser(user);
+        userTemporary.setPublicId(user.getPublicId());
+        userTemporary.setPhoneVerified(false);
+        userTemporary.setEmailVerified(false);
         return userTempRepository.save(userTemporary);
     }
 
@@ -55,5 +57,12 @@ public class UserTemporaryServiceImpl implements UserTemporaryService {
     @Override
     public Collection<UserTemporary> findAllByUpdateDateTimeBefore(ZonedDateTime updateDateTime) {
         return userTempRepository.findAllByUpdateDateTimeBefore(updateDateTime);
+    }
+
+    @Override
+    public UserTemporary findByPublicId(Long publicId) throws ResourceNotFoundException {
+        UserTemporary userTemporary = userTempRepository.findByPublicId(publicId);
+        if(userTemporary == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_TEMPORARY_NOT_FOUND_WITH_PUBLIC_ID);
+        return userTemporary;
     }
 }

@@ -20,4 +20,7 @@ public interface UserTemporaryService {
     UserTemporary save(UserTemporary userTemporary);
 
     Collection<UserTemporary> findAllByUpdateDateTimeBefore(ZonedDateTime updateDateTime);
+
+    UserTemporary findByPublicId(Long publicId) throws ResourceNotFoundException;
+
 }

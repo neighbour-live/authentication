@@ -137,6 +137,9 @@ public class AuthServiceImpl implements AuthService {
     public User register(SignUpRequest signUpRequest) throws Exception {
 
         User user = new User();
+
+        UserTemporary userTemporary = userTemporaryService.findByPublicId(user.getPublicId());
+
         user.setFirstName(signUpRequest.getFirstName());
         user.setLastName(signUpRequest.getLastName());
         user.setEmail(signUpRequest.getEmail().toLowerCase());
@@ -195,10 +198,8 @@ public class AuthServiceImpl implements AuthService {
                 .user(user)
                 .build();
 
-        //saving user
+
         user = userRepository.save(user);
-        UserTemporary userTemporary = userTemporaryService.createTempUser(user);
-        //saving user's default address
         userAddress = userAddressService.saveAddress(userAddress);
 
         //sending Welcome Email
@@ -277,6 +278,85 @@ public class AuthServiceImpl implements AuthService {
         return user;
     }
 
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Override
+    public UserTemporary sendEmailCodePreRegister(String email, User user) throws ResourceNotFoundException, IOException {
+
+        UserTemporary userTemporary = userTemporaryService.findByUser(user);
+        if(userTemporary == null) {
+            userTemporary = userTemporaryService.createTempUser(user);
+        }
+
+        String token = Utility.generateSafeToken() + UUID.randomUUID();
+        String otp = "0000";
+        userTemporary.setEmail(email);
+        userTemporary.setEmailCode(otp);
+        userTemporary.setEmailToken(token);
+        userTemporary = userTemporaryService.save(userTemporary);
+
+        //sending Welcome Email
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setSubject("Neighbour Live | Email Verification! ");
+        mailMessage.setFrom(EMAIL_FROM);
+        mailMessage.setText("Welcome " +user.getFirstName()+" "+user.getLastName()+ "\n"
+                +"To verify your email, please use the following code: "+ otp);
+
+        return userTemporary;
+    }
+
+    @Override
+    public UserTemporary confirmEmailPreRegister(String email, String emailToken, String emailCode) throws Exception {
+        UserTemporary userTemporary = userTemporaryService.findByEmailIgnoreCase(email);
+        if(userTemporary == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, email);
+        if(userTemporary.getEmailToken().equals(emailToken) && userTemporary.getEmailCode().equals(emailCode))
+        {
+            //check if OTP is expired
+            ZonedDateTime timeNow = ZonedDateTime.now();
+            if(userTemporary.getUpdateDateTime().plusSeconds(Long.parseLong(OTP_EXPIRY_TIME)).isBefore(timeNow)){
+                throw new Exception("Email Code expired, please try again.");
+            }
+
+            userTemporary.setEmailToken(null);
+            userTemporary.setEmailCode(null);
+            userTemporary.setEmailVerified(true);
+            userTemporary = userTemporaryService.save(userTemporary);
+            return userTemporary;
+        }
+        return null;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Override
+    public boolean sendEmailVerification(String email, User user) throws ResourceNotFoundException, IOException {
+
+        UserTemporary userTemporary = userTemporaryService.findByUser(user);
+        if(userTemporary == null) {
+            userTemporary = userTemporaryService.createTempUser(user);
+        }
+
+        userTemporary.setEmail(user.getEmail());
+        userTemporary = userTemporaryService.save(userTemporary);
+
+        String token = Utility.generateSafeToken() + UUID.randomUUID();
+
+        token = "0000";
+        user.setEmailVerificationToken(token);
+        user = userRepository.save(user);
+
+        //sending Welcome Email
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setSubject("Neighbour Live | Email Verification! ");
+        mailMessage.setFrom(EMAIL_FROM);
+        mailMessage.setText("Welcome " +user.getFirstName()+" "+user.getLastName()+ "\n"
+                +"To verify your email, please use the following code: "+ token);
+        return true;
+    }
+
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public User confirmEmail(String token) throws Exception {
@@ -306,41 +386,22 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
-    public boolean sendEmailVerification(String email, User user) throws ResourceNotFoundException, IOException {
+    public UserTemporary sendPhoneCodePreRegister(String phoneNumber, User user) throws Exception {
 
         UserTemporary userTemporary = userTemporaryService.findByUser(user);
         if(userTemporary == null) {
             userTemporary = userTemporaryService.createTempUser(user);
         }
+        userTemporary.setPhoneNumber(phoneNumber);
 
-        userTemporary.setEmail(user.getEmail());
-        userTemporary = userTemporaryService.save(userTemporary);
-
+        String otp = Utility.generateOTP();
+        otp = "0000"; //temporary
         String token = Utility.generateSafeToken() + UUID.randomUUID();
-
-
-        user.setEmailVerificationToken(token);
-        user = userRepository.save(user);
-
-        //sending Welcome Email
-
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(user.getEmail());
-        mailMessage.setSubject("Neighbour Live | Email Verification! ");
-        mailMessage.setFrom(EMAIL_FROM);
-        mailMessage.setText("Welcome " +user.getFirstName()+" "+user.getLastName()+ "\n"
-                +"To verify your email, please click on the following link: \n"
-                +EMAIL_REDIRECTION_URL+"/auth/confirm-email?token="+token);
-//        Map<String, String> placeHolders = new HashMap<String, String>();
-//        placeHolders.put("dynamic_url", EMAIL_REDIRECTION_URL+"/auth/confirm-email?token="+token);
-//        EmailNotificationDto emailNotificationDto = EmailNotificationDto.builder()
-//                .to(user.getEmail())
-//                .template(Constants.EmailTemplate.DYNAMIC_EMAIL_VERIFICATION_TEMPLATE.value())
-//                .placeHolders(placeHolders)
-//                .build();
-//        emailService.sendEmailFromExternalApi(emailNotificationDto);
-
-        return true;
+        userTemporary.setPhoneCode(otp);
+        userTemporary.setPhoneToken(token);
+        userTemporary = userTemporaryService.save(userTemporary);
+        smsService.sendOTPMessage(otp, phoneNumber);
+        return userTemporary;
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -363,6 +424,28 @@ public class AuthServiceImpl implements AuthService {
             user = userRepository.save(user);
             smsService.sendOTPMessage(otp, phoneNumber);
             return user.getPhoneVerificationToken();
+        }
+        return null;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Override
+    public UserTemporary confirmPhonePreRegister(String phoneNumber, String token, String otp) throws Exception {
+        UserTemporary userTemporary = userTemporaryService.findByPhoneNumber(phoneNumber);
+        if(userTemporary == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, phoneNumber);
+        if(userTemporary.getPhoneToken().equals(token) && userTemporary.getPhoneCode().equals(otp))
+        {
+            //check if OTP is expired
+            ZonedDateTime timeNow = ZonedDateTime.now();
+            if(userTemporary.getUpdateDateTime().plusSeconds(Long.parseLong(OTP_EXPIRY_TIME)).isBefore(timeNow)){
+                throw new Exception("Phone Code expired, please try again.");
+            }
+
+            userTemporary.setPhoneToken(null);
+            userTemporary.setPhoneCode(null);
+            userTemporary.setPhoneVerified(true);
+            userTemporary = userTemporaryService.save(userTemporary);
+            return userTemporary;
         }
         return null;
     }

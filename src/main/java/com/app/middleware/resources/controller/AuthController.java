@@ -2,6 +2,7 @@ package com.app.middleware.resources.controller;
 
 import com.app.middleware.exceptions.ExceptionUtil;
 import com.app.middleware.persistence.domain.User;
+import com.app.middleware.persistence.domain.UserTemporary;
 import com.app.middleware.persistence.dto.StatusMessageDTO;
 import com.app.middleware.persistence.dto.UserDTO;
 import com.app.middleware.persistence.mapper.UserMapper;
@@ -13,10 +14,12 @@ import com.app.middleware.resources.services.AuthService;
 import com.app.middleware.resources.services.LoggingService;
 import com.app.middleware.utility.AuthConstants;
 import com.app.middleware.utility.StatusCode;
+import com.app.middleware.utility.id.PublicIdGenerator;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -157,24 +160,62 @@ public class AuthController {
             return ExceptionUtil.handleException(e);
         }
     }
+    @PostMapping("/send-email-code")
+    @PreAuthorize("hasRole('USER')")
+    @ApiOperation(value = "This operation is used to send email verification.")
+    public ResponseEntity<?> sendEmailCodePreRegister(@RequestParam("email") String email, @RequestParam("publicId") String publicId) throws Exception {
+        try {
+            User user = new User();
+            user.setPublicId(PublicIdGenerator.decodePublicId(publicId));
+            UserTemporary userTemporary = authService.sendEmailCodePreRegister(email, user);
+            return GenericResponseEntity.create(StatusMessageDTO.builder()
+                    .message(AuthConstants.VERIFICATION_EMAIL_SENT + email)
+                    .userTemporary(UserMapper.createUserTemporaryDTOLazy(userTemporary))
+                    .status(0)
+                    .build(), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ExceptionUtil.handleException(e);
+        }
+    }
+
+    @PostMapping("/send-phone-code")
+    @PreAuthorize("hasRole('USER')")
+    @ApiOperation(value = "This operation is used to send phone verification.")
+    public ResponseEntity<?> sendPhoneCodePreRegister(@RequestParam("phoneNumber") String phoneNumber) throws Exception {
+        try {
+            User user = new User();
+            user.setPublicId(PublicIdGenerator.generatePublicId());
+            UserTemporary userTemporary = authService.sendPhoneCodePreRegister(phoneNumber, user);
+            return GenericResponseEntity.create(StatusMessageDTO.builder()
+                    .message(AuthConstants.VERIFICATION_OTP_SENT)
+                    .userTemporary(UserMapper.createUserTemporaryDTOLazy(userTemporary))
+                    .status(0)
+                    .build(), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ExceptionUtil.handleException(e);
+        }
+    }
+
+    @PostMapping("/confirm-phone")
+    @PreAuthorize("hasRole('USER')")
+    @ApiOperation(value = "This operation is used to confirm phone number.")
+    public ResponseEntity<?> confirmPhonePreRegister(@RequestParam("phoneNumber") String phoneNumber, @RequestParam("phoneCode") String phoneCode, @RequestParam("phoneToken") String phoneToken) throws Exception {
+        try {
+            UserTemporary userTemporary = authService.confirmPhonePreRegister(phoneNumber, phoneToken, phoneCode);
+            return GenericResponseEntity.create(StatusCode.SUCCESS, UserMapper.createUserTemporaryDTOLazy(userTemporary), HttpStatus.OK);
+        } catch (Exception e) {
+            return ExceptionUtil.handleException(e);
+        }
+    }
 
     @GetMapping("/confirm-email")
     @ApiOperation(value = "This operation is used to confirm User Email.")
-    public ResponseEntity<?> confirmEmail(@RequestParam("token") String token) throws Exception {
-
-        HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        List<String> request = new ArrayList<>();
-        request.add(token);
-        request.add(req.getRemoteAddr());
+    public ResponseEntity<?> confirmEmailPreRegister(@RequestParam("email") String email, @RequestParam("emailCode") String emailCode, @RequestParam("emailToken") String emailToken) throws Exception {
 
         try {
-            User user = authService.confirmEmail(token);
-            ResponseEntity response = GenericResponseEntity.create(StatusCode.SUCCESS, UserMapper.createUserDTOLazy(user), HttpStatus.OK);
-            loggingService.createLog(null, req.getRemoteAddr(), request, response);
-            return response;
+            UserTemporary userTemporary  = authService.confirmEmailPreRegister(email, emailToken, emailCode);
+            return GenericResponseEntity.create(StatusCode.SUCCESS, UserMapper.createUserTemporaryDTOLazy(userTemporary), HttpStatus.OK);
         } catch (Exception e) {
-            //Send Response and save Log
-            loggingService.createLog(null, req.getRemoteAddr(), request, e);
             return ExceptionUtil.handleException(e);
         }
     }
