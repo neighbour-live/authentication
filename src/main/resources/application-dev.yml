@@ -1,16 +1,16 @@
 server:
-  ssl:
-    key-store: classpath:test.p12
-    key-store-type: PKCS12
-    key-store-password: test
-    enabled: true
+#  ssl:
+#    key-store: classpath:test.p12
+#    key-store-type: PKCS12
+#    key-store-password: test
+#    enabled: true
   port: 8443
 
 spring:
   datasource:
     driver-class-name:
-    url: jdbc:mysql://localhost:3306/users_schema
-    username: root
+    url: jdbc:mysql://neighbourhub-writer.ct5upsnvglvr.eu-central-1.rds.amazonaws.com:3306/users_schema
+    username: admin
     password:
     dbcp2:
       driver-class-name: com.mysql.jdbc.Driver
@@ -42,8 +42,8 @@ spring:
             enable: true
             required: true
   liquibase:
-    url: jdbc:mysql://localhost:3306/users_schema
-    user: root
+    url: jdbc:mysql://neighbourhub-writer.ct5upsnvglvr.eu-central-1.rds.amazonaws.com:3306/users_schema
+    user: admin
     password:
     enabled: true
     change-log: db-liquibase/liquibase-changeLog.xml
@@ -64,7 +64,7 @@ app:
 
 
 email:
-  redirection: https://neighbour.live:8443
+  redirection: https://ec2-35-156-85-34.eu-central-1.compute.amazonaws.com:8443
   api-key: B0RSG.Abzf8Ozws-lJsrl1NjuWbIvww9j94bWesvysZIYfBg.SlUGaqMovZnAy7qbvmS1
   from: neighbourlivemal@gmail.com
 firebase:
