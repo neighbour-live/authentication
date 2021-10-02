@@ -5,11 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.json.JSONObject;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor
@@ -27,12 +27,14 @@ public class AddUserAddressRequest {
     @NotBlank
     private String userPublicId;
 
+    @NotNull
     @Min(-90)
     @Max(90)
-    private Double lat;
+    private float lat;
+    @NotNull
     @Min(-180)
     @Max(180)
-    private Double lng;
+    private float lng;
 
 
     @NotBlank

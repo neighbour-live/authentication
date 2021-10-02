@@ -229,6 +229,7 @@ public class AuthServiceImpl implements AuthService {
 
         user = userRepository.save(user);
         userAddress = userAddressService.saveAddress(userAddress);
+        userTemporaryService.delete(userTemporary);
 
         //sending Welcome Email
         SimpleMailMessage mailMessage = new SimpleMailMessage();

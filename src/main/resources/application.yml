@@ -14,7 +14,7 @@ logging:
     name: /var/log/app/app.log
 
 logo-url: www.google.com
-otp-expiry-time: 100
+otp-expiry-time: 300
 email-token-expiry-time: 86400
 
 

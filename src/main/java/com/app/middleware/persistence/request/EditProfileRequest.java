@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.*;
 
 @Data
@@ -36,12 +35,14 @@ public class EditProfileRequest {
     private String bio;
     private String tagLine;
 
+    @NotNull
     @Min(-90)
     @Max(90)
-    private Double lat;
+    private float lat;
+    @NotNull
     @Min(-180)
     @Max(180)
-    private Double lng;
+    private float lng;
 
     private String postalCode;
     private String city;

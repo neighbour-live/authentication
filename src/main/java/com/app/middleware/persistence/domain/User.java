@@ -141,10 +141,10 @@ public class User extends BaseEntity  implements Serializable{
     private String  currency;
 
     @Column(name ="lat")
-    private Double  lat;
+    private float  lat;
 
     @Column(name ="lng")
-    private Double  lng;
+    private float  lng;
 
     @Column(name ="ip")
     private String  ip;

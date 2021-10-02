@@ -1,19 +1,12 @@
 package com.app.middleware.persistence.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.firebase.database.annotations.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-import org.json.JSONObject;
-
-import javax.annotation.Nullable;
-import javax.persistence.Column;
 import javax.validation.constraints.*;
-import javax.ws.rs.Encoded;
-import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
@@ -50,11 +43,11 @@ public class SignUpRequest {
     @NotNull
     @Min(-90)
     @Max(90)
-    private Double lat;
+    private float lat;
     @NotNull
     @Min(-180)
     @Max(180)
-    private Double lng;
+    private float lng;
 
 
     @NotBlank(message = "User publicId is required")

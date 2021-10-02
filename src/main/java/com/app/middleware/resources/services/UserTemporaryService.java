@@ -23,4 +23,5 @@ public interface UserTemporaryService {
 
     UserTemporary findByPublicId(Long publicId) throws ResourceNotFoundException;
 
+    boolean delete(UserTemporary userTemporary);
 }

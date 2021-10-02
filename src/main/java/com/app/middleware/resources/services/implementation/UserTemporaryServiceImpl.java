@@ -64,4 +64,10 @@ public class UserTemporaryServiceImpl implements UserTemporaryService {
         if(userTemporary == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_TEMPORARY_NOT_FOUND_WITH_PUBLIC_ID);
         return userTemporary;
     }
+
+    @Override
+    public boolean delete(UserTemporary userTemporary) {
+        userTempRepository.delete(userTemporary);
+        return true;
+    }
 }

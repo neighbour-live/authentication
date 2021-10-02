@@ -22,7 +22,6 @@ public class Scheduler {
 
     @Autowired
     private UserTemporaryService userTemporaryService;
-
     //Running every 5 minutes
 //    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 //    @Scheduled(cron = "0/30 * * * * ?")
