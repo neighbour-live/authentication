@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.*;
 
@@ -23,6 +24,10 @@ public class EditProfileRequest {
 
     private String lastName;
 
+    private String gender;
+
+    private String userName;
+
     @Email(message = "Bad email format.")
     private String email;
 
@@ -32,8 +37,6 @@ public class EditProfileRequest {
 
     private String imageUrl;
     private String password;
-    private String bio;
-    private String tagLine;
 
     @NotNull
     @Min(-90)
@@ -58,29 +61,12 @@ public class EditProfileRequest {
     @Length(max = 10)
     private String dob;
 
-    @Max(value = 1, message = "updatePassword can be true(1) or false(0)")
-    @Min(value = 0, message = "updatePassword can be true(1) or false(0)")
-    @NotNull
-    private int updatePassword;
-
-    @Max(value = 1, message = "updatePhoneNumber can be true(1) or false(0)")
-    @Min(value = 0, message = "updatePhoneNumber can be true(1) or false(0)")
-    @NotNull
-    private int updatePhoneNumber;
-
-    @Max(value = 1, message = "updateEmail can be true(1) or false(0)")
-    @Min(value = 0, message = "updateEmail can be true(1) or false(0)")
-    @NotNull
-    private int updateEmail;
-
-    @Max(value = 1, message = "updatePersonalDetails can be true(1) or false(0)")
-    @Min(value = 0, message = "updatePersonalDetails can be true(1) or false(0)")
-    @NotNull
-    private int updatePersonalDetails;
-
-    @Max(value = 1, message = "updateAddressDetails can be true(1) or false(0)")
-    @Min(value = 0, message = "updateAddressDetails can be true(1) or false(0)")
-    @NotNull
-    private int updateAddressDetails;
+    private Boolean updateUserName;
+    private Boolean updatePassword;
+    private Boolean updatePhoneNumber;
+    private Boolean updateEmail;
+    private Boolean updatePersonalDetails;
+    private Boolean emailVerified;
+    private  Boolean updateAddressDetails;
 
 }

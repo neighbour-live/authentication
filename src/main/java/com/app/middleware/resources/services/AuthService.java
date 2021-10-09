@@ -20,7 +20,7 @@ public interface AuthService {
 
     User register(SignUpRequest signUpRequest) throws Exception;
 
-    User confirmEmail(String emailVerificationToken) throws Exception;
+    User confirmEmail(String emailVerificationToken, String emailCode) throws Exception;
 
     boolean sendEmailVerification(String email, User user) throws ResourceNotFoundException, IOException;
 
@@ -32,7 +32,7 @@ public interface AuthService {
 
     UserTemporary sendPhoneCodePreRegister(String phoneNumber, User user) throws Exception;
 
-    User confirmPhoneNumber(String token, String otp) throws Exception;
+    User confirmPhoneNumber(String phoneNumber, String otp) throws Exception;
 
     UserTemporary confirmPhonePreRegister(String phoneNumber, String token, String otp) throws Exception;
 

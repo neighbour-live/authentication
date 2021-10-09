@@ -5,7 +5,6 @@ import com.app.middleware.exceptions.type.ResourceNotFoundException;
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserAddress;
 import com.app.middleware.persistence.domain.UserTemporary;
-import com.app.middleware.persistence.dto.EmailNotificationDto;
 import com.app.middleware.persistence.repository.RoleRepository;
 import com.app.middleware.persistence.repository.UserRepository;
 import com.app.middleware.persistence.request.*;
@@ -13,7 +12,6 @@ import com.app.middleware.persistence.type.*;
 import com.app.middleware.resources.services.*;
 import com.app.middleware.security.TokenProvider;
 import com.app.middleware.utility.AuthConstants;
-import com.app.middleware.utility.Constants;
 import com.app.middleware.utility.ObjectUtils;
 import com.app.middleware.utility.Utility;
 import com.app.middleware.utility.id.PublicIdGenerator;
@@ -196,6 +194,11 @@ public class AuthServiceImpl implements AuthService {
         user.setFirebaseKey(signUpRequest.getFirebaseKey());
         user.setIp(signUpRequest.getIp());
         user.setDob(signUpRequest.getDob());
+        if(signUpRequest.getGender().equals(Gender.M.name()) || signUpRequest.getGender().equals(Gender.F.name())){
+            user.setGender(Gender.valueOf(signUpRequest.getGender()));
+        } else {
+            user.setGender(Gender.O);
+        }
 
         user.setAddressLine(signUpRequest.getAddressLine());
         user.setApartmentAddress(signUpRequest.getApartmentAddress());
@@ -253,7 +256,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String token = Utility.generateSafeToken() + UUID.randomUUID();
-        String otp = "0000";
+        String otp = Utility.generateOTP();
         userTemporary.setEmail(email);
         userTemporary.setEmailCode(otp);
         userTemporary.setEmailToken(token);
@@ -301,9 +304,9 @@ public class AuthServiceImpl implements AuthService {
         userTemporary.setEmail(user.getEmail());
         userTemporary = userTemporaryService.save(userTemporary);
 
-        String token = Utility.generateSafeToken() + UUID.randomUUID();
-        token = "0000";
-        user.setEmailVerificationToken(token);
+        String otp = Utility.generateSafeToken() + UUID.randomUUID();
+        otp = "0000";
+        user.setEmailVerificationToken(otp);
         user = userRepository.save(user);
 
         //sending Welcome Email
@@ -312,16 +315,16 @@ public class AuthServiceImpl implements AuthService {
         mailMessage.setTo(user.getEmail());
         mailMessage.setSubject("Neighbour Live | Email Verification! ");
         mailMessage.setFrom(EMAIL_FROM);
-        mailMessage.setText("Welcome " +user.getFirstName()+" "+user.getLastName()+ "\n" +"To verify your email, please use the following code: "+ token);
+        mailMessage.setText("Welcome " +user.getFirstName()+" "+user.getLastName()+ "\n" +"To verify your email, please use the following code: "+ otp);
         return true;
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
-    public User confirmEmail(String token) throws Exception {
-        User user = userRepository.findByEmailVerificationToken(token);
-        if(user == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, token);
-        if(user.getEmailVerificationToken().equals(token))
+    public User confirmEmail(String email, String emailCode) throws Exception {
+        User user = userRepository.findByEmailIgnoreCase(email);
+        if(user == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, email);
+        if(user.getEmailVerificationToken().equals(emailCode))
         {
             //check if OTP is expired
             ZonedDateTime timeNow = ZonedDateTime.now();
@@ -399,8 +402,7 @@ public class AuthServiceImpl implements AuthService {
         if(user.getPhoneNumber().equals(phoneNumber)){
             String otp = Utility.generateOTP();
             otp = "0000"; //temporary
-            String token = Utility.generateSafeToken() + UUID.randomUUID();
-            user.setPhoneVerificationToken(token);
+            user.setPhoneVerificationToken(otp);
             user.setPhoneVerificationOTP(otp);
             user = userRepository.save(user);
             smsService.sendOTPMessage(otp, phoneNumber);
@@ -411,10 +413,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
-    public User confirmPhoneNumber(String token, String otp) throws Exception {
-        User user = userRepository.findByPhoneVerificationToken(token);
+    public User confirmPhoneNumber(String phoneNumber, String otp) throws Exception {
+        User user = userRepository.findByPhoneNumber(phoneNumber);
         if(user == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, otp);
-        if(user.getPhoneVerificationToken().equals(token) && user.getPhoneVerificationOTP().equals(otp))
+        if(user.getPhoneVerificationOTP().equals(otp))
         {
             //check if OTP is expired
             ZonedDateTime timeNow = ZonedDateTime.now();
@@ -488,16 +490,27 @@ public class AuthServiceImpl implements AuthService {
         if(userTemporary == null) {
             userTemporary = userTemporaryService.createTempUser(user);
         }
+
+        if(editProfileRequest.getUpdateUserName() && (!editProfileRequest.getUserName().isEmpty())){
+            if(checkUserNameExist(editProfileRequest.getUserName())){
+                user.setUserName(editProfileRequest.getUserName());
+            }
+        }
         //Only update personal details if requested
-        if(editProfileRequest.getUpdatePersonalDetails() == 1){
-            user.setFirstName(editProfileRequest.getFirstName());
-            user.setLastName(editProfileRequest.getLastName());
-            user.setImageUrl(editProfileRequest.getImageUrl());
-            user.setDob(editProfileRequest.getDob());
+        if(editProfileRequest.getUpdatePersonalDetails()){
+            user.setFirstName(editProfileRequest.getFirstName() == null ? user.getFirstName() : editProfileRequest.getFirstName());
+            user.setLastName(editProfileRequest.getLastName() == null ? user.getLastName() : editProfileRequest.getLastName());
+            user.setImageUrl(editProfileRequest.getImageUrl() == null ? user.getImageUrl() : editProfileRequest.getImageUrl());
+            user.setDob(editProfileRequest.getDob() == null ? user.getDob() : editProfileRequest.getDob());
+            if(editProfileRequest.getGender().equals(Gender.M.name()) || editProfileRequest.getGender().equals(Gender.F.name())){
+                user.setGender(Gender.valueOf(editProfileRequest.getGender()));
+            } else {
+                user.setGender(Gender.O);
+            }
         }
 
         //Only update Phone number if requested
-        if(editProfileRequest.getUpdatePhoneNumber() == 1 && !user.getPhoneNumber().equals(editProfileRequest.getPhoneNumber())){
+        if(editProfileRequest.getUpdatePhoneNumber() && !user.getPhoneNumber().equals(editProfileRequest.getPhoneNumber())){
             User u = userRepository.findByPhoneNumber(editProfileRequest.getPhoneNumber());
             if(u == null){
                 user.setPhoneVerified(false);
@@ -506,12 +519,12 @@ public class AuthServiceImpl implements AuthService {
                 user.setPhoneNumber(editProfileRequest.getPhoneNumber());
             } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_ALREADY_EXIST_WITH_PHONE);
 
-            String response = AuthConstants.VERIFICATION_OTP_SENT + sendPhoneVerificationOTP(user.getPhoneNumber(), user);
+            String response = AuthConstants.VERIFICATION_OTP_SENT;
             return response;
         }
 
         //Only Update email if requested
-        if(editProfileRequest.getUpdateEmail() == 1 && user.getEmail().equals(editProfileRequest.getEmail())){
+        if(editProfileRequest.getUpdateEmail() && !user.getEmail().equals(editProfileRequest.getEmail())){
             Optional<User> u = userRepository.findByEmail(editProfileRequest.getEmail());
             if(u.isPresent() == false){
                 user.setEmailVerificationToken(null);
@@ -520,13 +533,12 @@ public class AuthServiceImpl implements AuthService {
             } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_ALREADY_EXIST_WITH_EMAIL);
 
             sendEmailVerification(user.getEmail(), user);
-
-            String response = AuthConstants.VERIFICATION_EMAIL_SENT;
+            String response = AuthConstants.VERIFICATION_EMAIL_SENT + editProfileRequest.getEmail();
             return response;
         }
 
         //Only Update address if requested
-        if(editProfileRequest.getUpdateAddressDetails() == 1 &&  (!user.getApartmentAddress().equals(editProfileRequest.getApartmentAddress()) || !user.getAddressLine().equals(editProfileRequest.getAddressLine()))){
+        if(editProfileRequest.getUpdateAddressDetails()  &&  (!user.getApartmentAddress().equals(editProfileRequest.getApartmentAddress()) || !user.getAddressLine().equals(editProfileRequest.getAddressLine()))){
 
             if(editProfileRequest.getAddressLine() == null || editProfileRequest.getApartmentAddress() == null || editProfileRequest.getIp() == null || editProfileRequest.getDob() == null
                 || editProfileRequest.getPostalCode() == null || editProfileRequest.getCity() == null || editProfileRequest.getState() == null || editProfileRequest.getCountry() == null
@@ -576,7 +588,7 @@ public class AuthServiceImpl implements AuthService {
 
 
         //Only Update password if requested
-        if(editProfileRequest.getUpdatePassword() == 1 && !editProfileRequest.getPassword().equals(null)){
+        if(editProfileRequest.getUpdatePassword() && !editProfileRequest.getPassword().equals(null)){
             if(user.getProvider().equals(AuthProvider.LOCAL)){
                 if(passwordEncoder.encode(editProfileRequest.getPassword()).equals(user.getPassword())){
                     throw new Exception("New password is similar to last password, try something else for change");
@@ -609,7 +621,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public boolean forgotPasswordRequest(String email) throws Exception {
-        if(checkEmailExist(email)){
+        if(!checkEmailExist(email)){
             User user  = userRepository.findUserByEmail(email);
             if(!user.getProvider().equals(AuthProvider.LOCAL)){
                 throw new Exception("Cannot change your "+user.getProvider().toString()+" password using Neighbour.");
@@ -627,14 +639,14 @@ public class AuthServiceImpl implements AuthService {
             user.setPhoneVerificationOTP(otp);
             userRepository.save(user);
             emailService.sendEmail(mailMessage);
-            smsService.sendOTPMessage(otp, user.getPhoneNumber());
+                smsService.sendOTPMessage(otp, user.getPhoneNumber());
             return true;
-        } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH);
+        } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, email);
     }
 
     @Override
     public boolean changePassword(String email, String newPassword, BigInteger otp) throws Exception {
-        if(checkEmailExist(email)){
+        if(!checkEmailExist(email)){
             User user  = userRepository.findUserByEmail(email);
 
             if(!user.getProvider().equals(AuthProvider.LOCAL)){
@@ -663,7 +675,7 @@ public class AuthServiceImpl implements AuthService {
                 throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_OTP);
             }
 
-        } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH);
+        } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, email);
     }
 
     @Override

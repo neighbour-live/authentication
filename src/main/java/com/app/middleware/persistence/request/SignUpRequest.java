@@ -31,6 +31,8 @@ public class SignUpRequest {
     private String state;
     @NotBlank
     private String country;
+    @NotBlank
+    private String gender;
 
     @Length(max = 15, min = 7)
     @Pattern(regexp = "((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)", message = "i.p. should be in format 000.000.000.000")

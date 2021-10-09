@@ -1,8 +1,6 @@
 package com.app.middleware.security;
 
-import com.app.middleware.exceptions.error.UnauthorizedExceptionErrorType;
 import com.app.middleware.exceptions.logging.GenericLog;
-import com.app.middleware.exceptions.type.UnauthorizedException;
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.repository.UserRepository;
 import com.app.middleware.persistence.type.RoleType;
@@ -45,6 +43,7 @@ public class AuthorizationAspect {
             "/auth/confirm-phone",
             "/auth/confirm-username",
             "/auth/forgot-password",
+            "/auth/change-password",
 //            --------------------
             "/error",
             "/v2/api-docs",
@@ -53,7 +52,8 @@ public class AuthorizationAspect {
             "/swagger-resources",
             "/swagger-resources/.*");
     private List<String> userUrls = Arrays.asList(
-            "/auth/change-password",
+            "/user/confirm-email",
+            "/user/confirm-phone",
             "/auth/refresh-token",
 //            ---------------------
             "/user/confirm-phone-number",

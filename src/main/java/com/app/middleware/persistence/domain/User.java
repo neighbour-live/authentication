@@ -1,5 +1,6 @@
 package com.app.middleware.persistence.domain;
 import com.app.middleware.persistence.type.AuthProvider;
+import com.app.middleware.persistence.type.Gender;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -39,6 +40,9 @@ public class User extends BaseEntity  implements Serializable{
 
     @Column(name ="last_name")
     private String lastName;
+
+    @Column(name ="gender")
+    private Gender gender;
 
     @Email
     @Column(name ="email", unique = true)

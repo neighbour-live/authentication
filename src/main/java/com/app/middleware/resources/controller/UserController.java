@@ -6,6 +6,7 @@ import com.app.middleware.exceptions.error.ResourceNotFoundErrorType;
 import com.app.middleware.exceptions.error.UnauthorizedExceptionErrorType;
 import com.app.middleware.exceptions.type.UnauthorizedException;
 import com.app.middleware.persistence.domain.User;
+import com.app.middleware.persistence.domain.UserTemporary;
 import com.app.middleware.persistence.dto.StatusMessageDTO;
 import com.app.middleware.persistence.mapper.UserMapper;
 import com.app.middleware.persistence.repository.UserRepository;
@@ -53,50 +54,6 @@ public class UserController {
 
     }
 
-    @PostMapping("/send-email-code")
-    @PreAuthorize("hasRole('USER')")
-    @ApiOperation(value = "This operation is used to send email verification.")
-    public ResponseEntity<?> sendEmailVerification(@RequestParam("email") String email, @RequestParam("publicId") String publicId) throws Exception {
-        try {
-            User user = isCurrentUser(publicId);
-            authService.sendEmailVerification(email, user);
-            return GenericResponseEntity.create(StatusMessageDTO.builder()
-                    .message(AuthConstants.VERIFICATION_EMAIL_SENT + email)
-                    .status(0)
-                    .build(), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return ExceptionUtil.handleException(e);
-        }
-    }
-
-    @PostMapping("/send-phone-code")
-    @PreAuthorize("hasRole('USER')")
-    @ApiOperation(value = "This operation is used to send phone verification.")
-    public ResponseEntity<?> sendPhoneVerificationOTP(@RequestParam("phoneNumber") String phoneNumber, @RequestParam("publicId") String publicId) throws Exception {
-        try {
-            User user = isCurrentUser(publicId);
-            return GenericResponseEntity.create(StatusMessageDTO.builder()
-                    .message(AuthConstants.VERIFICATION_OTP_SENT + authService.sendPhoneVerificationOTP(phoneNumber, user))
-                    .status(0)
-                    .build(), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return ExceptionUtil.handleException(e);
-        }
-    }
-
-    @PostMapping("/confirm-phone-number")
-    @PreAuthorize("hasRole('USER')")
-    @ApiOperation(value = "This operation is used to confirm phone number.")
-    public ResponseEntity<?> confirmPhoneNumber(@RequestParam("otp") String otp, @RequestParam("token") String token) throws Exception {
-        try {
-            User user = authService.confirmPhoneNumber(token, otp);
-            isCurrentUser(PublicIdGenerator.encodedPublicId(user.getPublicId()));
-            return GenericResponseEntity.create(StatusCode.SUCCESS, UserMapper.createUserDTOLazy(user), HttpStatus.OK);
-        } catch (Exception e) {
-            return ExceptionUtil.handleException(e);
-        }
-    }
-
     @PutMapping("/edit-profile")
     @PreAuthorize("hasRole('USER')")
     @ApiOperation(value = "This operation is used to edit user profile.")
@@ -107,6 +64,29 @@ public class UserController {
                     .message(authService.editProfile(editProfileRequest, user))
                     .status(0)
                     .build(), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ExceptionUtil.handleException(e);
+        }
+    }
+
+    @PostMapping("/confirm-email")
+    @ApiOperation(value = "This operation is used to confirm User Email.")
+    public ResponseEntity<?> confirmEmailPreRegister(@RequestParam("email") String email, @RequestParam("emailCode") String emailCode) throws Exception {
+
+        try {
+            User user  = authService.confirmEmail(email, emailCode);
+            return GenericResponseEntity.create(StatusCode.SUCCESS, AuthConstants.EDIT_PROFILE_SUCCESSFUL, HttpStatus.OK);
+        } catch (Exception e) {
+            return ExceptionUtil.handleException(e);
+        }
+    }
+
+    @PostMapping("/confirm-phone")
+    @ApiOperation(value = "This operation is used to confirm phone number.")
+    public ResponseEntity<?> confirmPhonePreRegister(@RequestParam("phoneNumber") String phoneNumber, @RequestParam("phoneCode") String phoneCode) throws Exception {
+        try {
+            User user = authService.confirmPhoneNumber(phoneNumber, phoneCode);
+            return GenericResponseEntity.create(StatusCode.SUCCESS, AuthConstants.EDIT_PROFILE_SUCCESSFUL, HttpStatus.OK);
         } catch (Exception e) {
             return ExceptionUtil.handleException(e);
         }

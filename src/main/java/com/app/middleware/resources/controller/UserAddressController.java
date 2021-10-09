@@ -55,7 +55,7 @@ public class UserAddressController {
     @ApiOperation(value = "This operation is used to edit user address.")
     public ResponseEntity<?> editUserAddress(@Valid @RequestBody AddUserAddressRequest addUserAddressRequest, @PathVariable String userAddressPublicId) throws Exception {
         try {
-            User user = isCurrentUser(userAddressPublicId);
+            User user = isCurrentUser(addUserAddressRequest.getUserPublicId());
             userAddressService.editUserAddress(addUserAddressRequest, userAddressPublicId);
             return GenericResponseEntity.create(StatusMessageDTO.builder()
                     .message("User Address" + AuthConstants.EDITED_SUCCESSFULLY)
