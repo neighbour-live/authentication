@@ -1,0 +1,90 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/users_schema?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+    username: root
+    password:
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      hibernate: org.hibernate.dialect.MySQL8Dialect
+      storage_engine: innodb
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: 8335880asmg0kiufbrgtm-m24301smd0e4faeijtlldq3asmg0kiufbrgtm.apps.googleusercontent.com
+            clientSecret: qUAKXrAANqapJr83v0EFZWNa
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - email
+              - profile
+          facebook:
+            clientId: 1629390323803242
+            clientSecret: e510999563496c087cffd42b6ebfb2b1
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - email
+              - public_profile
+        provider:
+          facebook:
+            authorizationUri: https://www.facebook.com/v3.0/dialog/oauth
+            tokenUri: https://graph.facebook.com/v3.0/oauth/access_token
+            userInfoUri: https://graph.facebook.com/v3.0/me?fields=id,first_name,middle_name,last_name,name,email,verified,is_verified,picture.width(250).height(250)
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: afinitisami@gmail.com
+    password: Testing1234$
+    properties:
+      mail:
+        smtp:
+          auth: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+          ssl:
+            trust: smtp.gmail.com
+          starttls:
+            enable: true
+            required: true
+  liquibase:
+    url: jdbc:mysql://localhost:3306/users_schema?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+    user: root
+    password:
+    enabled: true
+    change-log: db-liquibase/liquibase-changeLog.xml
+app:
+  auth:
+    tokenSecret: 926D270960DDC9429D0358DBBC51AC1B
+    tokenExpirationMsec: 259200000
+    refreshTokenExpirationMsec: 2592000000
+  oauth2:
+    # After successfully authenticating with the OAuth2 Provider,
+    # we'll be generating an auth token for the user and sending the token to the
+    # redirectUri mentioned by the client in the /oauth2/authorize request.
+    # We're not using cookies because they won't work well in mobile clients.
+    authorizedRedirectUris:
+      - http://localhost:3000/oauth2/redirect
+      - myandroidapp://oauth2/redirect
+      - myiosapp://oauth2/redirect
+
+
+email:
+  redirection: localhost:8080
+  api-key: B0RSG.Abzf8Ozws-lJsrl1NjuWbIvww9j94bWesvysZIYfBg.SlUGaqMovZnAy7qbvmS1
+  from: neighbourlivemal@gmail.com
+firebase:
+  config: confidential/firebase-configuration.json
+  database: https://neighbor-live.firebaseio.com
+

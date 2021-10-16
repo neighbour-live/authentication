@@ -1,0 +1,12 @@
+package com.app.middleware.persistence.type;
+
+public enum AwardType {
+    STARTER,
+    EARLY_USER,
+    SPENT_THOUSAND_DOLLARS,
+    EARNED_THOUSAND_DOLLARS,
+    SPENT_TEN_THOUSANDS_DOLLARS,
+    EARNED_TEN_THOUSANDS_DOLLARS,
+    SPENT_MILLION,
+    EARNED_MILLION
+}
