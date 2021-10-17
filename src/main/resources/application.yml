@@ -18,4 +18,14 @@ otp-expiry-time: 300
 email-token-expiry-time: 86400
 
 
-
+cloud:
+  aws:
+    region:
+      static: eu-central-1
+    stack:
+      auto: false
+    bucket-public: neighborlive-public
+    bucket-name: neighborlive-users
+    credentials:
+      accessKey: AKIAW53Q7GVWV2TY3EP6
+      secretKey: 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

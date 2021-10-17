@@ -209,7 +209,9 @@ public class AuthServiceImpl implements AuthService {
         user.setAddressType(AddressType.PERMANENT.toString());
         user.setLat(signUpRequest.getLat());
         user.setLng(signUpRequest.getLng());
-
+        user.setIdDocFrontUrl("");
+        user.setIdDocBackUrl("");
+        user.setIdentificationVerified(false);
         user.setIsBlocked(false);
         user.setIsDeleted(false);
         user.setIsSuspended(false);
@@ -684,7 +686,7 @@ public class AuthServiceImpl implements AuthService {
 
         //If Valid user - score +20
         if(user.getProvider().equals(AuthProvider.GOOGLE) || user.getProvider().equals(AuthProvider.LOCAL) || user.getProvider().equals(AuthProvider.FACEBOOK)){
-            profileCompletionPercentage += 40;
+            profileCompletionPercentage += 20;
         }
 
         //If Email Verified - score +20
@@ -694,6 +696,11 @@ public class AuthServiceImpl implements AuthService {
 
         //If Phone Verified - score +15
         if(user.getPhoneVerified()){
+            profileCompletionPercentage += 20;
+        }
+
+        //If Phone Verified - score +15
+        if(user.getIdentificationVerified()){
             profileCompletionPercentage += 20;
         }
 

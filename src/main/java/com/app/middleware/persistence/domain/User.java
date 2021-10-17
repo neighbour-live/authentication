@@ -68,6 +68,10 @@ public class User extends BaseEntity  implements Serializable{
     @Builder.Default
     private Boolean phoneVerified = false;
 
+    @Column(name ="identification_verified")
+    @Builder.Default
+    private Boolean identificationVerified = false;
+
     @Column(name ="is_blocked")
     @Builder.Default
     private Boolean isBlocked = false;
@@ -82,6 +86,12 @@ public class User extends BaseEntity  implements Serializable{
 
     @Column(name ="image_url")
     private String imageUrl;
+
+    @Column(name ="id_doc_front_url")
+    private String idDocFrontUrl;
+
+    @Column(name ="id_doc_back_url")
+    private String idDocBackUrl;
 
     @JsonIgnore
     @Column(name ="password")

@@ -83,6 +83,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.setIsSuspended(false);
         user.setEmailVerified(true);
         user.setPhoneVerified(false);
+        user.setIdDocFrontUrl("");
+        user.setIdDocBackUrl("");
+        user.setIdentificationVerified(false);
 
         user = userRepository.save(user);
         return user;

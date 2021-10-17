@@ -8,11 +8,14 @@ import com.app.middleware.exceptions.type.UnauthorizedException;
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserTemporary;
 import com.app.middleware.persistence.dto.StatusMessageDTO;
+import com.app.middleware.persistence.dto.UserIdentificationDTO;
 import com.app.middleware.persistence.mapper.UserMapper;
 import com.app.middleware.persistence.repository.UserRepository;
 import com.app.middleware.persistence.request.EditProfileRequest;
 import com.app.middleware.persistence.response.GenericResponseEntity;
 import com.app.middleware.resources.services.AuthService;
+import com.app.middleware.resources.services.S3BucketStorageService;
+import com.app.middleware.resources.services.UserService;
 import com.app.middleware.security.CurrentUser;
 import com.app.middleware.security.UserPrincipal;
 import com.app.middleware.utility.AuthConstants;
@@ -25,8 +28,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -38,7 +43,13 @@ public class UserController {
     private AuthService authService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private S3BucketStorageService s3BucketStorageService;
 
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
@@ -92,6 +103,20 @@ public class UserController {
         }
     }
 
+    @PostMapping("/upload-identification")
+    @ApiOperation(value = "This operation is used to upload identification document of a user")
+    public ResponseEntity<?> confirmPhonePreRegister(@RequestParam("userPublicId") String userPublicId,
+                                                     @RequestParam("front") MultipartFile front,
+                                                     @RequestParam("back") MultipartFile back) throws Exception {
+        try {
+            User user = isCurrentUser(userPublicId);
+            user = userService.uploadIdentificationDocuments(user, front, back);
+            return GenericResponseEntity.create(StatusCode.SUCCESS, UserMapper.createUserIdentificationDTOLazy(user), HttpStatus.OK);
+        } catch (Exception e) {
+            return ExceptionUtil.handleException(e);
+        }
+    }
+
     @PatchMapping("/logout")
     @PreAuthorize("hasRole('USER')")
     @ApiOperation(value = "This operation is used to logged out user from application.")
@@ -119,6 +144,13 @@ public class UserController {
         } catch (Exception e) {
             return ExceptionUtil.handleException(e);
         }
+    }
+
+    @GetMapping("/file")
+    @ApiOperation(value = "This operation is used to get bytes of file by its key name")
+    public ResponseEntity<?> getFileByKeyName(@RequestParam("keyName") String keyName, @RequestParam("userPublicId") String userPublicId) throws UnauthorizedException, com.app.middleware.exceptions.type.ResourceNotFoundException, IOException {
+        User user = isCurrentUser(userPublicId);
+        return new ResponseEntity<>(s3BucketStorageService.getFileByKeyName(keyName), HttpStatus.OK);
     }
 
     @GetMapping("/profile-completion")

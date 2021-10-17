@@ -2,10 +2,7 @@ package com.app.middleware.persistence.mapper;
 
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserTemporary;
-import com.app.middleware.persistence.dto.ChatRecipientDTO;
-import com.app.middleware.persistence.dto.UserDTO;
-import com.app.middleware.persistence.dto.UserMinimalDetailsDTO;
-import com.app.middleware.persistence.dto.UserTemporaryDTO;
+import com.app.middleware.persistence.dto.*;
 import com.app.middleware.utility.id.PublicIdGenerator;
 
 import java.time.format.DateTimeFormatter;
@@ -30,6 +27,7 @@ public class UserMapper {
                 .imageUrl(user.getImageUrl())
                 .emailVerified(user.getEmailVerified())
                 .phoneVerified(user.getPhoneVerified())
+                .identificationVerified(user.getIdentificationVerified())
                 .provider(user.getProvider().toString())
                 .providerId(user.getProviderId())
                 .dob((user.getDob() == null) ? "": user.getDob())
@@ -86,6 +84,25 @@ public class UserMapper {
 
         return userTemporaryDTO;
     }
+
+    public static List<UserIdentificationDTO> createUserIdentificationDTOListLazy(Collection<User> users) {
+        List<UserIdentificationDTO> userIdentificationDTOS = new ArrayList<>();
+        users.forEach(user -> userIdentificationDTOS.add(createUserIdentificationDTOLazy(user)));
+        return userIdentificationDTOS;
+    }
+
+    public static UserIdentificationDTO createUserIdentificationDTOLazy(User user) {
+        UserIdentificationDTO userIdentificationDTO = UserIdentificationDTO.builder()
+                .publicId(PublicIdGenerator.encodedPublicId(user.getPublicId()))
+                .userName(user.getUserName() == null ? "" : user.getUserName() )
+                .identificationVerified(user.getIdentificationVerified())
+                .idDocBackUrl(user.getIdDocBackUrl() == null ? "" : user.getIdDocBackUrl())
+                .idDocFrontUrl(user.getIdDocFrontUrl() == null ? "" : user.getIdDocFrontUrl())
+                .build();
+
+        return userIdentificationDTO;
+    }
+
 
     public static ChatRecipientDTO createChatRecipientDTOLazy(User user) {
         ChatRecipientDTO chatRecipientDTO = ChatRecipientDTO.builder()

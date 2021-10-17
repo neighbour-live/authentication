@@ -13,6 +13,7 @@ public class AuthConstants {
     public static final String DELETED_SUCCESSFULLY = " deleted successfully ";
     public static final String EDITED_SUCCESSFULLY = " edited successfully ";
     public static final String CHANGE_PASSWORD_SUCCESS = " Password changed successfully ";
+    public static final String VERIFICATION_DOCUMENTS_UPLOADED = " Verification Documents Uploaded ";
     public static final String LOGOUT_SUCCESS = " Logout successfully ";
 
 }

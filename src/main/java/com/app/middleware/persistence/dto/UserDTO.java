@@ -40,6 +40,7 @@ public class UserDTO {
 
     private boolean emailVerified;
     private boolean phoneVerified;
+    private boolean identificationVerified;
 
     private String createDateTime;
     private String updatedDateTime;

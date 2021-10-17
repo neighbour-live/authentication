@@ -57,6 +57,8 @@ public class AuthorizationAspect {
             "/auth/refresh-token",
             "/bucket/file/upload",
             "/bucket/list/files",
+            "/user/upload-identification",
+            "/user/file",
 //            ---------------------
             "/user/confirm-phone-number",
             "/user/edit-profile",
@@ -131,6 +133,8 @@ public class AuthorizationAspect {
             "/user-card/([a-zA-Z0-9]+)",
             "/task/([a-zA-Z0-9]+)/timeline");
     private List<String> moderatorUrls = Arrays.asList(
+            "/user/verify-identification",
+            "/user/file",
             "/auth/change-password",
             "/auth/refresh-token",
             "/user/confirm-phone-number",

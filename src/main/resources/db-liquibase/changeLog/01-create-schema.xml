@@ -555,4 +555,16 @@
         /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
         </sql>
     </changeSet>
+
+    <changeSet id="SchemaIDVerificationUpdate" author="Sami Haroon Khan">
+        <sql>
+            ALTER TABLE `users_schema`.`users`
+            ADD COLUMN `id_doc_front_url` TINYTEXT NULL DEFAULT NULL AFTER `role_id`,
+            ADD COLUMN `id_doc_back_url` TINYTEXT NULL DEFAULT NULL AFTER `id_doc_front_url`,
+            ADD COLUMN `identification_verified` BIT(1) NULL DEFAULT false AFTER `id_doc_back_url`;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
+
+
+
