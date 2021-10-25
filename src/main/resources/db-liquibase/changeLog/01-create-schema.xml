@@ -558,12 +558,44 @@
 
     <changeSet id="SchemaIDVerificationUpdate" author="Sami Haroon Khan">
         <sql>
-            ALTER TABLE `users_schema`.`users`
+            ALTER TABLE `users`
             ADD COLUMN `id_doc_front_url` TINYTEXT NULL DEFAULT NULL AFTER `role_id`,
             ADD COLUMN `id_doc_back_url` TINYTEXT NULL DEFAULT NULL AFTER `id_doc_front_url`,
             ADD COLUMN `identification_verified` BIT(1) NULL DEFAULT false AFTER `id_doc_back_url`;
         </sql>
     </changeSet>
+
+    <changeSet id="SchemaUserFileUpload" author="Sami Haroon Khan">
+        <sql>
+
+            -- --------------------------------------------------------
+
+            --
+            -- Table structure for table `conversations`
+            --
+
+            CREATE TABLE `user_uploads` (
+                                             `id` bigint(20) NOT NULL,
+                                             `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                             `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+                                             `is_active` bit(1) DEFAULT true ,
+                                             `is_deleted` bit(1) DEFAULT false,
+                                             `public_id` bigint(20) NOT NULL,
+                                             `public_url` TINYTEXT NULL DEFAULT NULL,
+                                             `key_name` varchar(255) DEFAULT NULL,
+                                             `service_type` varchar(51) DEFAULT NULL,
+                                             `user_id` bigint(20) NOT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+            ALTER TABLE `user_uploads`
+                ADD PRIMARY KEY (`id`),
+                ADD UNIQUE KEY `UK_user_upload_public_id` (`public_id`) USING BTREE;
+            ALTER TABLE `user_uploads`
+                ADD CONSTRAINT `FK_user_uploads_public_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`public_id`);
+            COMMIT;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
 
 

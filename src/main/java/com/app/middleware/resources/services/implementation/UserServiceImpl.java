@@ -1,14 +1,13 @@
 package com.app.middleware.resources.services.implementation;
 
 import com.app.middleware.persistence.domain.User;
+import com.app.middleware.persistence.domain.UserUpload;
 import com.app.middleware.persistence.repository.UserRepository;
+import com.app.middleware.persistence.type.ServiceType;
 import com.app.middleware.resources.services.S3BucketStorageService;
 import com.app.middleware.resources.services.UserService;
 import com.app.middleware.utility.id.PublicIdGenerator;
-import jdk.jfr.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -52,11 +51,11 @@ public class UserServiceImpl implements UserService {
             throw new Exception("The files must be in same format, allowed formats are "+ MediaType.APPLICATION_PDF_VALUE +", "+ MediaType.IMAGE_PNG_VALUE + " and "+ MediaType.IMAGE_JPEG_VALUE);
         }
 
-        String frontDocUrl =  s3BucketStorageService.uploadFile(frontDocKeyName, front, false);
-        String backDocUrl =  s3BucketStorageService.uploadFile(backDocKeyName, back, false);
+        UserUpload frontDoc =  s3BucketStorageService.uploadFile(frontDocKeyName, ServiceType.Identification.name(), front, user, false);
+        UserUpload backDoc =  s3BucketStorageService.uploadFile(backDocKeyName, ServiceType.Identification.name(), back, user, false);
 
-        user.setIdDocFrontUrl(frontDocUrl);
-        user.setIdDocBackUrl(backDocUrl);
+        user.setIdDocFrontUrl(frontDoc.getKeyName());
+        user.setIdDocBackUrl(backDoc.getKeyName());
         user.setIdentificationVerified(false);
         user = userRepository.save(user);
         return user;

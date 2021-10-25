@@ -12,15 +12,9 @@ public enum ResourceNotFoundErrorType implements ErrorEnum {
     USER_NOT_FOUND_WITH_PUBLIC_ID_IN_USER_ADDRESS(10001, "User not found with this PublicId : %s in User Addresses"),
     USER_NOT_FOUND_WITH_PUBLIC_ID_IN_USER_AWARD(10002, "User not found with this PublicId : %s in User Awards"),
     USER_NOT_FOUND_WITH_PUBLIC_ID_IN_USER_PAYMENT_CARD(10003, "User not found with this PublicId : %s in User Payment Cards"),
-    USER_NOT_FOUND_WITH_PUBLIC_ID_IN_USER_SKILL(10004, "User not found with this PublicId : %s in User Skills"),
-    AWARD_NOT_FOUND_WITH_PUBLIC_ID_IN_USER_AWARD(10005, "Award not found with this PublicId : %s in User Awards"),
-    SKILL_NOT_FOUND_WITH_PUBLIC_ID_IN_USER_SKILL(10006, "SKill not found with this PublicId : %s in User Skills"),
-    BLOCKED_BY_USER_NOT_FOUND_WITH_PUBLIC_ID_IN_TASK(10007, "blocked By User not found with this PublicId : %s in Tasks"),
-    TASK_NOT_FOUND_WITH_PUBLIC_ID_IN_REVIEW(10008, "Task not found with this PublicId : %s in Reviews"),
-    SUPPLIER_USER_NOT_FOUND_WITH_PUBLIC_ID_IN_TASK(10009, "Supplier not found with this PublicId : %s in Tasks"),
-    POSTER_USER_NOT_FOUND_WITH_PUBLIC_ID_IN_REVIEW(10010, "Poster not found with this PublicId : %s in Reviews"),
-    TASKER_NOT_FOUND_WITH_PUBLIC_ID_IN_REVIEW(10011, "Tasker not found with this PublicId : %s in Reviews"),
-    TASKER_USER_NOT_FOUND_WITH_PUBLIC_ID_IN_TASK(10012, "Tasker not found with this PublicId : %s in Tasks"),
+    AWARD_NOT_FOUND_WITH_PUBLIC_ID_IN_USER_AWARD(10004, "Award not found with this PublicId : %s in User Awards"),
+    USER_FILE_NOT_FOUND_WITH_KEY_NAME(10005,"File not found with Key: %s"),
+    USER_FILE_NOT_FOUND_WITH_PUBLIC_ID(10006,"File not found with Key: %s"),
 
 
 
@@ -61,8 +55,7 @@ public enum ResourceNotFoundErrorType implements ErrorEnum {
     //Already Exist
     USER_ALREADY_EXIST_WITH_EMAIL(11001, "User already exist with this : %s", "User already exist with email"),
     USER_ALREADY_EXIST_WITH_PHONE(11002, "User already exist with this : %s", "User already exist with phone"),
-//    USER_ALREADY_PINNED(10009, "User already pinned","User already pinned"),
-//    USER_ALREADY_UNPINNED(10010, "User already unpinned","User already unpinned"),
+
    ;
 
     private Integer errorCode;

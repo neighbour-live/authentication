@@ -56,7 +56,7 @@ public class AuthorizationAspect {
             "/user/confirm-phone",
             "/auth/refresh-token",
             "/bucket/file/upload",
-            "/bucket/list/files",
+            "/bucket/file",
             "/user/upload-identification",
             "/user/file",
 //            ---------------------

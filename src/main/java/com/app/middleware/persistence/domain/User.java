@@ -188,6 +188,10 @@ public class User extends BaseEntity  implements Serializable{
 
     @OneToMany(cascade = CascadeType.PERSIST , mappedBy = "user", fetch = FetchType.LAZY)
     @Builder.Default
+    private Collection<UserUpload> userUploads = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.PERSIST , mappedBy = "user", fetch = FetchType.LAZY)
+    @Builder.Default
     private Collection<UserAward> userAwards = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.PERSIST)
