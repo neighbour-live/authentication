@@ -15,6 +15,7 @@ public enum ResourceNotFoundErrorType implements ErrorEnum {
     AWARD_NOT_FOUND_WITH_PUBLIC_ID_IN_USER_AWARD(10004, "Award not found with this PublicId : %s in User Awards"),
     USER_FILE_NOT_FOUND_WITH_KEY_NAME(10005,"File not found with Key: %s"),
     USER_FILE_NOT_FOUND_WITH_PUBLIC_ID(10006,"File not found with Key: %s"),
+    NOT_FOUND_WITH(10000, "Not found with this : %s", "User not found"),
 
 
 

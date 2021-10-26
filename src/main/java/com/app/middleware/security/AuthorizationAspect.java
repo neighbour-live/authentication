@@ -44,6 +44,8 @@ public class AuthorizationAspect {
             "/auth/confirm-username",
             "/auth/forgot-password",
             "/auth/change-password",
+            "/user-uploads/all/([a-zA-Z0-9]+)",
+            "/user-uploads/([a-zA-Z0-9]+)/upload/([a-zA-Z0-9]+)",
 //            --------------------
             "/error",
             "/v2/api-docs",
@@ -59,6 +61,8 @@ public class AuthorizationAspect {
             "/bucket/file",
             "/user/upload-identification",
             "/user/file",
+            "/user-uploads/all/([a-zA-Z0-9]+)",
+            "/user-uploads/([a-zA-Z0-9]+)/upload/([a-zA-Z0-9]+)",
 //            ---------------------
             "/user/confirm-phone-number",
             "/user/edit-profile",
