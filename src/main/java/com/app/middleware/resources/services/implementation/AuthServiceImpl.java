@@ -233,8 +233,8 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         user = userRepository.save(user);
-        userAddress = userAddressService.saveAddress(userAddress);
-//        userTemporaryService.delete(userTemporary);
+        userAddressService.saveAddress(userAddress);
+        userTemporaryService.delete(userTemporary);
 
         //sending Welcome Email
         SimpleMailMessage mailMessage = new SimpleMailMessage();
@@ -242,7 +242,7 @@ public class AuthServiceImpl implements AuthService {
         mailMessage.setSubject("Welcome to Neighbour Live! ");
         mailMessage.setFrom(EMAIL_FROM);
         mailMessage.setText("Welcome " + user.getFirstName() + " " + user.getLastName() + "\n" +"We really Appreciate the valuable addition of you into our growing community. \n");
-//        emailService.sendEmail(mailMessage);
+        emailService.sendEmail(mailMessage);
 
         return user;
     }
@@ -642,7 +642,7 @@ public class AuthServiceImpl implements AuthService {
 
             user.setPhoneVerificationOTP(otp);
             userRepository.save(user);
-//            emailService.sendEmail(mailMessage);
+            emailService.sendEmail(mailMessage);
                 smsService.sendOTPMessage(otp, user.getPhoneNumber());
             return true;
         } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, email);
@@ -673,7 +673,7 @@ public class AuthServiceImpl implements AuthService {
                 user.setPhoneVerificationOTP(null);
                 user.setPassword(passwordEncoder.encode(newPassword));
                 userRepository.save(user);
-//                emailService.sendEmail(mailMessage);
+                emailService.sendEmail(mailMessage);
                 return true;
             } else {
                 throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_OTP);
