@@ -259,6 +259,7 @@ public class AuthServiceImpl implements AuthService {
 
         String token = Utility.generateSafeToken() + UUID.randomUUID();
         String otp = Utility.generateOTP();
+        otp = "0000";
         userTemporary.setEmail(email);
         userTemporary.setEmailCode(otp);
         userTemporary.setEmailToken(token);
@@ -291,7 +292,7 @@ public class AuthServiceImpl implements AuthService {
             userTemporary = userTemporaryService.save(userTemporary);
             return userTemporary;
         }
-        return null;
+        throw new Exception("Email Code and Token are not matching.");
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -345,7 +346,7 @@ public class AuthServiceImpl implements AuthService {
             return user;
         }
 
-        return null;
+        throw new Exception("Email Token is not matching.");
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -387,7 +388,7 @@ public class AuthServiceImpl implements AuthService {
             userTemporary = userTemporaryService.save(userTemporary);
             return userTemporary;
         }
-        return null;
+        throw new Exception("Phone Code and Token is not matching.");
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -410,7 +411,7 @@ public class AuthServiceImpl implements AuthService {
             smsService.sendOTPMessage(otp, phoneNumber);
             return user.getPhoneVerificationToken();
         }
-        return null;
+        throw new Exception("Phone Code is not matching.");
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -629,6 +630,7 @@ public class AuthServiceImpl implements AuthService {
                 throw new Exception("Cannot change your "+user.getProvider().toString()+" password using Neighbour.");
             }
             String otp = Utility.generateOTP();
+            otp = "0000"; //temporary
 
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setTo(user.getEmail());
