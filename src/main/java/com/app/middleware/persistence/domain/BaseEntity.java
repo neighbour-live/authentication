@@ -18,9 +18,9 @@ public class BaseEntity {
 
     @Column(name = "create_date_time")
     @CreationTimestamp
-    private ZonedDateTime createDateTime;
+    private ZonedDateTime createDateTime = ZonedDateTime.now();
 
     @Column(name = "update_date_time")
     @UpdateTimestamp
-    private ZonedDateTime updateDateTime;
+    private ZonedDateTime updateDateTime = ZonedDateTime.now();
 }
