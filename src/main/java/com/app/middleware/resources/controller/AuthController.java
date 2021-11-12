@@ -51,7 +51,6 @@ public class AuthController {
         request.add(req.getRemoteAddr());
 
         try {
-            //Do Login
             user = authService.login(loginRequest);
             //Send Response and save Log
             ResponseEntity response = GenericResponseEntity.create(StatusCode.SUCCESS, UserMapper.createUserDTOLazy(user), HttpStatus.OK);

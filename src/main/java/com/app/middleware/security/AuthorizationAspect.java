@@ -1,6 +1,5 @@
 package com.app.middleware.security;
 
-import com.app.middleware.exceptions.logging.GenericLog;
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.repository.UserRepository;
 import com.app.middleware.persistence.type.RoleType;
@@ -22,9 +21,6 @@ import java.util.Optional;
 public class AuthorizationAspect {
 
     @Autowired
-    private GenericLog log;
-
-    @Autowired
     private TokenProvider tokenProvider;
 
     @Autowired
@@ -33,7 +29,6 @@ public class AuthorizationAspect {
     private List<String> openUrls = Arrays.asList(
             "/auth/register",
             "/auth/login",
-//            --------------------
             "/auth/check-email",
             "/auth/check-phone",
             "/auth/check-username",
@@ -46,7 +41,6 @@ public class AuthorizationAspect {
             "/auth/change-password",
             "/user-uploads/all/([a-zA-Z0-9]+)",
             "/user-uploads/([a-zA-Z0-9]+)/upload/([a-zA-Z0-9]+)",
-//            --------------------
             "/error",
             "/v2/api-docs",
             "/swagger-ui",
@@ -57,13 +51,6 @@ public class AuthorizationAspect {
             "/user/confirm-email",
             "/user/confirm-phone",
             "/auth/refresh-token",
-            "/bucket/file/upload",
-            "/bucket/file",
-            "/user/upload-identification",
-            "/user/file",
-            "/user-uploads/all/([a-zA-Z0-9]+)",
-            "/user-uploads/([a-zA-Z0-9]+)/upload/([a-zA-Z0-9]+)",
-//            ---------------------
             "/user/confirm-phone-number",
             "/user/edit-profile",
             "/user/logout",
@@ -72,42 +59,23 @@ public class AuthorizationAspect {
             "/user/send-email-verification",
             "/user/send-phone-verification-otp",
             "/user/verification-status",
-            "/bid",
-            "/bid/status/([a-zA-Z0-9]+)",
-            "/bid/([a-zA-Z0-9]+)",
-            "/bid/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
-            "/conversation",
-            "/conversation/page",
-            "/report-user",
-            "/review",
-            "/review/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
-            "/skills",
-            "/support-user",
+            "/bucket/file/upload",
+            "/bucket/file",
+            "/user/upload-identification",
+            "/user/file",
+            "/user-uploads/all/([a-zA-Z0-9]+)",
+            "/user-uploads/([a-zA-Z0-9]+)/upload/([a-zA-Z0-9]+)",
+            "/offline-conversation",
+            "/offline-conversation/page",
+            "/offline-chat",
+            "/offline-chat/page",
             "/user-address",
             "/user-address/([a-zA-Z0-9]+)",
             "/user-address/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
-            "/user-bank/add-bank",
-            "/user-bank/check-bank",
-            "/user-bank/verify-bank",
-            "/user-bank/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
-            "/user-bank/([a-zA-Z0-9]+)",
-            "/user-wallet",
-            "/user-wallet/account",
-            "/user-wallet/account/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
-            "/user-wallet/balance",
-            "user-wallet/frequency",
-            "/user-wallet/redeem",
-            "/user-wallet/transaction/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
-            "/user-wallet/transactions",
             "/awards",
             "/awards/user-award",
             "/awards/user-award/([a-zA-Z0-9]+)",
             "/awards/([a-zA-Z0-9]+)/user-award/([a-zA-Z0-9]+)",
-            "/certifications",
-            "/certifications/([a-zA-Z0-9]+)",
-            "/certifications/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
-            "/chat",
-            "/chat/page",
             "/notification",
             "/notification/archive",
             "/notification/archive-all",
