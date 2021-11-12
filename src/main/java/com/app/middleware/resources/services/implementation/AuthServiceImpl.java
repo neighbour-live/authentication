@@ -4,6 +4,7 @@ import com.app.middleware.exceptions.error.ResourceNotFoundErrorType;
 import com.app.middleware.exceptions.type.ResourceNotFoundException;
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserAddress;
+import com.app.middleware.persistence.domain.UserNotification;
 import com.app.middleware.persistence.domain.UserTemporary;
 import com.app.middleware.persistence.repository.RoleRepository;
 import com.app.middleware.persistence.repository.UserRepository;
@@ -125,6 +126,36 @@ public class AuthServiceImpl implements AuthService {
             user.setRefreshToken(tokenProvider.createRefreshToken(user.getId(), permissions, roleType));
             user.setFirebaseKey(loginRequest.getFirebaseKey());
             user = userRepository.save(user);
+
+
+            /**
+             * Sending Push notifications Test Code
+             * START
+             * */
+
+            Map<String,String> actionsInfo =  new HashMap<>();
+            actionsInfo.put("userPublicId", PublicIdGenerator.encodedPublicId(user.getPublicId()));
+
+            UserNotificationRequest userNotificationRequest = UserNotificationRequest.builder()
+                    .notificationType(NotificationEnum.DEFAULT.toString())
+                    .target("INDIVIDUAL")
+                    .title("We Welcome Our Neighbour!")
+                    .body("Connect, add value, share and grow together!")
+                    .imageUrl("https://drive.google.com/file/d/1Hs7IDWaYbjWYiUQS9bQFsXQ6IhUGJ1E9/view")
+                    .actions(NotificationAction.HOME.name())
+                    .actionsInfo(actionsInfo)
+                    .firebaseKey(loginRequest.getFirebaseKey())
+                    .build();
+
+            UserNotification userNotification = notificationService.postUserNotification(userNotificationRequest, user);
+
+
+            /**
+             * Sending Push notifications Test Code
+             * ENDS
+             * */
+
+
             return user;
         }
         throw new Exception("cannot login!");

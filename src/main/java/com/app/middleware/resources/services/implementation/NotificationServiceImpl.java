@@ -22,6 +22,7 @@ import com.app.middleware.resources.services.EmailService;
 import com.app.middleware.resources.services.FCMService;
 import com.app.middleware.resources.services.NotificationService;
 import com.app.middleware.resources.services.NotificationTypeService;
+import com.app.middleware.utility.AuthConstants;
 import com.app.middleware.utility.Constants;
 import com.app.middleware.utility.StatusCode;
 import com.app.middleware.utility.id.PublicIdGenerator;
@@ -464,7 +465,7 @@ public class NotificationServiceImpl implements NotificationService {
         List<UserNotificationDTO> userNotificationDTOList = UserNotificationMapper.createUserNotificationDTOListLazy(userNotificationsPage.getContent());
         PageableResponseEntity<Object> pageableResponseEntity = new PageableResponseEntity<Object>(
                 StatusCode.SUCCESS,
-                "Paginated response",
+                AuthConstants.PAGE_RETRIEVED_SUCCESSFULLY,
                 userNotificationDTOList,
                 userNotificationsPage.getTotalElements(),
                 userNotificationsPage.getSize(),
@@ -486,7 +487,7 @@ public class NotificationServiceImpl implements NotificationService {
         List<UserNotificationDTO> userNotificationDTOList = UserNotificationMapper.createUserNotificationDTOListLazy(userNotificationsPage.getContent());
         PageableResponseEntity<Object> pageableResponseEntity = new PageableResponseEntity<Object>(
                 StatusCode.SUCCESS,
-                "Paginated response",
+                AuthConstants.PAGE_RETRIEVED_SUCCESSFULLY,
                 userNotificationDTOList,
                 userNotificationsPage.getTotalElements(),
                 userNotificationsPage.getSize(),
@@ -508,7 +509,7 @@ public class NotificationServiceImpl implements NotificationService {
         List<UserNotificationDTO> userNotificationDTOList = UserNotificationMapper.createUserNotificationDTOListLazy(userNotificationsPage.getContent());
         PageableResponseEntity<Object> pageableResponseEntity = new PageableResponseEntity<Object>(
                 StatusCode.SUCCESS,
-                "Paginated response",
+                AuthConstants.PAGE_RETRIEVED_SUCCESSFULLY,
                 userNotificationDTOList,
                 userNotificationsPage.getTotalElements(),
                 userNotificationsPage.getSize(),
@@ -527,7 +528,7 @@ public class NotificationServiceImpl implements NotificationService {
         List<UserNotificationDTO> userNotificationDTOList = UserNotificationMapper.createUserNotificationDTOListLazy(userNotificationsPage.getContent());
         PageableResponseEntity<Object> pageableResponseEntity = new PageableResponseEntity<Object>(
                 StatusCode.SUCCESS,
-                "Paginated response",
+                AuthConstants.PAGE_RETRIEVED_SUCCESSFULLY,
                 userNotificationDTOList,
                 userNotificationsPage.getTotalElements(),
                 userNotificationsPage.getSize(),

@@ -205,7 +205,7 @@ public class NotificationController {
         placeHolders.put("dynamic_url", "http://www.google.com");
         //sending Welcome Email
         EmailNotificationDto emailNotificationDto = EmailNotificationDto.builder()
-                .to("k142266@nu.edu.pk")
+                .to("afinitisami@gmail.com")
                 .template(Constants.EmailTemplate.DYNAMIC_EMAIL_VERIFICATION_TEMPLATE.value())
                 .placeHolders(placeHolders)
                 .build();

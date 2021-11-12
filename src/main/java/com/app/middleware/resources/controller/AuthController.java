@@ -28,7 +28,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -55,6 +57,7 @@ public class AuthController {
             //Send Response and save Log
             ResponseEntity response = GenericResponseEntity.create(StatusCode.SUCCESS, UserMapper.createUserDTOLazy(user), HttpStatus.OK);
             loggingService.createLog(user, req.getRemoteAddr(), response, loginRequest);
+
             return response;
 
         } catch (Exception e) {
