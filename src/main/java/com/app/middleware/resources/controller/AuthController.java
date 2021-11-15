@@ -210,10 +210,14 @@ public class AuthController {
 
     @PostMapping("/send-phone-code")
     @ApiOperation(value = "This operation is used to send phone verification.")
-    public ResponseEntity<?> sendPhoneCodePreRegister(@RequestParam("phoneNumber") String phoneNumber) throws Exception {
+    public ResponseEntity<?> sendPhoneCodePreRegister(@RequestParam("phoneNumber") String phoneNumber, @RequestParam(name = "publicId", required = false) String publicId) throws Exception {
         try {
             User user = new User();
-            user.setPublicId(PublicIdGenerator.generatePublicId());
+            if(publicId.isEmpty()){
+                user.setPublicId(PublicIdGenerator.generatePublicId());
+            } else {
+                user.setPublicId(PublicIdGenerator.decodePublicId(publicId));
+            }
             UserTemporary userTemporary = authService.sendPhoneCodePreRegister(phoneNumber, user);
             return GenericResponseEntity.create(StatusMessageDTO.builder()
                     .message(AuthConstants.VERIFICATION_OTP_SENT)
