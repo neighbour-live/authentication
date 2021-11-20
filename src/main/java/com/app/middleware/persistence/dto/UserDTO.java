@@ -33,6 +33,8 @@ public class UserDTO {
     private String city;
     private String state;
     private String country;
+    private String nationality;
+    private String ethnicity;
     private String ip;
     private Double lat;
     private Double lng;

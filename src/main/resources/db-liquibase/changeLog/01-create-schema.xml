@@ -596,6 +596,14 @@
         </sql>
     </changeSet>
 
+    <changeSet id="SchemaAddNationalityEthnicityForUser" author="Sami Haroon Khan">
+        <sql>
+            ALTER TABLE `users`
+                ADD COLUMN `nationality` varchar(100) DEFAULT NULL AFTER `currency`,
+                ADD COLUMN `ethnicity` varchar(100) DEFAULT NULL AFTER `nationality`;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
 
 

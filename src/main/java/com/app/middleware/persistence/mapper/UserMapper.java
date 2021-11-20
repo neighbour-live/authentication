@@ -39,6 +39,8 @@ public class UserMapper {
                 .city((user.getCity() == null) ? "": user.getCity())
                 .state((user.getState() == null) ? "": user.getState())
                 .country((user.getCountry() == null) ? "": user.getCountry())
+                .nationality((user.getNationality() == null) ? "": user.getNationality())
+                .ethnicity((user.getEthnicity() == null) ? "": user.getEthnicity())
                 .createDateTime(user.getCreateDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 .updatedDateTime(user.getUpdateDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 .build();

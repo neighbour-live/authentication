@@ -187,7 +187,8 @@ public class AuthServiceImpl implements AuthService {
                 user.setEmailVerified(userTemporary.getEmailVerified());
             } else throw new Exception("For LOCAL Provider a verified email and phone number is required");
 
-        } else if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.FACEBOOK)) {
+        }
+        else if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.FACEBOOK)) {
 
             user.setProvider(AuthProvider.FACEBOOK);
             user.setGgId("");
@@ -201,7 +202,8 @@ public class AuthServiceImpl implements AuthService {
                 user.setEmailVerified(true);
             } else throw new Exception("For FACEBOOK Provider a verified phone number is required");
 
-        } else if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.GOOGLE)) {
+        }
+        else if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.GOOGLE)) {
 
             user.setProvider(AuthProvider.GOOGLE);
             user.setFbId("");
@@ -215,7 +217,8 @@ public class AuthServiceImpl implements AuthService {
                 user.setEmailVerified(true);
             } else throw new Exception("For GOOGLE Provider a verified phone number is required");
 
-        } else {
+        }
+        else {
             throw new Exception("Provider can only be LOCAL, FACEBOOK or GOOGLE");
         }
 
@@ -242,10 +245,13 @@ public class AuthServiceImpl implements AuthService {
         user.setLng(signUpRequest.getLng());
         user.setIdDocFrontUrl("");
         user.setIdDocBackUrl("");
+        user.setNationality(signUpRequest.getNationality() == null ? "": signUpRequest.getNationality());
+        user.setNationality(signUpRequest.getEthnicity() == null ? "": signUpRequest.getEthnicity());
         user.setIdentificationVerified(false);
         user.setIsBlocked(false);
         user.setIsDeleted(false);
         user.setIsSuspended(false);
+
 
         user.setRole(roleRepository.findByRoleType(RoleType.USER));
 
@@ -535,6 +541,8 @@ public class AuthServiceImpl implements AuthService {
             user.setFirstName(editProfileRequest.getFirstName() == null ? user.getFirstName() : editProfileRequest.getFirstName());
             user.setLastName(editProfileRequest.getLastName() == null ? user.getLastName() : editProfileRequest.getLastName());
             user.setImageUrl(editProfileRequest.getImageUrl() == null ? user.getImageUrl() : editProfileRequest.getImageUrl());
+            user.setNationality(editProfileRequest.getNationality() == null ? user.getNationality() : editProfileRequest.getNationality());
+            user.setEthnicity(editProfileRequest.getEthnicity() == null ? user.getEthnicity() : editProfileRequest.getEthnicity());
             user.setDob(editProfileRequest.getDob() == null ? user.getDob() : editProfileRequest.getDob());
             if(editProfileRequest.getGender().equals(Gender.M.name()) || editProfileRequest.getGender().equals(Gender.F.name())){
                 user.setGender(Gender.valueOf(editProfileRequest.getGender()));

@@ -32,6 +32,10 @@ public class SignUpRequest {
     @NotBlank
     private String country;
     @NotBlank
+    private String nationality;
+    @NotBlank
+    private String ethnicity;
+    @NotBlank
     private String gender;
 
     @Length(max = 15, min = 7)

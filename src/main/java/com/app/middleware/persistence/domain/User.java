@@ -154,6 +154,12 @@ public class User extends BaseEntity  implements Serializable{
     @Column(name ="currency")
     private String  currency;
 
+    @Column(name ="nationality")
+    private String  nationality;
+
+    @Column(name ="ethnicity")
+    private String  ethnicity;
+
     @Column(name ="lat")
     private float  lat;
 

@@ -54,6 +54,9 @@ public class EditProfileRequest {
     private String addressLine;
     private String apartmentAddress;
 
+    private String nationality;
+    private String ethnicity;
+
     @Length(max = 15, min = 7)
     @Pattern(regexp = "((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)", message = "i.p. should be in format abc.efg.uvw.xyz")
     private String ip;
