@@ -18,7 +18,4 @@ public class AddUserAward {
     private String awardPublicId;
     @NotBlank
     private String userPublicId;
-    private Integer progress;
-    private boolean isActive;
-    private boolean isUnlocked;
 }

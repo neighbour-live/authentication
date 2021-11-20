@@ -44,4 +44,17 @@
             COMMIT;
         </sql>
     </changeSet>
+    <changeSet id="populateAwards" author="Sami Haroon Khan">
+        <sql>
+            INSERT INTO `awards`
+            (`id`, `create_date_time`, `update_date_time`, `award_icon`, `award_type`, `description`, `public_id`, `title`)
+            VALUES
+            (1, current_timestamp(),current_timestamp(), 'https://cdn2.iconfinder.com/data/icons/basic-icons-5/64/AWARDS-512.png', 'STARTER', 'Awarded to any user who have finished signup', 6864947802670401001, 'Starter'),
+            (2, current_timestamp(),current_timestamp(), 'https://cdn4.iconfinder.com/data/icons/trophy-and-awards-1/64/Icon_Medal_Trophy_Awards_Blue-512.png', 'EARLY_USER', 'Awarded to any user who have finished signup before reaching 1 Million users', 6864947802670401002, 'Early User'),
+            (3, current_timestamp(),current_timestamp(), 'https://cdn4.iconfinder.com/data/icons/awards-74/64/Champion-cup-hand-winner-awards-512.png', 'SPENT_THOUSAND_DOLLARS', 'Awarded to any user who have finished spending 1000 USD.', 6864947802670401003, 'Spent 1000 USD');
+
+            COMMIT;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
+

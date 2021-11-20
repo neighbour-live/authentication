@@ -56,9 +56,9 @@ public class AwardsServiceImpl implements AwardsService {
         userAward.setPublicId(PublicIdGenerator.generatePublicId());
         userAward.setUser(user);
         userAward.setAward(award);
-        userAward.setProgress(addUserAward.getProgress());
-        userAward.setIsActive(Boolean.valueOf(addUserAward.isActive()));
-        userAward.setIsUnlocked(Boolean.valueOf(addUserAward.isUnlocked()));
+        userAward.setProgress(100);
+        userAward.setIsActive(true);
+        userAward.setIsUnlocked(true);
         return userAwardsRepository.save(userAward);
     }
 
