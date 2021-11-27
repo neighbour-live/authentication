@@ -313,6 +313,7 @@ public class AuthServiceImpl implements AuthService {
         return userTemporary;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public UserTemporary confirmEmailPreRegister(String email, String emailToken, String emailCode) throws Exception {
         UserTemporary userTemporary = userTemporaryService.findByEmailIgnoreCase(email);
@@ -475,6 +476,7 @@ public class AuthServiceImpl implements AuthService {
         return null;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public UserTemporary confirmUserNamePreRegister(String userName, String publicId) throws Exception {
         if(checkUserNameExist(userName)){
@@ -663,6 +665,7 @@ public class AuthServiceImpl implements AuthService {
         return response;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public boolean forgotPasswordRequest(String email) throws Exception {
         if(!checkEmailExist(email)){
@@ -689,6 +692,7 @@ public class AuthServiceImpl implements AuthService {
         } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, email);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public boolean changePassword(String email, String newPassword, BigInteger otp) throws Exception {
         if(!checkEmailExist(email)){
@@ -754,6 +758,7 @@ public class AuthServiceImpl implements AuthService {
         return profileCompletionPercentage;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public boolean logout(User user) {
         user.setAccessToken(null);

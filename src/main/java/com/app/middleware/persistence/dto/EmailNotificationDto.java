@@ -1,10 +1,6 @@
 package com.app.middleware.persistence.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import java.util.Map;
 
 @Data

@@ -348,25 +348,25 @@
         --
         ALTER TABLE `awards`
             ADD PRIMARY KEY (`id`),
-                ADD UNIQUE KEY `UK_awards_public_id` (`public_id`) USING BTREE;
+            ADD UNIQUE KEY `UK_awards_public_id` (`public_id`) USING BTREE;
 
         --
         -- Indexes for table `conversations`
         --
         ALTER TABLE `conversations`
             ADD PRIMARY KEY (`id`),
-                ADD UNIQUE KEY `UK_conversations_publid_id` (`public_id`) USING BTREE,
-                ADD KEY `INDEX_conversations_second_user_id` (`second_user_id`) USING BTREE,
-                ADD KEY `INDEX_conversations_first_user_id` (`first_user_id`) USING BTREE;
+            ADD UNIQUE KEY `UK_conversations_publid_id` (`public_id`) USING BTREE,
+            ADD KEY `INDEX_conversations_second_user_id` (`second_user_id`) USING BTREE,
+            ADD KEY `INDEX_conversations_first_user_id` (`first_user_id`) USING BTREE;
 
         --
         -- Indexes for table `firebase_logs`
         --
         ALTER TABLE `firebase_logs`
             ADD PRIMARY KEY (`id`),
-                ADD KEY `INDEX_fire_logs_user_id` (`user_id`) USING BTREE,
-                ADD KEY `INDEX_fire_logs_notification_type_id` (`request_type_id`) USING BTREE,
-                ADD KEY `INDEX_fire_logs_user_notification_id` (`user_notification_id`) USING BTREE;
+            ADD KEY `INDEX_fire_logs_user_id` (`user_id`) USING BTREE,
+            ADD KEY `INDEX_fire_logs_notification_type_id` (`request_type_id`) USING BTREE,
+            ADD KEY `INDEX_fire_logs_user_notification_id` (`user_notification_id`) USING BTREE;
 
         --
         -- Indexes for table `logs`
@@ -397,29 +397,29 @@
         --
         ALTER TABLE `role_permission`
             ADD PRIMARY KEY (`id`),
-                ADD KEY `FK_rp_role_id` (`role_id`) USING BTREE,
-                ADD KEY `FK_rp_permission_id` (`permission_id`) USING BTREE;
+            ADD KEY `FK_rp_role_id` (`role_id`) USING BTREE,
+            ADD KEY `FK_rp_permission_id` (`permission_id`) USING BTREE;
 
         --
         -- Indexes for table `users`
         --
         ALTER TABLE `users`
-            ADD PRIMARY KEY (`id`),
-                  ADD UNIQUE KEY `UK_user_email` (`email`) USING BTREE,
-                  ADD UNIQUE KEY `UK_user_user_name` (`user_name`) USING BTREE,
-                  ADD UNIQUE KEY `UK_user_refresh_token` (`refresh_token`) USING BTREE,
-                  ADD UNIQUE KEY `UK_user_phone` (`phone_number`) USING BTREE,
-                  ADD UNIQUE KEY `UK_user_access_token` (`access_token`) USING BTREE,
-                  ADD UNIQUE KEY `UK_user_public_id` (`public_id`) USING BTREE,
-                  ADD UNIQUE KEY `UK_user_phone_verification_token` (`phone_verification_token`) USING BTREE,
-                  ADD UNIQUE KEY `UK_user_email_verification_token` (`email_verification_token`) USING BTREE,
-                  ADD KEY `INDEX_user_role_id` (`role_id`) USING BTREE;
+              ADD PRIMARY KEY (`id`),
+              ADD UNIQUE KEY `UK_user_email` (`email`) USING BTREE,
+              ADD UNIQUE KEY `UK_user_user_name` (`user_name`) USING BTREE,
+              ADD UNIQUE KEY `UK_user_refresh_token` (`refresh_token`) USING BTREE,
+              ADD UNIQUE KEY `UK_user_phone` (`phone_number`) USING BTREE,
+              ADD UNIQUE KEY `UK_user_access_token` (`access_token`) USING BTREE,
+              ADD UNIQUE KEY `UK_user_public_id` (`public_id`) USING BTREE,
+              ADD UNIQUE KEY `UK_user_phone_verification_token` (`phone_verification_token`) USING BTREE,
+              ADD UNIQUE KEY `UK_user_email_verification_token` (`email_verification_token`) USING BTREE,
+              ADD KEY `INDEX_user_role_id` (`role_id`) USING BTREE;
 
         --
         -- Indexes for table `user_addresses`
         --
         ALTER TABLE `user_addresses`
-            ADD PRIMARY KEY (`id`),
+              ADD PRIMARY KEY (`id`),
               ADD UNIQUE KEY `UK_user_address_public_id` (`public_id`) USING BTREE,
               ADD KEY `INDEX_user_address_user_id` (`user_id`) USING BTREE;
 

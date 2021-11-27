@@ -1,11 +1,9 @@
 package com.app.middleware.persistence.domain;
 
 import lombok.*;
-import org.json.JSONObject;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import org.json.*;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @Data

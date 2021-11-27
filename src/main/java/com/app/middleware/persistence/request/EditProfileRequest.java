@@ -1,14 +1,9 @@
 package com.app.middleware.persistence.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.Range;
-
+import lombok.*;
 import javax.validation.constraints.*;
+import org.hibernate.validator.constraints.Length;
 
 @Data
 @NoArgsConstructor

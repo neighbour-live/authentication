@@ -33,7 +33,7 @@ import javax.validation.Valid;
 public class ChatController {
 
 //    @Autowired
-//    private UserRepository userRepository;
+//    private AuthorizationService authorizationService;
 //
 //    @Autowired
 //    private ChatService chatService;

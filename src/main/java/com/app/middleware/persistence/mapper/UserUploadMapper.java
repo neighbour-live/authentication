@@ -3,7 +3,6 @@ package com.app.middleware.persistence.mapper;
 import com.app.middleware.persistence.domain.UserUpload;
 import com.app.middleware.persistence.dto.UserUploadDTO;
 import com.app.middleware.persistence.type.ServiceType;
-import com.app.middleware.utility.id.PublicIdGenerator;
 
 import java.util.ArrayList;
 import java.util.Collection;

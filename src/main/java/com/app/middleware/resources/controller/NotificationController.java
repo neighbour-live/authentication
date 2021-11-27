@@ -1,9 +1,6 @@
 package com.app.middleware.resources.controller;
 
 import com.app.middleware.exceptions.ExceptionUtil;
-import com.app.middleware.exceptions.error.ResourceNotFoundErrorType;
-import com.app.middleware.exceptions.error.UnauthorizedExceptionErrorType;
-import com.app.middleware.exceptions.type.UnauthorizedException;
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserNotification;
 import com.app.middleware.persistence.dto.EmailNotificationDto;
@@ -12,18 +9,15 @@ import com.app.middleware.persistence.request.UserNotificationRequest;
 import com.app.middleware.persistence.response.GenericResponseEntity;
 import com.app.middleware.persistence.response.PageableResponseEntity;
 import com.app.middleware.persistence.response.PushNotificationResponse;
+import com.app.middleware.resources.services.AuthorizationService;
 import com.app.middleware.resources.services.EmailService;
 import com.app.middleware.resources.services.NotificationService;
-import com.app.middleware.resources.services.UserService;
-import com.app.middleware.security.UserPrincipal;
 import com.app.middleware.utility.Constants;
 import com.app.middleware.utility.StatusCode;
-import com.app.middleware.utility.id.PublicIdGenerator;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -34,7 +28,7 @@ import java.util.Map;
 public class NotificationController {
 
     @Autowired
-    private UserService userService;
+    private AuthorizationService authorizationService;
 
     @Autowired
     private NotificationService notificationService;
@@ -51,7 +45,7 @@ public class NotificationController {
     @ApiOperation(value = "This operation is used to add user notification.")
     public ResponseEntity postUserNotification(@RequestBody UserNotificationRequest userNotificationRequest) throws Exception {
         try {
-            User user = isCurrentUser(userNotificationRequest.getUserPublicId());
+            User user = authorizationService.isCurrentUser(userNotificationRequest.getUserPublicId());
             UserNotification userNotification = notificationService.postUserNotification(userNotificationRequest, user);
             return GenericResponseEntity.create(StatusCode.SUCCESS, UserNotificationMapper.createUserNotificationDTOLazy(userNotification), HttpStatus.OK);
         } catch (Exception e) {
@@ -64,7 +58,7 @@ public class NotificationController {
     public ResponseEntity getUserNotification(@RequestParam("userPublicId") String userPublicId,
                                               @RequestParam("userNotificationPublicId") String userNotificationPublicId) throws Exception {
         try {
-            User user = isCurrentUser(userPublicId);
+            User user = authorizationService.isCurrentUser(userPublicId);
             UserNotification userNotification = notificationService.getUserNotification(userNotificationPublicId, user);
             return GenericResponseEntity.create(StatusCode.SUCCESS, UserNotificationMapper.createUserNotificationDTOLazy(userNotification), HttpStatus.OK);
         } catch (Exception e) {
@@ -79,7 +73,7 @@ public class NotificationController {
             @RequestParam("userNotificationPublicId") String userNotificationPublicId,
             @RequestParam(value="markAsRead", required = false, defaultValue = "true") boolean markAsRead) throws Exception {
         try {
-            User user = isCurrentUser(userPublicId);
+            User user = authorizationService.isCurrentUser(userPublicId);
 
             if(markAsRead){
                 notificationService.markUserNotificationsAsRead(userNotificationPublicId, user);
@@ -100,7 +94,7 @@ public class NotificationController {
             @RequestParam("userNotificationPublicId") String userNotificationPublicId,
             @RequestParam(value="markAsArchived", required = false, defaultValue = "true") boolean markAsArchived) throws Exception {
         try {
-            User user = isCurrentUser(userPublicId);
+            User user = authorizationService.isCurrentUser(userPublicId);
 
             if(markAsArchived){
                 notificationService.markUserNotificationsAsArchived(userNotificationPublicId, user);
@@ -121,7 +115,7 @@ public class NotificationController {
             @RequestParam("userPublicId") String userPublicId,
             @RequestParam(value="markAllAsRead", required = false, defaultValue = "true") boolean markAllAsRead) throws Exception {
         try {
-            User user = isCurrentUser(userPublicId);
+            User user = authorizationService.isCurrentUser(userPublicId);
 
             if(markAllAsRead){
                 notificationService.markAllUserNotificationsAsRead(user);
@@ -141,7 +135,7 @@ public class NotificationController {
             @RequestParam("userPublicId") String userPublicId,
             @RequestParam(value="markAllAsArchived", required = false, defaultValue = "true") boolean markAllAsArchived) throws Exception {
         try {
-            User user = isCurrentUser(userPublicId);
+            User user = authorizationService.isCurrentUser(userPublicId);
             if(markAllAsArchived){
                 notificationService.markAllUserNotificationsAsArchived(user);
                 return GenericResponseEntity.create(StatusCode.SUCCESS, "All marked as archived.", HttpStatus.OK);
@@ -166,7 +160,7 @@ public class NotificationController {
                                                                   @RequestParam(value="isEarlier", required = false, defaultValue = "false") boolean isEarlier,
                                                                   @RequestParam(value="isArchived", required = false, defaultValue = "false") boolean isArchived) throws Exception {
         try {
-            User user = isCurrentUser(userPublicId);
+            User user = authorizationService.isCurrentUser(userPublicId);
             if(Integer.valueOf(pageNo) < 0 || Integer.valueOf(pageSize) < 0){
                 throw new Exception("PageNo and PageSize must be positive numbers.");
             }
@@ -212,14 +206,5 @@ public class NotificationController {
         emailService.sendEmailFromExternalApi(emailNotificationDto);
 
         return new ResponseEntity<>(new PushNotificationResponse(HttpStatus.OK.value(), "Notification has been sent."), HttpStatus.OK);
-    }
-
-    public User isCurrentUser(String userPublicId) throws com.app.middleware.exceptions.type.ResourceNotFoundException, UnauthorizedException {
-        User user = userService.findByPublicId(PublicIdGenerator.decodePublicId(userPublicId));
-        if(user == null) throw new com.app.middleware.exceptions.type.ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_PUBLIC_ID, userPublicId);
-
-        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(!userPrincipal.getEmail().equals(user.getEmail())) throw new UnauthorizedException(UnauthorizedExceptionErrorType.UNAUTHORIZED_ACTION);
-        return user;
     }
 }

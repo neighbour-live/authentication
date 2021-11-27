@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConversationController {
 
 //    @Autowired
-//    private UserRepository userRepository;
+//    private AuthorizationService authorizationService;
 //
 //    @Autowired
 //    private ConversationService conversationService;

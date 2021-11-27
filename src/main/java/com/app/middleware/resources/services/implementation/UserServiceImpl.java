@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Optional;
+
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -59,5 +61,10 @@ public class UserServiceImpl implements UserService {
         user.setIdentificationVerified(false);
         user = userRepository.save(user);
         return user;
+    }
+
+    @Override
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
     }
 }

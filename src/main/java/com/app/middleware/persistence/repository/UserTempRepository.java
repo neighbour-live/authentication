@@ -1,6 +1,5 @@
 package com.app.middleware.persistence.repository;
 
-import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserTemporary;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,13 +1,8 @@
 package com.app.middleware.persistence.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
+import lombok.*;
+import javax.validation.constraints.*;
 
 @Data
 @NoArgsConstructor

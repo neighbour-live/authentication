@@ -1,6 +1,5 @@
 package com.app.middleware.persistence.repository;
 
-import com.app.middleware.persistence.domain.Award;
 import com.app.middleware.persistence.domain.UserUpload;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

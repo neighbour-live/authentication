@@ -14,6 +14,8 @@ import com.app.middleware.resources.services.AwardsService;
 import com.app.middleware.utility.id.PublicIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -42,6 +44,7 @@ public class AwardsServiceImpl implements AwardsService {
         return awardRepository.findAll();
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public boolean deleteAward(String awardPublicId) throws ResourceNotFoundException {
         Award award = awardRepository.findByPublicId(PublicIdGenerator.decodePublicId(awardPublicId));
@@ -69,6 +72,7 @@ public class AwardsServiceImpl implements AwardsService {
         return userAward;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public boolean deleteUserAward(String userAwardPublicId) throws ResourceNotFoundException {
         UserAward userAward = userAwardsRepository.findByPublicId(PublicIdGenerator.decodePublicId(userAwardPublicId));

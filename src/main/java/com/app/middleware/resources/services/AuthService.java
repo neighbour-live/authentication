@@ -1,6 +1,5 @@
 package com.app.middleware.resources.services;
 
-
 import com.app.middleware.exceptions.type.ResourceNotFoundException;
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserTemporary;

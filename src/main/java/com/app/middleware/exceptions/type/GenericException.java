@@ -16,21 +16,21 @@ public class GenericException extends BaseException {
     private AppErrorType appErrorType;
 
     public GenericException(Exception e) {
-        super(e, ApplicationErrorType.ALADDIN);
+        super(e, ApplicationErrorType.GENERAL);
     }
 
     public GenericException(Exception e, AppErrorType appErrorType) {
-        super(e, ApplicationErrorType.ALADDIN);
+        super(e, ApplicationErrorType.GENERAL);
         this.appErrorType = appErrorType;
     }
 
     public GenericException(AppErrorType appErrorType) {
-        super(ApplicationErrorType.ALADDIN);
+        super(ApplicationErrorType.GENERAL);
         this.appErrorType = appErrorType;
     }
 
     public GenericException(AppErrorType appErrorType, String value) {
-        super(ApplicationErrorType.ALADDIN);
+        super(ApplicationErrorType.GENERAL);
         appErrorType.setValue(value);
         this.appErrorType = appErrorType;
     }

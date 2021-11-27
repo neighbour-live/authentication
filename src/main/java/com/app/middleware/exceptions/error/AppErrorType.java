@@ -4,7 +4,6 @@ public enum AppErrorType implements ErrorEnum {
 
 
     INVALID_APP_VERSION(2001, "You are using an outdated version of the app, please update."),
-
     ;
 
 
