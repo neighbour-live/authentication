@@ -356,17 +356,17 @@
         ALTER TABLE `conversations`
             ADD PRIMARY KEY (`id`),
                 ADD UNIQUE KEY `UK_conversations_publid_id` (`public_id`) USING BTREE,
-                ADD KEY `FK_conversations_second_user_id` (`second_user_id`) USING BTREE,
-                ADD KEY `FK_conversations_first_user_id` (`first_user_id`) USING BTREE;
+                ADD KEY `INDEX_conversations_second_user_id` (`second_user_id`) USING BTREE,
+                ADD KEY `INDEX_conversations_first_user_id` (`first_user_id`) USING BTREE;
 
         --
         -- Indexes for table `firebase_logs`
         --
         ALTER TABLE `firebase_logs`
             ADD PRIMARY KEY (`id`),
-                ADD KEY `FK_fire_logs_user_id` (`user_id`) USING BTREE,
-                ADD KEY `FK_fire_logs_notification_type_id` (`request_type_id`) USING BTREE,
-                ADD KEY `FK_fire_logs_user_notification_id` (`user_notification_id`) USING BTREE;
+                ADD KEY `INDEX_fire_logs_user_id` (`user_id`) USING BTREE,
+                ADD KEY `INDEX_fire_logs_notification_type_id` (`request_type_id`) USING BTREE,
+                ADD KEY `INDEX_fire_logs_user_notification_id` (`user_notification_id`) USING BTREE;
 
         --
         -- Indexes for table `logs`
@@ -413,7 +413,7 @@
                   ADD UNIQUE KEY `UK_user_public_id` (`public_id`) USING BTREE,
                   ADD UNIQUE KEY `UK_user_phone_verification_token` (`phone_verification_token`) USING BTREE,
                   ADD UNIQUE KEY `UK_user_email_verification_token` (`email_verification_token`) USING BTREE,
-                  ADD KEY `FK_user_role_id` (`role_id`) USING BTREE;
+                  ADD KEY `INDEX_user_role_id` (`role_id`) USING BTREE;
 
         --
         -- Indexes for table `user_addresses`
@@ -421,7 +421,7 @@
         ALTER TABLE `user_addresses`
             ADD PRIMARY KEY (`id`),
               ADD UNIQUE KEY `UK_user_address_public_id` (`public_id`) USING BTREE,
-              ADD KEY `FK_user_address_user_id` (`user_id`) USING BTREE;
+              ADD KEY `INDEX_user_address_user_id` (`user_id`) USING BTREE;
 
         --
         -- Indexes for table `user_awards`
@@ -429,8 +429,8 @@
         ALTER TABLE `user_awards`
             ADD PRIMARY KEY (`id`),
               ADD UNIQUE KEY `UK_user_awards_publid_id` (`public_id`) USING BTREE,
-              ADD KEY `FK_user_awards_award_id` (`award_id`) USING BTREE,
-              ADD KEY `FK_user_awards_user_id` (`user_id`) USING BTREE;
+              ADD KEY `INDEX_user_awards_award_id` (`award_id`) USING BTREE,
+              ADD KEY `INDEX_user_awards_user_id` (`user_id`) USING BTREE;
 
         --
         -- Indexes for table `user_chats`
@@ -438,17 +438,17 @@
         ALTER TABLE `user_chats`
             ADD PRIMARY KEY (`id`),
               ADD UNIQUE KEY `UK_user_chats_public_id` (`public_id`) USING BTREE,
-              ADD KEY `FK_user_chats_sender_id` (`sender_public_id`) USING BTREE,
-              ADD KEY `FK_user_chats_receiver_id` (`receiver_public_id`) USING BTREE,
-              ADD KEY `FK_user_chats_conversation_id` (`conversation_public_id`) USING BTREE;
+              ADD KEY `INDEX_user_chats_sender_id` (`sender_public_id`) USING BTREE,
+              ADD KEY `INDEX_user_chats_receiver_id` (`receiver_public_id`) USING BTREE,
+              ADD KEY `INDEX_user_chats_conversation_id` (`conversation_public_id`) USING BTREE;
 
         --
         -- Indexes for table `user_notifications`
         --
         ALTER TABLE `user_notifications`
             ADD PRIMARY KEY (`id`),
-              ADD KEY `FK_user_notifications_user_id` (`user_id`) USING BTREE,
-              ADD KEY `FK_user_notifications_notification_type_id` (`notification_type_id`) USING BTREE;
+              ADD KEY `INDEX_user_notifications_user_id` (`user_id`) USING BTREE,
+              ADD KEY `INDEX_user_notifications_notification_type_id` (`notification_type_id`) USING BTREE;
 
         --
         -- Indexes for table `user_temporary`
@@ -458,7 +458,7 @@
               ADD UNIQUE KEY `UK_user_temporary_phone` (`phone_number`) USING BTREE,
               ADD UNIQUE KEY `UK_user_temporary_email` (`email`) USING BTREE,
               ADD UNIQUE KEY `UK_user_temporary_user_name` (`user_name`) USING BTREE,
-              ADD KEY `FK_user_temporary_user_id` (`user_public_id`) USING BTREE,
+              ADD KEY `INDEX_user_temporary_user_id` (`user_public_id`) USING BTREE,
               ADD KEY `INDEX_user_temporary_password` (`password`) USING BTREE;
 
         --

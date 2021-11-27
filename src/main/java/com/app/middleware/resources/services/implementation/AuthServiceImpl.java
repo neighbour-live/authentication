@@ -1,6 +1,8 @@
 package com.app.middleware.resources.services.implementation;
 
+import com.app.middleware.exceptions.error.ResourceAlreadyExistErrorType;
 import com.app.middleware.exceptions.error.ResourceNotFoundErrorType;
+import com.app.middleware.exceptions.type.ResourceAlreadyExistsException;
 import com.app.middleware.exceptions.type.ResourceNotFoundException;
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserAddress;
@@ -94,13 +96,13 @@ public class AuthServiceImpl implements AuthService {
 
         if(loginRequest.isUserNameLogin()){
             user = userRepository.findByUserName(loginRequest.getUsername());
-            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, loginRequest.getUsername());
+            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, loginRequest.getUsername());
         } else if(loginRequest.isEmailLogin()){
             user = userRepository.findByEmailIgnoreCase(loginRequest.getEmail().toLowerCase());
-            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, loginRequest.getEmail());
+            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, loginRequest.getEmail());
         } else if(loginRequest.isPhoneLogin()){
             user = userRepository.findByPhoneNumber(loginRequest.getPhone());
-            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, loginRequest.getPhone());
+            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, loginRequest.getPhone());
         }
 
         Authentication authentication = authenticationManager.authenticate(
@@ -314,7 +316,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UserTemporary confirmEmailPreRegister(String email, String emailToken, String emailCode) throws Exception {
         UserTemporary userTemporary = userTemporaryService.findByEmailIgnoreCase(email);
-        if(userTemporary == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, email);
+        if(userTemporary == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, email);
         if(userTemporary.getEmailToken().equals(emailToken) && userTemporary.getEmailCode().equals(emailCode))
         {
             //check if OTP is expired
@@ -363,7 +365,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public User confirmEmail(String email, String emailCode) throws Exception {
         User user = userRepository.findByEmailIgnoreCase(email);
-        if(user == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, email);
+        if(user == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, email);
         if(user.getEmailVerificationToken().equals(emailCode))
         {
             //check if OTP is expired
@@ -410,7 +412,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UserTemporary confirmPhonePreRegister(String phoneNumber, String token, String otp) throws Exception {
         UserTemporary userTemporary = userTemporaryService.findByPhoneNumber(phoneNumber);
-        if(userTemporary == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, phoneNumber);
+        if(userTemporary == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, phoneNumber);
         if(userTemporary.getPhoneToken().equals(token) && userTemporary.getPhoneCode().equals(otp))
         {
             //check if OTP is expired
@@ -455,7 +457,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public User confirmPhoneNumber(String phoneNumber, String otp) throws Exception {
         User user = userRepository.findByPhoneNumber(phoneNumber);
-        if(user == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, otp);
+        if(user == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, otp);
         if(user.getPhoneVerificationOTP().equals(otp))
         {
             //check if OTP is expired
@@ -559,7 +561,7 @@ public class AuthServiceImpl implements AuthService {
                 user.setPhoneVerificationToken(null);
                 user.setPhoneVerificationOTP(null);
                 user.setPhoneNumber(editProfileRequest.getPhoneNumber());
-            } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_ALREADY_EXIST_WITH_PHONE);
+            } else throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_PHONE_NUMBER);
 
             String response = AuthConstants.VERIFICATION_OTP_SENT;
             return response;
@@ -572,7 +574,7 @@ public class AuthServiceImpl implements AuthService {
                 user.setEmailVerificationToken(null);
                 user.setEmailVerified(false);
                 user.setEmail(editProfileRequest.getEmail());
-            } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_ALREADY_EXIST_WITH_EMAIL);
+            } else throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_EMAIL);
 
             sendEmailVerification(user.getEmail(), user);
             String response = AuthConstants.VERIFICATION_EMAIL_SENT + editProfileRequest.getEmail();
@@ -684,7 +686,7 @@ public class AuthServiceImpl implements AuthService {
             emailService.sendEmail(mailMessage);
                 smsService.sendOTPMessage(otp, user.getPhoneNumber());
             return true;
-        } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, email);
+        } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, email);
     }
 
     @Override
@@ -718,7 +720,7 @@ public class AuthServiceImpl implements AuthService {
                 throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_OTP);
             }
 
-        } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, email);
+        } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, email);
     }
 
     @Override

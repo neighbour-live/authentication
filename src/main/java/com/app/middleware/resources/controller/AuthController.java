@@ -55,7 +55,10 @@ public class AuthController {
         try {
             user = authService.login(loginRequest);
             //Send Response and save Log
-            ResponseEntity response = GenericResponseEntity.create(StatusCode.SUCCESS, UserMapper.createUserDTOLazy(user), HttpStatus.OK);
+            ResponseEntity response = GenericResponseEntity.create(
+                    StatusCode.SUCCESS,
+                    UserMapper.createUserDTOLazy(user),
+                    HttpStatus.OK);
             loggingService.createLog(user, req.getRemoteAddr(), response, loginRequest);
 
             return response;
@@ -109,8 +112,6 @@ public class AuthController {
         List<String> request = new ArrayList<>();
         request.add(email);
         request.add(req.getRemoteAddr());
-
-
 
         try {
             authService.forgotPasswordRequest(email);
@@ -213,7 +214,7 @@ public class AuthController {
     public ResponseEntity<?> sendPhoneCodePreRegister(@RequestParam("phoneNumber") String phoneNumber, @RequestParam(name = "publicId", required = false) String publicId) throws Exception {
         try {
             User user = new User();
-            if(publicId.isEmpty()){
+            if(publicId == null){
                 user.setPublicId(PublicIdGenerator.generatePublicId());
             } else {
                 user.setPublicId(PublicIdGenerator.decodePublicId(publicId));

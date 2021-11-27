@@ -17,5 +17,5 @@ public class AuthConstants {
     public static final String PAGE_RETRIEVED_SUCCESSFULLY = "Page Retrieved!";
     public static final String VERIFICATION_DOCUMENTS_UPLOADED = " Verification Documents Uploaded ";
     public static final String LOGOUT_SUCCESS = " Logout successfully ";
-
+    public static final String OK = "ok";
 }
