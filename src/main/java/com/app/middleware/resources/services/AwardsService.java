@@ -25,4 +25,6 @@ public interface AwardsService {
     Award getByAwardId(String awardPublicId) throws ResourceNotFoundException;
 
     List<UserAward> getAllUserAwards(User user);
+
+    Award addAward(AddAward addAward, User user);
 }

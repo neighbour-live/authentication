@@ -12,6 +12,9 @@ import javax.validation.constraints.*;
 public class AddAward {
 
     @NotBlank
+    private String userPublicId;
+
+    @NotBlank
     private String title;
 
     @NotBlank

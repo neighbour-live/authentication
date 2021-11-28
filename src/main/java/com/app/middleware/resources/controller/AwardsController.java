@@ -7,6 +7,7 @@ import com.app.middleware.persistence.domain.UserAward;
 import com.app.middleware.persistence.dto.StatusMessageDTO;
 import com.app.middleware.persistence.mapper.AwardMapper;
 import com.app.middleware.persistence.mapper.UserAwardsMapper;
+import com.app.middleware.persistence.request.AddAward;
 import com.app.middleware.persistence.request.AddUserAward;
 import com.app.middleware.persistence.response.GenericResponseEntity;
 import com.app.middleware.resources.services.AuthorizationService;
@@ -40,6 +41,19 @@ public class AwardsController {
         try {
             List<Award> awards = awardsService.getAllAwards();
             return GenericResponseEntity.create(StatusCode.SUCCESS, AwardMapper.createAwardDTOListLazy(awards), HttpStatus.OK);
+        } catch (Exception e) {
+            return ExceptionUtil.handleException(e);
+        }
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('USER') OR hasRole('MODERATOR') OR hasRole('ADMIN')")
+    @ApiOperation(value = "This operation is used to add an award.")
+    public ResponseEntity<?> addAward(@Valid @RequestBody AddAward addAward) throws Exception {
+        try {
+            User user = authorizationService.isCurrentUser(addAward.getUserPublicId());
+            Award award = awardsService.addAward(addAward, user);
+            return GenericResponseEntity.create(StatusCode.SUCCESS, AwardMapper.createAwardDTOLazy(award), HttpStatus.OK);
         } catch (Exception e) {
             return ExceptionUtil.handleException(e);
         }

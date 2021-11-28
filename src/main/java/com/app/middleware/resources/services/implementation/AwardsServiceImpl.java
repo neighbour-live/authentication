@@ -77,10 +77,7 @@ public class AwardsServiceImpl implements AwardsService {
     public boolean deleteUserAward(String userAwardPublicId) throws ResourceNotFoundException {
         UserAward userAward = userAwardsRepository.findByPublicId(PublicIdGenerator.decodePublicId(userAwardPublicId));
         if(userAward == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.AWARD_NOT_FOUND_WITH_PUBLIC_ID, userAwardPublicId);
-        userAward.setIsUnlocked(false);
-        userAward.setIsActive(false);
-        userAward.setProgress(0);
-        userAwardsRepository.save(userAward);
+        userAwardsRepository.delete(userAward);
         return true;
     }
 
@@ -95,5 +92,17 @@ public class AwardsServiceImpl implements AwardsService {
     public List<UserAward> getAllUserAwards(User user) {
         List<UserAward> userAwards = userAwardsRepository.findAllByUser(user);
         return userAwards;
+    }
+
+    @Override
+    public Award addAward(AddAward addAward, User user) {
+
+        Award award = new Award();
+        award.setAwardIcon(addAward.getAwardIconUrl());
+        award.setAwardType(addAward.getAwardType());
+        award.setDescription(addAward.getDescription());
+        award.setPublicId(PublicIdGenerator.generatePublicId());
+        award.setTitle(addAward.getTitle());
+        return awardRepository.save(award);
     }
 }
