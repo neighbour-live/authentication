@@ -59,7 +59,6 @@ public class FaqController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('MODERATOR') OR hasRole('ADMIN')")
     @ApiOperation(value = "This operation is used to add an faq.")
     public ResponseEntity<?> addFaq(@Valid @RequestBody AddFaq addFaq) throws Exception {
         try {
@@ -71,8 +70,7 @@ public class FaqController {
         }
     }
 
-    @PatchMapping()
-    @PreAuthorize("hasRole('MODERATOR') OR hasRole('ADMIN')")
+    @PatchMapping("/{faqPublicId}/user/{userPublicId}")
     @ApiOperation(value = "This operation is used to delete faq.")
     public ResponseEntity<?> deleteFaq(@PathVariable String userPublicId, @PathVariable String faqPublicId) throws Exception {
         try {
@@ -83,15 +81,14 @@ public class FaqController {
                     .status(0)
                     .build(), HttpStatus.CREATED);
         } catch (Exception e) {
-            return ExceptionUtil.handleException(e);
+            return ExceptionUtil.handleException(e) ;
         }
     }
 
 
     @PutMapping()
-    @PreAuthorize("hasRole('MODERATOR') OR hasRole('ADMIN')")
     @ApiOperation(value = "This operation is used to update faq.")
-    public ResponseEntity<?> updateFaq(AddFaq addFaq) throws Exception {
+    public ResponseEntity<?> updateFaq(@Valid @RequestBody AddFaq addFaq) throws Exception {
         try {
             User user = authorizationService.isCurrentUser(addFaq.getUserPublicId());
             faqsService.editFaq(addFaq, user);

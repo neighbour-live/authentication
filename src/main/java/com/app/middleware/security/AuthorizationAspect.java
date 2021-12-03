@@ -93,7 +93,8 @@ public class AuthorizationAspect {
             "/awards/([a-zA-Z0-9]+)/user-award/([a-zA-Z0-9]+)",
 
             "/faq",
-            "/faq/([a-zA-Z0-9]+)"
+            "/faq/([a-zA-Z0-9]+)",
+            "/faq/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)"
     );
 
 

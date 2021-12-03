@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Builder
 @Entity
 @ToString(onlyExplicitlyIncluded = true)
-@Table(name = "awards", schema = "public")
+@Table(name = "faq", schema = "public")
 public class Faq extends BaseEntity  implements Serializable{
     /**
      *

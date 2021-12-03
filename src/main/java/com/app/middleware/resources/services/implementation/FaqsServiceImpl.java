@@ -28,8 +28,8 @@ public class FaqsServiceImpl implements FaqsService {
         faq.setQuestion(addFaq.getQuestion());
         faq.setDescription(addFaq.getDescription());
         faq.setIsActive(true);
-
-        return faqRepository.save(faq);
+        faq = faqRepository.save(faq);
+        return faq;
     }
 
     @Override
