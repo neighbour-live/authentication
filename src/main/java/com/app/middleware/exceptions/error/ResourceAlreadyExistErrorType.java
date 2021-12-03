@@ -30,6 +30,8 @@ public enum ResourceAlreadyExistErrorType implements ErrorEnum {
 
     USER_ADDRESS_ALREADY_EXIST_WITH_PUBLIC_ID(1018, "User address already exist with public ID %s"),
     USER_UPLOAD_ALREADY_EXIST_WITH_PUBLIC_ID(1019, "User uploaded file already exist with public ID %s"),
+
+    FAQ_ALREADY_EXIST_WITH_PUBLIC_ID(1020, "Faq already exist with public ID %s"),
     ;
 
 

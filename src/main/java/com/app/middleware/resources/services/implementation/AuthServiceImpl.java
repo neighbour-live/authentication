@@ -95,14 +95,14 @@ public class AuthServiceImpl implements AuthService {
         }
 
         if(loginRequest.isUserNameLogin()){
-            user = userRepository.findByUserName(loginRequest.getUsername());
-            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, loginRequest.getUsername());
+            user = userRepository.findByUserName(loginRequest.getUserName());
+            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, loginRequest.getUserName());
         } else if(loginRequest.isEmailLogin()){
             user = userRepository.findByEmailIgnoreCase(loginRequest.getEmail().toLowerCase());
             if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, loginRequest.getEmail());
         } else if(loginRequest.isPhoneLogin()){
-            user = userRepository.findByPhoneNumber(loginRequest.getPhone());
-            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, loginRequest.getPhone());
+            user = userRepository.findByPhoneNumber(loginRequest.getPhoneNumber());
+            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, loginRequest.getPhoneNumber());
         }
 
         Authentication authentication = authenticationManager.authenticate(
@@ -149,7 +149,7 @@ public class AuthServiceImpl implements AuthService {
                     .firebaseKey(loginRequest.getFirebaseKey())
                     .build();
 
-            UserNotification userNotification = notificationService.postUserNotification(userNotificationRequest, user);
+//            UserNotification userNotification = notificationService.postUserNotification(userNotificationRequest, user);
 
 
             /**

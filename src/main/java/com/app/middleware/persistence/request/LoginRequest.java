@@ -13,9 +13,8 @@ public class LoginRequest {
 
     @Email(message = "Bad email format.")
     private String email;
-
-    private String username;
-    private String phone;
+    private String userName;
+    private String phoneNumber;
 
     @NotBlank
     private String password;

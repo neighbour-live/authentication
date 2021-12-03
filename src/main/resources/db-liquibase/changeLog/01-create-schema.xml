@@ -604,7 +604,42 @@
         </sql>
     </changeSet>
 
+    <changeSet id="SchemaDropTokenIndexesAndAddingLenghts" author="Sami Haroon Khan">
+        <sql>
+            ALTER TABLE  `users` DROP INDEX `UK_user_refresh_token`;
+            ALTER TABLE  `users` DROP INDEX `UK_user_access_token`;
+
+            ALTER TABLE `users` modify column `access_token`tinytext;
+            ALTER TABLE `users` modify column `refresh_token` tinytext;
+        </sql>
+    </changeSet>
+    <changeSet id="SchemaUpdateAuthTokenDataTypesFromTinyTextToText" author="Sami Haroon Khan">
+        <sql>
+            ALTER TABLE `users` modify column `access_token` TEXT;
+            ALTER TABLE `users` modify column `refresh_token` TEXT;
+        </sql>
+    </changeSet>
+
+    <changeSet id="addFaqSchema" author="Sami Haroon Khan">
+        <sql>
+            CREATE TABLE `faq` (
+                `id` bigint(20) NOT NULL,
+                `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                `is_active` bit(1) DEFAULT true,
+                `public_id` bigint(20) NOT NULL,
+                `question` TEXT,
+                `description` LONGTEXT
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+            ALTER TABLE `faq`
+                ADD PRIMARY KEY (`id`),
+                ADD UNIQUE KEY `UK_faq_public_id` (`public_id`) USING BTREE;
+            COMMIT;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
 
-
-
+<!--        GENERATED AS MD5(RAND(10))-->
+<!--        SHOW INDEX FROM `users_schema`.`users`;-->

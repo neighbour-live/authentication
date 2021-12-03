@@ -47,6 +47,8 @@ public enum ResourceNotFoundErrorType implements ErrorEnum {
     CONVERSATION_NOT_FOUND_WITH_CONVERSATION_ID_IN_USER_CHAT(10050,"Conversation not found with PublicID %s in User Chat", "Conversation not found with Public ID"),
     RECEIVER_NOT_FOUND_WITH_RECEIVER_ID_IN_USER_CHAT(10050,"Receiver not found with PublicID %s in User Chat", "Receiver not found with Public ID"),
     SENDER_NOT_FOUND_WITH_SENDER_ID_IN_USER_CHAT(10050,"Sender not found with PublicID %s in User Chat", "Sender not found with Public ID"),
+
+    FAQ_NOT_FOUND_WITH_FAQ_ID_FAQ(10050,"FAQ not found with PublicID %s in Faq", "FAQ not found with Public ID"),
    ;
 
     private Integer errorCode;

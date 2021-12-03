@@ -5,9 +5,7 @@ public class UniqueKeyExceptionConstants {
     // Users
     public static final String UK_user_email = "UK_user_email";
     public static final String UK_user_user_name= "UK_user_user_name";
-    public static final String UK_user_refresh_token = "UK_user_refresh_token";
     public static final String UK_user_phone = "UK_user_phone";
-    public static final String UK_user_access_token= "UK_user_access_token";
     public static final String UK_user_public_id = "UK_user_public_id";
     public static final String UK_user_phone_verification_token= "UK_user_phone_verification_token";
     public static final String UK_user_email_verification_token= "UK_user_email_verification_token";
@@ -38,5 +36,8 @@ public class UniqueKeyExceptionConstants {
 
     //User Uploads
     public static final String UK_user_upload_public_id = "UK_user_upload_public_id";
+
+    // Faq
+    public static final String UK_faq_public_id = "UK_faq_public_id";
 }
 

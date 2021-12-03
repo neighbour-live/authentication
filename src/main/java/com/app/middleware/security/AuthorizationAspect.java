@@ -48,9 +48,9 @@ public class AuthorizationAspect {
             "/swagger-resources",
             "/swagger-resources/.*");
     private List<String> userUrls = Arrays.asList(
+            "/auth/refresh-token",
             "/user/confirm-email",
             "/user/confirm-phone",
-            "/auth/refresh-token",
             "/user/confirm-phone-number",
             "/user/edit-profile",
             "/user/logout",
@@ -82,8 +82,19 @@ public class AuthorizationAspect {
             "/notification/email",
             "/notification/page",
             "/notification/read",
-            "/notification/read-all");
-    private List<String> moderatorUrls = Arrays.asList();
+            "/notification/read-all",
+            "/faq/([a-zA-Z0-9]+)");
+    private List<String> moderatorUrls = Arrays.asList(
+            "/auth/refresh-token",
+
+            "/awards",
+            "/awards/user-award",
+            "/awards/user-award/([a-zA-Z0-9]+)",
+            "/awards/([a-zA-Z0-9]+)/user-award/([a-zA-Z0-9]+)",
+
+            "/faq",
+            "/faq/([a-zA-Z0-9]+)"
+    );
 
 
     @Before(value = "@annotation(org.springframework.web.bind.annotation.RequestMapping) " +

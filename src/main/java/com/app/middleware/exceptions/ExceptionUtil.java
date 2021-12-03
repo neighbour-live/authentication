@@ -59,13 +59,6 @@ public class ExceptionUtil {
                 throw new ResourceAlreadyExistsException(resourceAlreadyExistErrorType);
             }
 
-            case UniqueKeyExceptionConstants.UK_user_refresh_token: {
-                ResourceAlreadyExistErrorType resourceAlreadyExistErrorType = ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_REFRESH_TOKEN;
-                if (baseEntity instanceof User)
-                    resourceAlreadyExistErrorType.setValue(((User) baseEntity).getRefreshToken());
-                throw new ResourceAlreadyExistsException(resourceAlreadyExistErrorType);
-            }
-
             case UniqueKeyExceptionConstants.UK_user_phone: {
                 ResourceAlreadyExistErrorType resourceAlreadyExistErrorType = ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_PHONE_NUMBER;
                 if (baseEntity instanceof User)
@@ -73,12 +66,6 @@ public class ExceptionUtil {
                 throw new ResourceAlreadyExistsException(resourceAlreadyExistErrorType);
             }
 
-            case UniqueKeyExceptionConstants.UK_user_access_token: {
-                ResourceAlreadyExistErrorType resourceAlreadyExistErrorType = ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_ACCESS_TOKEN;
-                if (baseEntity instanceof User)
-                    resourceAlreadyExistErrorType.setValue(((User) baseEntity).getAccessToken());
-                throw new ResourceAlreadyExistsException(resourceAlreadyExistErrorType);
-            }
 
             case UniqueKeyExceptionConstants.UK_user_public_id: {
                 ResourceAlreadyExistErrorType resourceAlreadyExistErrorType = ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_PUBLIC_ID;
@@ -148,6 +135,10 @@ public class ExceptionUtil {
 
             case UniqueKeyExceptionConstants.UK_user_upload_public_id: {
                 throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_UPLOAD_ALREADY_EXIST_WITH_PUBLIC_ID);
+            }
+
+            case UniqueKeyExceptionConstants.UK_faq_public_id: {
+                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.FAQ_ALREADY_EXIST_WITH_PUBLIC_ID);
             }
 
             default:
