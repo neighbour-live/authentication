@@ -15,7 +15,7 @@ public class FaqMapper {
                 .publicId(PublicIdGenerator.encodedPublicId(faq.getPublicId()))
                 .description(faq.getDescription())
                 .question(faq.getQuestion())
-                .isActive(faq.getIsActive() == null ? true: false)
+                .isActive(faq.getIsActive() == null ? false : true)
                 .build();
 
         return faqDTO;

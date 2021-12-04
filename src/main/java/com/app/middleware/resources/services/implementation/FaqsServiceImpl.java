@@ -55,7 +55,7 @@ public class FaqsServiceImpl implements FaqsService {
     @Override
     public Faq editFaq(AddFaq addFaq, User user) throws ResourceNotFoundException {
         Faq faq = getByFaqId(addFaq.getFaqPublicId());
-        faq.setIsActive(addFaq.getIsActive() == null ? true: false);
+        faq.setIsActive(addFaq.getIsActive() == null ? false : true);
         faq.setQuestion(addFaq.getQuestion());
         faq.setDescription(addFaq.getDescription());
         faq = faqRepository.save(faq);
