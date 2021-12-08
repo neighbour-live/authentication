@@ -400,12 +400,12 @@ public class AuthServiceImpl implements AuthService {
         userTemporary.setPhoneNumber(phoneNumber);
 
         String otp = Utility.generateOTP();
-        otp = "0000"; //temporary
+//        otp = "0000"; //temporary
         String token = Utility.generateSafeToken() + UUID.randomUUID();
         userTemporary.setPhoneCode(otp);
         userTemporary.setPhoneToken(token);
         userTemporary = userTemporaryService.save(userTemporary);
-        smsService.sendOTPMessage(otp, phoneNumber);
+        smsService.sendOTPMessageByTwilio(otp, phoneNumber);
         return userTemporary;
     }
 
@@ -444,11 +444,11 @@ public class AuthServiceImpl implements AuthService {
 
         if(user.getPhoneNumber().equals(phoneNumber)){
             String otp = Utility.generateOTP();
-            otp = "0000"; //temporary
+//            otp = "0000"; //temporary
             user.setPhoneVerificationToken(otp);
             user.setPhoneVerificationOTP(otp);
             user = userRepository.save(user);
-            smsService.sendOTPMessage(otp, phoneNumber);
+            smsService.sendOTPMessageByTwilio(otp, phoneNumber);
             return user.getPhoneVerificationToken();
         }
         throw new Exception("Phone Code is not matching.");
