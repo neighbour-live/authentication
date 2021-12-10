@@ -96,7 +96,4 @@ firebase:
   config: confidential/firebase-configuration.json
   database: https://neighbor-live.firebaseio.com
 
-twilio-sid:
-twilio-token:
-twilio-sender:
 

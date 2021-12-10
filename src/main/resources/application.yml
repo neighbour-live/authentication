@@ -2,12 +2,14 @@ server:
   error:
     whitelabel:
       enabled: false
+
 spring:
   profiles:
     active: dev
   output:
     ansi:
       enabled: always
+
 logging:
   file:
     path: /var/log/app/
@@ -27,5 +29,10 @@ cloud:
     bucket-public: neighborlive-public
     bucket-name: neighborlive-users
     credentials:
-      accessKey: AKIAW53Q7GVWV2TY3EP6
-      secretKey: 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
+      accessKey: ${S3-BUCKET-ACCESS-KEY:test}
+      secretKey: ${S3-BUCKET-SECRET-KEY:test}
+
+
+twilio-sid: ${TWILIO-SID:test}
+twilio-token: ${TWILIO-TOKEN:test}
+twilio-sender: ${TWILIO-SENDER:test}
