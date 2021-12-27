@@ -21,6 +21,7 @@ public class Constants {
     public static final String ENV_QA = "qa";
     public static final String ENV_PROD = "prod";
     public static final String SEND_GRID_FROM_EMAIL = "test@test.com";
+    public static final String AWS_SES_FROM_EMAIL = "social@neighbour.live";
 
     public enum Sort {
         ASCENDING("asc"),
