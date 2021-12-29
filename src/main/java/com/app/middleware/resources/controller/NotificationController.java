@@ -191,7 +191,7 @@ public class NotificationController {
         }
     }
 
-    @PostMapping("/email")
+    @GetMapping("/email")
     @ApiOperation(value = "This hardcoded operation is used to send specific email.")
     public ResponseEntity sendEmailNotification() throws Exception {
 
@@ -199,11 +199,11 @@ public class NotificationController {
         placeHolders.put("dynamic_url", "http://www.google.com");
         //sending Welcome Email
         EmailNotificationDto emailNotificationDto = EmailNotificationDto.builder()
-                .to("abdulsami.se@gmail.com")
+                .to("afinitisami@gmail.com")
                 .template(Constants.EmailTemplate.DYNAMIC_EMAIL_VERIFICATION_TEMPLATE.value())
                 .placeHolders(placeHolders)
                 .build();
-        emailService.sendEmailFromAWSEmailSES(emailNotificationDto);
+        emailService.sendEmailFromExternalApi(emailNotificationDto);
 
         return new ResponseEntity<>(new PushNotificationResponse(HttpStatus.OK.value(), "Notification has been sent."), HttpStatus.OK);
     }
