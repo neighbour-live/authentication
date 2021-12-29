@@ -1,5 +1,4 @@
 package com.app.middleware.config;
-
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
@@ -8,11 +7,9 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class AwsS3ClientConfig {
-
     @Value("${cloud.aws.credentials.accessKey}")
     private String awsId;
 
@@ -23,7 +20,7 @@ public class AwsS3ClientConfig {
     private String region;
 
     @Bean
-    public AmazonS3 s3clientAws() {
+    public AmazonS3 s3client() {
 
         BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsId, awsKey);
         AmazonS3 amazonS3Client = AmazonS3ClientBuilder.standard()
