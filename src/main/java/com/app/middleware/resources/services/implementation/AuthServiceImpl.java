@@ -84,6 +84,9 @@ public class AuthServiceImpl implements AuthService {
     @Value("${email-token-expiry-time}")
     private String EMAIL_TOKEN_EXPIRY_TIME;
 
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
+
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public User login(LoginRequest loginRequest) throws Exception {
@@ -400,12 +403,23 @@ public class AuthServiceImpl implements AuthService {
         userTemporary.setPhoneNumber(phoneNumber);
 
         String otp = Utility.generateOTP();
-//        otp = "0000"; //temporary
         String token = Utility.generateSafeToken() + UUID.randomUUID();
+
+
+        // only set OTP on Prod
+        if(activeProfile != AuthConstants.PROFILE_PROD){
+            otp = "0000";
+        }
+
         userTemporary.setPhoneCode(otp);
         userTemporary.setPhoneToken(token);
         userTemporary = userTemporaryService.save(userTemporary);
-        smsService.sendOTPMessageByTwilio(otp, phoneNumber);
+
+        // only send OTP on Prod
+        if(activeProfile == AuthConstants.PROFILE_PROD){
+            smsService.sendOTPMessageByTwilio(otp, phoneNumber);
+        }
+
         return userTemporary;
     }
 
@@ -444,11 +458,23 @@ public class AuthServiceImpl implements AuthService {
 
         if(user.getPhoneNumber().equals(phoneNumber)){
             String otp = Utility.generateOTP();
-//            otp = "0000"; //temporary
-            user.setPhoneVerificationToken(otp);
+            String token = Utility.generateSafeToken() + UUID.randomUUID();
+
+            // only set OTP on Prod
+            if(activeProfile != AuthConstants.PROFILE_PROD){
+                otp = "0000";
+            }
+
+            user.setPhoneVerificationToken(token);
             user.setPhoneVerificationOTP(otp);
             user = userRepository.save(user);
-            smsService.sendOTPMessageByTwilio(otp, phoneNumber);
+
+
+            // only send OTP on Prod
+            if(activeProfile == AuthConstants.PROFILE_PROD){
+                smsService.sendOTPMessageByTwilio(otp, phoneNumber);
+            }
+
             return user.getPhoneVerificationToken();
         }
         throw new Exception("Phone Code is not matching.");

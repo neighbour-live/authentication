@@ -18,4 +18,10 @@ public class AuthConstants {
     public static final String VERIFICATION_DOCUMENTS_UPLOADED = " Verification Documents Uploaded ";
     public static final String LOGOUT_SUCCESS = " Logout successfully ";
     public static final String OK = "ok";
+
+    public static final String PROFILE_LOCAL = "local";
+    public static final String PROFILE_DEV = "dev";
+    public static final String PROFILE_PROD = "prod";
+
+
 }

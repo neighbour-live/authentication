@@ -21,7 +21,6 @@ public class SMSServiceImpl implements SMSService {
     @Value("${twilio-sender}")
     private String SMS_FROM;
 
-
     @Override
     public void sendOTPMessageByTwilio(String otp, String phoneNumber) throws Exception {
         try {
