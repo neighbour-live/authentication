@@ -34,9 +34,7 @@ cloud:
     bucket-public: neighborlive-public
     bucket-name: neighborlive-users
     credentials:
-      profile-name: default
-      access-key: ${S3-BUCKET-ACCESS-KEY:test}
-      secret-key: ${S3-BUCKET-SECRET-KEY:test}
+      profile-name: neighbour
 
 
 twilio-sid: ${TWILIO-SID:test}
