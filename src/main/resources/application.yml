@@ -14,6 +14,11 @@ logging:
   file:
     path: /var/log/app/
     name: /var/log/app/app.log
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
 
 logo-url: www.google.com
 otp-expiry-time: 300
@@ -29,8 +34,9 @@ cloud:
     bucket-public: neighborlive-public
     bucket-name: neighborlive-users
     credentials:
-      accessKey: ${S3-BUCKET-ACCESS-KEY:test}
-      secretKey: ${S3-BUCKET-SECRET-KEY:test}
+      profile-name: default
+      access-key: ${S3-BUCKET-ACCESS-KEY:test}
+      secret-key: ${S3-BUCKET-SECRET-KEY:test}
 
 
 twilio-sid: ${TWILIO-SID:test}
