@@ -57,7 +57,7 @@ public class S3BucketStorageServiceImpl implements S3BucketStorageService {
             metadata.setContentLength(file.getSize());
             metadata.setContentType(file.getContentType());
 
-            if(ServiceType.Identification.equals(ServiceType.valueOf(serviceName)) || String.valueOf(ServiceType.valueOf(serviceName)).isEmpty())
+            if(String.valueOf(ServiceType.valueOf(serviceName)).isEmpty())
             {
                 throw new Exception("File cannot be uploaded for this service");
             }
