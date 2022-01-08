@@ -216,7 +216,7 @@ public class AuthServiceImpl implements AuthService {
             user.setProvider(AuthProvider.GOOGLE);
             user.setProviderId(AuthProvider.GOOGLE.name());
             user.setFbId("");
-            if(!signUpRequest.getGgId().isEmpty() && signUpRequest.getGgId() != null && signUpRequest.getEmail().isEmpty()){
+            if(!signUpRequest.getGgId().isEmpty() && signUpRequest.getGgId() != null && !signUpRequest.getEmail().isEmpty() && signUpRequest.getEmail() !=null){
                 user.setGgId(signUpRequest.getGgId());
                 user.setEmail(signUpRequest.getEmail());
             } else throw new Exception("For GOOGLE Provider ggId  & email is required");
