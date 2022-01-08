@@ -152,7 +152,7 @@ public class AuthServiceImpl implements AuthService {
                     .firebaseKey(loginRequest.getFirebaseKey())
                     .build();
 
-//            UserNotification userNotification = notificationService.postUserNotification(userNotificationRequest, user);
+            UserNotification userNotification = notificationService.postUserNotification(userNotificationRequest, user);
 
 
             /**
