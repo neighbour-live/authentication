@@ -166,6 +166,7 @@ public class AuthServiceImpl implements AuthService {
         throw new Exception("cannot login!");
     }
 
+//    https://stackoverflow.com/a/42899742/8995178
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public User register(SignUpRequest signUpRequest) throws Exception {
@@ -181,6 +182,7 @@ public class AuthServiceImpl implements AuthService {
         if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.LOCAL)){
 
             user.setProvider(AuthProvider.LOCAL);
+            user.setProviderId(AuthProvider.LOCAL.name());
             if(!userTemporary.getEmail().isEmpty() && userTemporary.getEmail() !=null){
                 user.setEmail(userTemporary.getEmail());
                 user.setFbId("");
@@ -196,6 +198,7 @@ public class AuthServiceImpl implements AuthService {
         else if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.FACEBOOK)) {
 
             user.setProvider(AuthProvider.FACEBOOK);
+            user.setProviderId(AuthProvider.FACEBOOK.name());
             user.setGgId("");
             if(!signUpRequest.getFbId().isEmpty() && signUpRequest.getFbId() !=null){
                 user.setFbId(signUpRequest.getFbId());
@@ -211,11 +214,12 @@ public class AuthServiceImpl implements AuthService {
         else if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.GOOGLE)) {
 
             user.setProvider(AuthProvider.GOOGLE);
+            user.setProviderId(AuthProvider.GOOGLE.name());
             user.setFbId("");
-            if(!signUpRequest.getGgId().isEmpty() && signUpRequest.getGgId() != null){
+            if(!signUpRequest.getGgId().isEmpty() && signUpRequest.getGgId() != null && signUpRequest.getEmail().isEmpty()){
                 user.setGgId(signUpRequest.getGgId());
-                user.setEmail(signUpRequest.getGgId());
-            } else throw new Exception("For GOOGLE Provider fbId is required");
+                user.setEmail(signUpRequest.getEmail());
+            } else throw new Exception("For GOOGLE Provider ggId  & email is required");
 
             if(userTemporary.getPhoneVerified()){
                 user.setPhoneVerified(userTemporary.getPhoneVerified());
@@ -274,8 +278,12 @@ public class AuthServiceImpl implements AuthService {
                 .user(user)
                 .build();
 
+
+        List<UserAddress> userAddresses = new ArrayList<>();
+        userAddresses.add(userAddressService.saveAddress(userAddress));
+        user.setUserAddresses(userAddresses);
+
         user = userRepository.save(user);
-        userAddressService.saveAddress(userAddress);
         userTemporaryService.delete(userTemporary);
 
         //sending Welcome Email
