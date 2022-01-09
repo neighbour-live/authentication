@@ -177,12 +177,15 @@ public class AuthServiceImpl implements AuthService {
         user.setPublicId(userTemporary.getPublicId());
         user.setPhoneNumber(userTemporary.getPhoneNumber());
         user.setUserName(userTemporary.getUserName());
-        user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+
+        String tempPass = null;
 
         if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.LOCAL)){
 
             user.setProvider(AuthProvider.LOCAL);
             user.setProviderId(AuthProvider.LOCAL.name());
+            user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+
             if(!userTemporary.getEmail().isEmpty() && userTemporary.getEmail() !=null){
                 user.setEmail(userTemporary.getEmail());
                 user.setFbId("");
@@ -200,6 +203,10 @@ public class AuthServiceImpl implements AuthService {
             user.setProvider(AuthProvider.FACEBOOK);
             user.setProviderId(AuthProvider.FACEBOOK.name());
             user.setGgId("");
+
+            tempPass = Utility.generatePassword();
+            user.setPassword(passwordEncoder.encode(tempPass));
+
             if(!signUpRequest.getFbId().isEmpty() && signUpRequest.getFbId() !=null){
                 user.setFbId(signUpRequest.getFbId());
                 user.setEmail(signUpRequest.getFbId() + "@fb.com");
@@ -216,6 +223,10 @@ public class AuthServiceImpl implements AuthService {
             user.setProvider(AuthProvider.GOOGLE);
             user.setProviderId(AuthProvider.GOOGLE.name());
             user.setFbId("");
+
+            tempPass = Utility.generatePassword();
+            user.setPassword(passwordEncoder.encode(tempPass));
+
             if(!signUpRequest.getGgId().isEmpty() && signUpRequest.getGgId() != null && !signUpRequest.getEmail().isEmpty() && signUpRequest.getEmail() !=null){
                 user.setGgId(signUpRequest.getGgId());
                 user.setEmail(signUpRequest.getEmail());
@@ -291,7 +302,14 @@ public class AuthServiceImpl implements AuthService {
         mailMessage.setTo(user.getEmail());
         mailMessage.setSubject("Welcome to Neighbour Live! ");
         mailMessage.setFrom(EMAIL_FROM);
-        mailMessage.setText("Welcome " + user.getFirstName() + " " + user.getLastName() + "\n" +"We really Appreciate the valuable addition of you into our growing community. \n");
+
+        if(tempPass.isEmpty()){
+            mailMessage.setText("Welcome " + user.getFirstName() + " " + user.getLastName() + "\n" +"We really Appreciate the valuable addition of you into our growing community. \n");
+        } else {
+            mailMessage.setText("Welcome " + user.getFirstName() + " " + user.getLastName() + "\n" +"We really Appreciate the valuable addition of you into our growing community. \n A temporary password is generated against this email: "+ tempPass + "\n");
+        }
+
+        // Welcome Email
         emailService.sendEmail(mailMessage);
 
         return user;

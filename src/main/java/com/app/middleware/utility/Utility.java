@@ -85,6 +85,12 @@ public class Utility {
         return RandomStringUtils.randomNumeric(6);
     }
 
+    public static String generatePassword() {
+        StringBuilder tokenBuilder = new StringBuilder();
+        tokenBuilder.append(RandomStringUtils.randomAlphanumeric(24));
+        return tokenBuilder.toString();
+    }
+
     public static String generateSafeToken() {
         StringBuilder tokenBuilder = new StringBuilder();
 //        tokenBuilder.append(new String(Longs.toByteArray(System.currentTimeMillis())));
