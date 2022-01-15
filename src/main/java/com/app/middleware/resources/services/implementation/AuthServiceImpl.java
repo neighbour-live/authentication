@@ -178,8 +178,6 @@ public class AuthServiceImpl implements AuthService {
         user.setPhoneNumber(userTemporary.getPhoneNumber());
         user.setUserName(userTemporary.getUserName());
 
-        String tempPass = null;
-
         if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.LOCAL)){
 
             user.setProvider(AuthProvider.LOCAL);
@@ -260,15 +258,18 @@ public class AuthServiceImpl implements AuthService {
         user.setAddressType(AddressType.PERMANENT.toString());
         user.setLat(signUpRequest.getLat());
         user.setLng(signUpRequest.getLng());
+
         user.setIdDocFrontUrl("");
         user.setIdDocBackUrl("");
         user.setNationality(signUpRequest.getNationality() == null ? "": signUpRequest.getNationality());
-        user.setNationality(signUpRequest.getEthnicity() == null ? "": signUpRequest.getEthnicity());
+        user.setEthnicity(signUpRequest.getEthnicity() == null ? "": signUpRequest.getEthnicity());
         user.setIdentificationVerified(false);
         user.setIsBlocked(false);
         user.setIsDeleted(false);
         user.setIsSuspended(false);
 
+        user.setCountry_short(signUpRequest.getCountry());
+        user.setCurrency("USD");
 
         user.setRole(roleRepository.findByRoleType(RoleType.USER));
 
@@ -289,22 +290,17 @@ public class AuthServiceImpl implements AuthService {
 
         List<UserAddress> userAddresses = new ArrayList<>();
         userAddresses.add(userAddressService.saveAddress(userAddress));
+
         user.setUserAddresses(userAddresses);
 
         user = userRepository.save(user);
         userTemporaryService.delete(userTemporary);
 
-        //sending Welcome Email
+//        sending Welcome Email
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(user.getEmail());
         mailMessage.setSubject("Welcome to Neighbour Live! ");
         mailMessage.setFrom(EMAIL_FROM);
-
-        if(tempPass.isEmpty()){
-            mailMessage.setText("Welcome " + user.getFirstName() + " " + user.getLastName() + "\n" +"We really Appreciate the valuable addition of you into our growing community. \n");
-        } else {
-            mailMessage.setText("Welcome " + user.getFirstName() + " " + user.getLastName() + "\n" +"We really Appreciate the valuable addition of you into our growing community. \n A temporary password is generated against this email: "+ tempPass + "\n");
-        }
 
         // Welcome Email
         emailService.sendEmail(mailMessage);
