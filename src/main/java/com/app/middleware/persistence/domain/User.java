@@ -35,6 +35,12 @@ public class User extends BaseEntity  implements Serializable{
     @Column(updatable = false, unique = true, name ="public_id")
     private Long publicId;
 
+    @Column(name ="stripe_id", unique = true)
+    private String stripeId;
+
+    @Column(name ="connect_id", unique = true)
+    private String connectId;
+
     @Column(name ="first_name")
     private String firstName;
 
@@ -71,6 +77,14 @@ public class User extends BaseEntity  implements Serializable{
     @Column(name ="identification_verified")
     @Builder.Default
     private Boolean identificationVerified = false;
+
+    @Column(name ="card_verified")
+    @Builder.Default
+    private Boolean cardVerified = false;
+
+    @Column(name ="bank_verified")
+    @Builder.Default
+    private Boolean bankVerified = false;
 
     @Column(name ="is_blocked")
     @Builder.Default
@@ -187,6 +201,17 @@ public class User extends BaseEntity  implements Serializable{
 //    CascadeType.DETACH : cascade type detach detaches all related entities if a “manual detach” occurs.
 //    CascadeType.ALL : cascade type all is shorthand for all of the above cascade operations.
 
+    @OneToMany(cascade = CascadeType.PERSIST , mappedBy = "user", fetch = FetchType.LAZY)
+    @Builder.Default
+    private Collection<UserPaymentCard> userPaymentCards = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.PERSIST , mappedBy = "user", fetch = FetchType.LAZY)
+    @Builder.Default
+    private Collection<UserBankAccount> userBankAccounts = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.PERSIST , mappedBy = "user", fetch = FetchType.LAZY)
+    @Builder.Default
+    private Collection<UserTransactions> userTransactions = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.PERSIST , mappedBy = "user", fetch = FetchType.LAZY)
     @Builder.Default

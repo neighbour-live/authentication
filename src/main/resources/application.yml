@@ -42,3 +42,7 @@ cloud:
 twilio-sid: ${TWILIO-SID:test}
 twilio-token: ${TWILIO-TOKEN:test}
 twilio-sender: ${TWILIO-SENDER:test}
+
+service-fees-factor: 0.1
+minimum-charge-amount: 10
+currency-factor: 100

@@ -18,6 +18,8 @@ import com.app.middleware.utility.AuthConstants;
 import com.app.middleware.utility.ObjectUtils;
 import com.app.middleware.utility.Utility;
 import com.app.middleware.utility.id.PublicIdGenerator;
+import com.stripe.model.Account;
+import com.stripe.model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -65,6 +67,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private StripeService stripeService;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -166,7 +171,6 @@ public class AuthServiceImpl implements AuthService {
         throw new Exception("cannot login!");
     }
 
-//    https://stackoverflow.com/a/42899742/8995178
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public User register(SignUpRequest signUpRequest) throws Exception {
@@ -293,6 +297,37 @@ public class AuthServiceImpl implements AuthService {
         List<UserAddress> userAddresses = new ArrayList<>();
         userAddresses.add(userAddressService.saveAddress(userAddress));
         user.setUserAddresses(userAddresses);
+
+        /**
+         *
+         */
+        //creating stripe customer account
+        Customer stripeCustomer = stripeService.createStripeCustomer(user);
+        user.setStripeId(stripeCustomer.getId());
+
+        //creating stripe connect user account
+        CreateStripeConnectRequest stripeConnectRequest = new CreateStripeConnectRequest();
+        stripeConnectRequest.setIp(signUpRequest.getIp());
+        stripeConnectRequest.setDob(signUpRequest.getDob());
+        stripeConnectRequest.setAddressLine(signUpRequest.getAddressLine());
+        stripeConnectRequest.setPostalCode(signUpRequest.getPostalCode());
+        stripeConnectRequest.setCity(signUpRequest.getCity());
+        stripeConnectRequest.setState(signUpRequest.getState());
+        stripeConnectRequest.setCountry(signUpRequest.getCountry());
+        stripeConnectRequest.setFirstName(signUpRequest.getFirstName());
+        stripeConnectRequest.setLastName(signUpRequest.getLastName());
+        stripeConnectRequest.setEmail(signUpRequest.getEmail().toLowerCase());
+        stripeConnectRequest.setPhoneNumber(signUpRequest.getPhoneNumber());
+        stripeConnectRequest.setUserPublicId(user.getPublicId());
+
+        Account connectAccount = stripeService.createStripeCustomConnectAccount(stripeConnectRequest);
+        user.setConnectId(connectAccount.getId());
+
+        /**
+         *
+         */
+
+
 
         user = userRepository.save(user);
         userTemporaryService.delete(userTemporary);
