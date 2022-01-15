@@ -204,9 +204,6 @@ public class AuthServiceImpl implements AuthService {
             user.setProviderId(AuthProvider.FACEBOOK.name());
             user.setGgId("");
 
-            tempPass = Utility.generatePassword();
-            user.setPassword(passwordEncoder.encode(tempPass));
-
             if(!signUpRequest.getFbId().isEmpty() && signUpRequest.getFbId() !=null){
                 user.setFbId(signUpRequest.getFbId());
                 user.setEmail(signUpRequest.getFbId() + "@fb.com");
@@ -217,15 +214,14 @@ public class AuthServiceImpl implements AuthService {
                 user.setEmailVerified(true);
             } else throw new Exception("For FACEBOOK Provider a verified phone number is required");
 
+            user.setPassword(passwordEncoder.encode(user.getFbId()));
+
         }
         else if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.GOOGLE)) {
 
             user.setProvider(AuthProvider.GOOGLE);
             user.setProviderId(AuthProvider.GOOGLE.name());
             user.setFbId("");
-
-            tempPass = Utility.generatePassword();
-            user.setPassword(passwordEncoder.encode(tempPass));
 
             if(!signUpRequest.getGgId().isEmpty() && signUpRequest.getGgId() != null && !signUpRequest.getEmail().isEmpty() && signUpRequest.getEmail() !=null){
                 user.setGgId(signUpRequest.getGgId());
@@ -237,6 +233,7 @@ public class AuthServiceImpl implements AuthService {
                 user.setEmailVerified(true);
             } else throw new Exception("For GOOGLE Provider a verified phone number is required");
 
+            user.setPassword(passwordEncoder.encode(user.getGgId()));
         }
         else {
             throw new Exception("Provider can only be LOCAL, FACEBOOK or GOOGLE");
