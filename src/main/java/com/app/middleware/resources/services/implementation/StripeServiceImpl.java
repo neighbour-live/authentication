@@ -184,6 +184,8 @@ public class StripeServiceImpl implements StripeService {
         Map<String, Object> customParameter = new HashMap<>();
         customParameter.put("name", user.getFirstName()+" "+user.getLastName());
         customParameter.put("email", user.getEmail());
+        customParameter.put("phone", user.getPhoneNumber());
+        customParameter.put("username", user.getUserName());
 
         return Customer.create(customParameter);
     }
