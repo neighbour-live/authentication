@@ -182,8 +182,6 @@ public class AuthServiceImpl implements AuthService {
         user.setPhoneNumber(userTemporary.getPhoneNumber());
         user.setUserName(userTemporary.getUserName());
 
-        String tempPass = null;
-
         if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.LOCAL)){
 
             user.setProvider(AuthProvider.LOCAL);
@@ -208,9 +206,6 @@ public class AuthServiceImpl implements AuthService {
             user.setProviderId(AuthProvider.FACEBOOK.name());
             user.setGgId("");
 
-            tempPass = Utility.generatePassword();
-            user.setPassword(passwordEncoder.encode(tempPass));
-
             if(!signUpRequest.getFbId().isEmpty() && signUpRequest.getFbId() !=null){
                 user.setFbId(signUpRequest.getFbId());
                 user.setEmail(signUpRequest.getFbId() + "@fb.com");
@@ -221,15 +216,14 @@ public class AuthServiceImpl implements AuthService {
                 user.setEmailVerified(true);
             } else throw new Exception("For FACEBOOK Provider a verified phone number is required");
 
+            user.setPassword(passwordEncoder.encode(user.getFbId()));
+
         }
         else if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.GOOGLE)) {
 
             user.setProvider(AuthProvider.GOOGLE);
             user.setProviderId(AuthProvider.GOOGLE.name());
             user.setFbId("");
-
-            tempPass = Utility.generatePassword();
-            user.setPassword(passwordEncoder.encode(tempPass));
 
             if(!signUpRequest.getGgId().isEmpty() && signUpRequest.getGgId() != null && !signUpRequest.getEmail().isEmpty() && signUpRequest.getEmail() !=null){
                 user.setGgId(signUpRequest.getGgId());
@@ -241,6 +235,7 @@ public class AuthServiceImpl implements AuthService {
                 user.setEmailVerified(true);
             } else throw new Exception("For GOOGLE Provider a verified phone number is required");
 
+            user.setPassword(passwordEncoder.encode(user.getGgId()));
         }
         else {
             throw new Exception("Provider can only be LOCAL, FACEBOOK or GOOGLE");
@@ -267,15 +262,18 @@ public class AuthServiceImpl implements AuthService {
         user.setAddressType(AddressType.PERMANENT.toString());
         user.setLat(signUpRequest.getLat());
         user.setLng(signUpRequest.getLng());
+
         user.setIdDocFrontUrl("");
         user.setIdDocBackUrl("");
         user.setNationality(signUpRequest.getNationality() == null ? "": signUpRequest.getNationality());
-        user.setNationality(signUpRequest.getEthnicity() == null ? "": signUpRequest.getEthnicity());
+        user.setEthnicity(signUpRequest.getEthnicity() == null ? "": signUpRequest.getEthnicity());
         user.setIdentificationVerified(false);
         user.setIsBlocked(false);
         user.setIsDeleted(false);
         user.setIsSuspended(false);
 
+        user.setCountry_short(signUpRequest.getCountry());
+        user.setCurrency("USD");
 
         user.setRole(roleRepository.findByRoleType(RoleType.USER));
 
@@ -296,6 +294,7 @@ public class AuthServiceImpl implements AuthService {
 
         List<UserAddress> userAddresses = new ArrayList<>();
         userAddresses.add(userAddressService.saveAddress(userAddress));
+
         user.setUserAddresses(userAddresses);
 
         /**
@@ -332,17 +331,11 @@ public class AuthServiceImpl implements AuthService {
         user = userRepository.save(user);
         userTemporaryService.delete(userTemporary);
 
-        //sending Welcome Email
+//        sending Welcome Email
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(user.getEmail());
         mailMessage.setSubject("Welcome to Neighbour Live! ");
         mailMessage.setFrom(EMAIL_FROM);
-
-        if(tempPass.isEmpty()){
-            mailMessage.setText("Welcome " + user.getFirstName() + " " + user.getLastName() + "\n" +"We really Appreciate the valuable addition of you into our growing community. \n");
-        } else {
-            mailMessage.setText("Welcome " + user.getFirstName() + " " + user.getLastName() + "\n" +"We really Appreciate the valuable addition of you into our growing community. \n A temporary password is generated against this email: "+ tempPass + "\n");
-        }
 
         // Welcome Email
         emailService.sendEmail(mailMessage);
