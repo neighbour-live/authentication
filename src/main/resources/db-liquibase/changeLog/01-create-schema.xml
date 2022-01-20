@@ -639,7 +639,151 @@
         </sql>
     </changeSet>
 
+    <changeSet id="StripeConnectSchemaChanges" author="Sami Haroon Khan">
+        <sql>
+            START TRANSACTION;
+            ALTER TABLE `users`
+                ADD COLUMN `stripe_id` varchar(255) AFTER `public_id`,
+                ADD COLUMN `connect_id` varchar(255) AFTER `public_id`,
+                ADD COLUMN `card_verified` BIT(1) NOT NULL DEFAULT false AFTER `identification_verified`,
+                ADD COLUMN `bank_verified` BIT(1) NOT NULL DEFAULT false AFTER `identification_verified`;
+
+            ALTER TABLE `users`
+                ADD UNIQUE KEY `UK_user_stripe_id` (`stripe_id`) USING BTREE;
+            ALTER TABLE `users`
+                ADD UNIQUE KEY `UK_user_stripe_connect_id` (`connect_id`) USING BTREE;
+
+            --
+            -- Table structure for table `user_payments_cards`
+            --
+
+            CREATE TABLE `user_payment_cards` (
+                                                  `id` bigint(20) NOT NULL,
+                                                  `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                  `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                                  `is_active` bit(1) DEFAULT false ,
+                                                  `is_deleted` bit(1) DEFAULT false,
+                                                  `is_default` bit(1) DEFAULT false,
+                                                  `card_verified` bit(1) DEFAULT false,
+                                                  `public_id` bigint(20) NOT NULL,
+                                                  `stripe_source_id` varchar(255) DEFAULT NULL,
+                                                  `connect_source_id` varchar(255) DEFAULT NULL,
+                                                  `stripe_source_object` TEXT DEFAULT NULL,
+                                                  `card_number` varchar(16) DEFAULT NULL,
+                                                  `card_expiry_date` varchar(10) DEFAULT NULL,
+                                                  `card_type` ENUM('CREDIT', 'DEBIT', 'ATM'),
+                                                  `card_brand` ENUM('Visa', 'MasterCard', 'UnionPay', 'AmericanExpress'),
+                                                  `user_id` bigint(20) NOT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+            ALTER TABLE `user_payment_cards`
+                ADD PRIMARY KEY (`id`),
+                ADD UNIQUE KEY `UK_user_payment_cards_public_id` (`public_id`) USING BTREE,
+                ADD UNIQUE KEY `UK_user_payment_cards_stripe_source_id` (`stripe_source_id`) USING BTREE,
+                ADD UNIQUE KEY `UK_user_payment_cards_card_number` (`card_number`) USING BTREE;
+            ALTER TABLE `user_payment_cards`
+                ADD CONSTRAINT `FK_user_payment_cards_public_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`public_id`);
+
+
+
+
+            --
+            -- Table structure for table `user_bank_account`
+            --
+
+            CREATE TABLE `user_bank_account` (
+                                                 `id` bigint(20) NOT NULL,
+                                                 `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                 `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                                 `is_active` bit(1) DEFAULT false ,
+                                                 `is_deleted` bit(1) DEFAULT false,
+                                                 `is_default` bit(1) DEFAULT false,
+                                                 `is_verified` bit(1) DEFAULT false,
+                                                 `public_id` bigint(20) NOT NULL,
+                                                 `stripe_source_id` varchar(255) DEFAULT NULL,
+                                                 `stripe_source_object` TEXT DEFAULT NULL,
+                                                 `account_holder_name` varchar(100) NOT NULL,
+                                                 `bank_name` varchar(100) NOT NULL,
+                                                 `transit_number` varchar(10) DEFAULT NULL,
+                                                 `financial_institution_number` varchar(10) DEFAULT NULL,
+                                                 `account_number` varchar(50) NOT NULL,
+                                                 `user_id` bigint(20) NOT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+            ALTER TABLE `user_bank_account`
+                ADD PRIMARY KEY (`id`),
+                ADD UNIQUE KEY `UK_user_bank_account_public_id` (`public_id`) USING BTREE,
+            ADD UNIQUE KEY `UK_user_bank_account_stripe_source_id` (`stripe_source_id`) USING BTREE,
+            ADD UNIQUE KEY `UK_user_bank_account_account_number` (`account_number`) USING BTREE;
+            ALTER TABLE `user_bank_account`
+                ADD CONSTRAINT `FK_user_bank_account_public_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`public_id`);
+
+
+            --
+            -- Table structure for table `user_transactions`
+            --
+
+            CREATE TABLE `user_transactions` (
+                                                 `id` bigint(20) NOT NULL,
+                                                 `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                 `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                                 `transaction_type` ENUM('CREDIT', 'DEBIT', 'ESCROW'),
+                                                 `public_id` bigint(20) NOT NULL,
+                                                 `amount` float NOT NULL,
+                                                 `purpose` TEXT DEFAULT NULL,
+                                                 `category` varchar(100) DEFAULT NULL,
+                                                 `description` varchar(100) DEFAULT NULL,
+                                                 `payment_id` varchar(10) NOT NULL,
+                                                 `user_id` bigint(20) NOT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+            ALTER TABLE `user_transactions`
+                ADD PRIMARY KEY (`id`),
+                ADD UNIQUE KEY `UK_user_transactions_public_id` (`public_id`) USING BTREE,
+            ADD UNIQUE KEY `UK_user_transactions_payment_id` (`payment_id`) USING BTREE;
+            ALTER TABLE `user_transactions`
+                ADD CONSTRAINT `FK_user_transactions_public_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`public_id`);
+
+
+
+            --
+            -- Table structure for table `user_wallet`
+            --
+
+            CREATE TABLE `user_wallet` (
+                                           `id` bigint(20) NOT NULL,
+                                           `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                           `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                           `transaction_type` ENUM('CREDIT', 'DEBIT', 'ESCROW'),
+                                           `public_id` bigint(20) NOT NULL,
+                                           `amount` float NOT NULL,
+                                           `currency` varchar(31) NOT NULL,
+                                           `user_id` bigint(20) NOT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+            ALTER TABLE `user_wallet`
+                ADD PRIMARY KEY (`id`),
+                ADD UNIQUE KEY `UK_user_wallet_public_id` (`public_id`) USING BTREE;
+            ALTER TABLE `user_wallet`
+                ADD CONSTRAINT `FK_user_wallets_public_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`public_id`);
+
+            COMMIT;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
+
+<!--        Hibernate: alter table user_payment_cards add column cardholder_name varchar(255) not null-->
+<!--        Hibernate: alter table user_temporary add column public_id bigint not null-->
+<!--        Hibernate: alter table awards drop index UK_553xyershkjrsjdgx510w6kf7-->
+<!--        Hibernate: alter table awards add constraint UK_553xyershkjrsjdgx510w6kf7 unique (public_id)-->
+<!--        Hibernate: alter table conversations drop index UK_q07914pcv9kk9toltnas25mrh-->
+<!--        Hibernate: alter table conversations add constraint UK_q07914pcv9kk9toltnas25mrh unique (public_id)-->
+<!--        Hibernate: alter table user_temporary drop index UK_m4buelcm4waa5cpybal3rxvvr-->
+<!--        Hibernate: alter table user_temporary add constraint UK_m4buelcm4waa5cpybal3rxvvr unique (public_id)-->
+<!--        Hibernate: alter table users drop index UK_s24bux761rbgowsl7a4b386ba-->
+<!--        Hibernate: alter table users add constraint UK_s24bux761rbgowsl7a4b386ba unique (public_id)-->
+
 
 <!--        GENERATED AS MD5(RAND(10))-->
 <!--        SHOW INDEX FROM `users_schema`.`users`;-->

@@ -3,6 +3,7 @@ package com.app.middleware.exceptions;
 import com.app.middleware.exceptions.constants.*;
 import com.app.middleware.exceptions.error.ResourceAlreadyExistErrorType;
 import com.app.middleware.exceptions.error.ResourceNotFoundErrorType;
+import com.app.middleware.exceptions.error.SomethingUnexpectedErrorType;
 import com.app.middleware.exceptions.type.*;
 import com.app.middleware.persistence.domain.*;
 import com.app.middleware.persistence.response.PageableResponseEntity;
@@ -19,20 +20,23 @@ public class ExceptionUtil {
 
         String constraintName = ((ConstraintViolationException) exception.getCause()).getConstraintName();
 
-        if(constraintName.startsWith(ExceptionConstants.UNIQUE_KEY_EXCEPTION_CONSTANT)) {
-            handleUniqueKeyException(constraintName, baseEntity);
-        }
-        else if(constraintName.startsWith(ExceptionConstants.FOREIGN_KEY_EXCEPTION_CONSTANT)) {
-            handleForeignKeyException(constraintName, baseEntity);
-        }
-        else if(constraintName.endsWith(ExceptionConstants.CHECK_EXCEPTION_CONSTANT)) {
-            handleCheckException(constraintName, baseEntity);
-        }
-        else {
-            handleNotNullException(constraintName, baseEntity);
+        if(constraintName != null){
+            if(constraintName.startsWith(ExceptionConstants.UNIQUE_KEY_EXCEPTION_CONSTANT)) {
+                handleUniqueKeyException(constraintName, baseEntity);
+            }
+            else if(constraintName.startsWith(ExceptionConstants.FOREIGN_KEY_EXCEPTION_CONSTANT)) {
+                handleForeignKeyException(constraintName, baseEntity);
+            }
+            else if(constraintName.endsWith(ExceptionConstants.CHECK_EXCEPTION_CONSTANT)) {
+                handleCheckException(constraintName, baseEntity);
+            }
+            else {
+                handleNotNullException(constraintName, baseEntity);
+            }
         }
 
-        throw new SomethingUnexpectedException(exception);
+
+        throw new SomethingUnexpectedException(exception, exception.getMessage());
     }
 
     private static void validateConstraintViolationException(DataIntegrityViolationException exception) throws SomethingUnexpectedException {

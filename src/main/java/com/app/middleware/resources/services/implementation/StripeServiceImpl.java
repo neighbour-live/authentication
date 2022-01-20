@@ -110,7 +110,7 @@ public class StripeServiceImpl implements StripeService {
 
         //For now only for CANADA
         params.put("type", "custom");
-        params.put("country", "USA");
+        params.put("country", "US");
         params.put("business_type", "individual");
         params.put("default_currency", "usd");
         params.put("email", stripeConnectRequest.getEmail());
@@ -185,7 +185,6 @@ public class StripeServiceImpl implements StripeService {
         customParameter.put("name", user.getFirstName()+" "+user.getLastName());
         customParameter.put("email", user.getEmail());
         customParameter.put("phone", user.getPhoneNumber());
-        customParameter.put("username", user.getUserName());
 
         return Customer.create(customParameter);
     }
@@ -337,7 +336,7 @@ public class StripeServiceImpl implements StripeService {
 
         Map<String, Object> tokenParams = new HashMap<>();
         Map<String, Object> bankAccountParams = new HashMap<>();
-        bankAccountParams.put("country", "USA");
+        bankAccountParams.put("country", "US");
         bankAccountParams.put("currency", "usd");
         bankAccountParams.put("account_holder_type", "individual");
         bankAccountParams.put("account_holder_name", addBankAccountRequest.getAccountHolderName());

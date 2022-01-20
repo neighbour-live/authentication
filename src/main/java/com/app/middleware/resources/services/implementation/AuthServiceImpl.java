@@ -271,6 +271,8 @@ public class AuthServiceImpl implements AuthService {
         user.setIsBlocked(false);
         user.setIsDeleted(false);
         user.setIsSuspended(false);
+        user.setCardVerified(false);
+        user.setBankVerified(false);
 
         user.setCountry_short(signUpRequest.getCountry());
         user.setCurrency("USD");
@@ -320,15 +322,10 @@ public class AuthServiceImpl implements AuthService {
         stripeConnectRequest.setUserPublicId(user.getPublicId());
 
         Account connectAccount = stripeService.createStripeCustomConnectAccount(stripeConnectRequest);
+
         user.setConnectId(connectAccount.getId());
-
-        /**
-         *
-         */
-
-
-
         user = userRepository.save(user);
+
         userTemporaryService.delete(userTemporary);
 
 //        sending Welcome Email
