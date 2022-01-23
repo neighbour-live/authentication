@@ -1,8 +1,6 @@
 package com.app.middleware.resources.controller;
 
-import com.app.middleware.exception.ResourceNotFoundException;
 import com.app.middleware.exceptions.ExceptionUtil;
-import com.app.middleware.exceptions.type.UnauthorizedException;
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserTransactions;
 import com.app.middleware.persistence.domain.UserWallet;
@@ -24,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;

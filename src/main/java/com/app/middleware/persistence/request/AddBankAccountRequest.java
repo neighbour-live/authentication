@@ -16,13 +16,13 @@ import javax.validation.constraints.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AddBankAccountRequest {
 
-    @Length(max = 5, min = 5)
-    @Pattern(regexp = "[0-9]{5}", message = "Your transit number has five digits and is on the left-most side of your cheque, please enter valid transit number.")
+    @Length(max = 6, min = 5)
+    @Pattern(regexp = "[0-9]{6}", message = "Your transit number has five digits and is on the left-most side of your cheque, please enter valid transit number.")
     @NotBlank
     private String transitNumber;
 
-    @Length(max = 3, min = 3)
-    @Pattern(regexp = "[0-9]{3}", message = "Your financial institution number from your bank, the three-digit number in the center of your cheque, please enter valid financial institution number.")
+    @Length(max = 4, min = 3)
+    @Pattern(regexp = "[0-9]{4}", message = "Your financial institution number from your bank, the three-digit number in the center of your cheque, please enter valid financial institution number.")
     @NotBlank
     private String financialInstitutionNumber;
 

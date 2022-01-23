@@ -83,7 +83,32 @@ public class AuthorizationAspect {
             "/notification/page",
             "/notification/read",
             "/notification/read-all",
-            "/faq/([a-zA-Z0-9]+)");
+            "/faq/([a-zA-Z0-9]+)",
+
+            "/user-wallet",
+            "/user-wallet/([a-zA-Z0-9]+)",
+            "/user-wallet/redeem",
+            "/user-wallet/transactions",
+            "/user-wallet/balance",
+            "/user-wallet/frequency",
+            "/user-wallet/account",
+            "/user-wallet/account/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
+            "/user-wallet/transaction/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
+
+            "/user-bank",
+            "/user-bank/([a-zA-Z0-9]+)",
+            "/user-bank/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
+            "/user-bank/add-bank",
+            "/user-bank/check-bank",
+            "/user-bank/verify-bank",
+
+            "/user-card",
+            "/user-card/([a-zA-Z0-9]+)",
+            "/user-card/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
+            "/user-card/check-card",
+            "/user-card/add-card"
+    );
+
     private List<String> moderatorUrls = Arrays.asList(
             "/auth/refresh-token",
             "/user/confirm-email",
@@ -122,7 +147,30 @@ public class AuthorizationAspect {
             "/notification/read-all",
             "/faq",
             "/faq/([a-zA-Z0-9]+)",
-            "/faq/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)"
+            "/faq/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
+
+            "/user-wallet",
+            "/user-wallet/([a-zA-Z0-9]+)",
+            "/user-wallet/redeem",
+            "/user-wallet/transactions",
+            "/user-wallet/balance",
+            "/user-wallet/frequency",
+            "/user-wallet/account",
+            "/user-wallet/account/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
+            "/user-wallet/transaction/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
+
+            "/user-bank",
+            "/user-bank/([a-zA-Z0-9]+)",
+            "/user-bank/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
+            "/user-bank/add-bank",
+            "/user-bank/check-bank",
+            "/user-bank/verify-bank",
+
+            "/user-card",
+            "/user-card/([a-zA-Z0-9]+)",
+            "/user-card/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
+            "/user-card/check-card",
+            "/user-card/add-card"
     );
 
 
