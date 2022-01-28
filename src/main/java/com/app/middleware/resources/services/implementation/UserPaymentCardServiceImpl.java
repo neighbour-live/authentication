@@ -44,7 +44,7 @@ public class UserPaymentCardServiceImpl implements UserPaymentCardService {
     }
 
     @Override
-    public boolean checkCardExist(Long card) {
+    public boolean checkCardExist(String card) {
         User user = userRepository.findByUserPaymentCards(card);
         if(user == null){
             return false;

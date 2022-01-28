@@ -1,8 +1,6 @@
 package com.app.middleware.resources.controller;
 
-import com.app.middleware.exception.ResourceNotFoundException;
 import com.app.middleware.exceptions.ExceptionUtil;
-import com.app.middleware.exceptions.type.UnauthorizedException;
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserPaymentCard;
 import com.app.middleware.persistence.dto.StatusMessageDTO;
@@ -20,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -41,7 +38,7 @@ public class UserPaymentCardController {
     @GetMapping("/check-card")
     @PreAuthorize("hasRole('USER')")
     @ApiOperation(value = "This operation is used to check card.")
-    public ResponseEntity<?> checkCard(@RequestParam("card") Long card) throws Exception {
+    public ResponseEntity<?> checkCard(@RequestParam("card") String card) throws Exception {
         try {
             Boolean response = userPaymentCardService.checkCardExist(card);
             return GenericResponseEntity.create(StatusCode.SUCCESS, response, HttpStatus.OK);

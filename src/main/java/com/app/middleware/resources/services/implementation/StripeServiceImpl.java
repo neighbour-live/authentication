@@ -284,12 +284,17 @@ public class StripeServiceImpl implements StripeService {
                     paymentCard.setIsDefault(false);
                 }
             });
-            userPaymentCardsRepository.saveAll(userPaymentCards);
+            userPaymentCards = userPaymentCardsRepository.saveAll(userPaymentCards);
 
 
             List<UserBankAccount> userBankAccounts = userBankAccountRepository.findAllByUser(user);
             userBankAccounts.forEach( bank -> bank.setIsDefault(false));
-            userBankAccountRepository.saveAll(userBankAccounts);
+            userBankAccounts = userBankAccountRepository.saveAll(userBankAccounts);
+
+            //updating user-car-banks
+            user.setUserBankAccounts(userBankAccounts);
+            user.setUserPaymentCards(userPaymentCards);
+            userRepository.save(user);
         }
 
         System.out.println(gson.toJson(customerCard));
@@ -341,9 +346,10 @@ public class StripeServiceImpl implements StripeService {
         bankAccountParams.put("account_holder_type", "individual");
         bankAccountParams.put("account_holder_name", addBankAccountRequest.getAccountHolderName());
         bankAccountParams.put("account_number", addBankAccountRequest.getAccountNumber());
-        //routing number = Transit Number(5 digits) - Financial Institute Number(3 Digits)
-        bankAccountParams.put("routing_number", addBankAccountRequest.getTransitNumber() +"-"+ addBankAccountRequest.getFinancialInstitutionNumber());
-
+        //routing number = Transit Number(5 digits) - Financial Institute Number(3 Digits) // for CANADA
+        //routing number = Transit Number(6 digits) - Financial Institute Number(3 Digits) // for AMERICA
+//        bankAccountParams.put("routing_number", addBankAccountRequest.getTransitNumber() +"-"+ addBankAccountRequest.getFinancialInstitutionNumber()); // FOR CANADA
+        bankAccountParams.put("routing_number", addBankAccountRequest.getTransitNumber() + addBankAccountRequest.getFinancialInstitutionNumber()); // FOR AMERICA
         tokenParams.put("bank_account", bankAccountParams);
         Token token = Token.create(tokenParams);
 
@@ -355,7 +361,7 @@ public class StripeServiceImpl implements StripeService {
         }
         BankAccount bankAccount = (BankAccount) account.getExternalAccounts().create(params);
 
-        //Creating BanK Account Object for  local User
+        //Creating Bank Account Object for local User
         UserBankAccount userBankAccount = new UserBankAccount();
         userBankAccount.setUser(user);
         userBankAccount.setIsActive(true);
@@ -381,11 +387,16 @@ public class StripeServiceImpl implements StripeService {
                     bank.setIsDefault(false);
                 }
             });
-            userBankAccountRepository.saveAll(userBankAccounts);
+            userBankAccounts = userBankAccountRepository.saveAll(userBankAccounts);
 
             List<UserPaymentCard> userPaymentCards = userPaymentCardsRepository.findAllByUser(user);
             userPaymentCards.forEach( paymentCard -> paymentCard.setIsDefault(false));
-            userPaymentCardsRepository.saveAll(userPaymentCards);
+            userPaymentCards = userPaymentCardsRepository.saveAll(userPaymentCards);
+
+            //updating user-car-banks
+            user.setUserBankAccounts(userBankAccounts);
+            user.setUserPaymentCards(userPaymentCards);
+            userRepository.save(user);
         }
 
         return userBankAccount;

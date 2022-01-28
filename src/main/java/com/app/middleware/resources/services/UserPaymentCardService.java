@@ -12,7 +12,7 @@ import java.util.List;
 public interface UserPaymentCardService {
     UserPaymentCard addPaymentCard(AddPaymentCardRequest addPaymentCardRequest, String publicId, String userConnectId) throws StripeException, ResourceNotFoundException, UnauthorizedException;
 
-    boolean checkCardExist(Long card);
+    boolean checkCardExist(String card);
 
     List<UserPaymentCard> getAllUserPaymentCard(User user);
 
