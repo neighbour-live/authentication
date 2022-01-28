@@ -93,6 +93,8 @@ public class AuthorizationAspect {
             "/user-wallet/frequency",
             "/user-wallet/account",
             "/user-wallet/account/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
+            "/user-wallet/set-default-payment-source",
+            "/user-wallet/set-default-payment-source/([a-zA-Z0-9]+)",
             "/user-wallet/transaction/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
 
             "/user-bank",
@@ -152,11 +154,14 @@ public class AuthorizationAspect {
             "/user-wallet",
             "/user-wallet/([a-zA-Z0-9]+)",
             "/user-wallet/redeem",
-            "/user-wallet/transactions",
+
             "/user-wallet/balance",
             "/user-wallet/frequency",
             "/user-wallet/account",
             "/user-wallet/account/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
+            "/user-wallet/set-default-payment-source",
+            "/user-wallet/set-default-payment-source/([a-zA-Z0-9]+)",
+            "/user-wallet/transactions",
             "/user-wallet/transaction/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
 
             "/user-bank",

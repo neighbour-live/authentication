@@ -129,6 +129,20 @@ public class UserWalletController {
     }
 
 
+
+
+//    @PostMapping("/account")
+//    @PreAuthorize("hasRole('USER')")
+//    @ApiOperation(value = "This operation is used to create connect account.")
+//    public ResponseEntity<?> createConnectAccount(@RequestParam("userPublicId") String userPublicId) throws Exception {
+//        try {
+//            User user = authorizationService.isCurrentUser(userPublicId);
+//            return GenericResponseEntity.create(StatusCode.SUCCESS, userWalletService.createConnectAccount(user), HttpStatus.OK);
+//        } catch (Exception e) {
+//            return ExceptionUtil.handleException(e);
+//        }
+//    }
+
     //Stripe connect pay-in and payout
     @GetMapping("/account/{accountId}/user/{userPublicId}")
     @PreAuthorize("hasRole('USER')")
@@ -143,19 +157,7 @@ public class UserWalletController {
         }
     }
 
-    @PostMapping("/account")
-    @PreAuthorize("hasRole('USER')")
-    @ApiOperation(value = "This operation is used to create connect account.")
-    public ResponseEntity<?> createConnectAccount(@RequestParam("userPublicId") String userPublicId) throws Exception {
-        try {
-            User user = authorizationService.isCurrentUser(userPublicId);
-            return GenericResponseEntity.create(StatusCode.SUCCESS, userWalletService.createConnectAccount(user), HttpStatus.OK);
-        } catch (Exception e) {
-            return ExceptionUtil.handleException(e);
-        }
-    }
-
-    @PutMapping("/account")
+    @PutMapping("/set-default-payment-source")
     @PreAuthorize("hasRole('USER')")
     @ApiOperation(value = "This operation is used to set default currency account.")
     public ResponseEntity<?> setDefaultCurrencyAccount(
