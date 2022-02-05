@@ -5,6 +5,7 @@ import com.app.middleware.exceptions.type.UnauthorizedException;
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserBankAccount;
 import com.app.middleware.persistence.domain.UserPaymentCard;
+import com.app.middleware.persistence.domain.UserTransactions;
 import com.app.middleware.persistence.repository.UserBankAccountRepository;
 import com.app.middleware.persistence.repository.UserPaymentCardsRepository;
 import com.app.middleware.persistence.repository.UserRepository;
@@ -14,6 +15,7 @@ import com.app.middleware.persistence.request.AddPaymentCardRequest;
 import com.app.middleware.persistence.request.CreateStripeConnectRequest;
 import com.app.middleware.persistence.request.RedeemAmount;
 import com.app.middleware.persistence.type.Intervals;
+import com.app.middleware.persistence.type.TransactionType;
 import com.app.middleware.resources.services.StripeService;
 import com.app.middleware.utility.id.PublicIdGenerator;
 import com.google.gson.Gson;
@@ -27,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -435,7 +438,7 @@ public class StripeServiceImpl implements StripeService {
 
         return true;
     }
-
+//
 //    @Override
 //    public UserTransactions chargeMoneyFromTaskPoster(Task task) throws StripeException {
 //        Stripe.apiKey = API_SECRET_KEY;
@@ -458,7 +461,8 @@ public class StripeServiceImpl implements StripeService {
 //        params.put("currency", "usd");
 //        params.put("source", posterCard.getId());
 //
-//        params.put( "description", "Reserved Payment to BidOnTask for: \nTask: " +task.getTitle()+"\n" +
+//        params.put( "description", "Reserved Payment: \n" +
+//                    "Item: " +task.getTitle()+"\n" +
 //                    "Task description: "+task.getDescription()+"\n"+
 //                    "Task budget: "+task.getBudget()
 //        );

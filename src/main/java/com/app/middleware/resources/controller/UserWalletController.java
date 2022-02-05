@@ -55,6 +55,30 @@ public class UserWalletController {
         }
     }
 
+//    @PostMapping("/pay-in")
+//    @PreAuthorize("hasRole('USER')")
+//    @ApiOperation(value = "This operation is used to charge amount from user's card")
+//    public ResponseEntity<?> chargeMoneyFromUser(@Valid @RequestBody RedeemAmount redeemAmount) throws Exception {
+//        try {
+//            User user = authorizationService.isCurrentUser(redeemAmount.getUserPublicId());
+//            return GenericResponseEntity.create(StatusCode.SUCCESS, userWalletService.subtractMoneyAndSendItToUserPaymentOption(redeemAmount, user), HttpStatus.OK);
+//        } catch (Exception e) {
+//            return ExceptionUtil.handleException(e);
+//        }
+//    }
+//
+//    @PostMapping("/pay-out")
+//    @PreAuthorize("hasRole('USER')")
+//    @ApiOperation(value = "This operation is used to transfer amount to user's bank")
+//    public ResponseEntity<?> sendMoneyToUser(@Valid @RequestBody RedeemAmount redeemAmount) throws Exception {
+//        try {
+//            User user = authorizationService.isCurrentUser(redeemAmount.getUserPublicId());
+//            return GenericResponseEntity.create(StatusCode.SUCCESS, userWalletService.subtractMoneyAndSendItToUserPaymentOption(redeemAmount, user), HttpStatus.OK);
+//        } catch (Exception e) {
+//            return ExceptionUtil.handleException(e);
+//        }
+//    }
+
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     @ApiOperation(value = "This operation is used to fetch user wallet details.")

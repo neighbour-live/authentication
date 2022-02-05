@@ -4,6 +4,7 @@ import com.app.middleware.exceptions.type.UnauthorizedException;
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserBankAccount;
 import com.app.middleware.persistence.domain.UserPaymentCard;
+import com.app.middleware.persistence.domain.UserTransactions;
 import com.app.middleware.persistence.request.AddBankAccountRequest;
 import com.app.middleware.persistence.request.AddPaymentCardRequest;
 import com.app.middleware.persistence.request.CreateStripeConnectRequest;
@@ -29,10 +30,6 @@ public interface StripeService {
 
     boolean deleteBankAccount(User user, UserBankAccount userBankAccount) throws StripeException;
 
-//    UserTransactions chargeMoneyFromTaskPoster(Task task) throws StripeException;
-//
-//    UserTransactions transferMoneyFromPlatformToTasker(Task task) throws StripeException;
-
     Account createStripeCustomConnectAccount(CreateStripeConnectRequest stripeConnectRequest) throws StripeException;
 
     Account getConnectAccount(String connectId) throws StripeException;
@@ -50,6 +47,11 @@ public interface StripeService {
     Card editCard(User user, UserPaymentCard userPaymentCard, AddPaymentCardRequest addPaymentCardRequest) throws StripeException;
 
     BankAccount editBankAccount(User user, UserBankAccount userBankAccount, AddBankAccountRequest addBankAccountRequest) throws StripeException;
+
+
+//    UserTransactions chargeMoneyFromTaskPoster(Task task) throws StripeException;
+//
+//    UserTransactions transferMoneyFromPlatformToTasker(Task task) throws StripeException;
 
     Payout subtractMoneyAndSendItToUserPaymentOption(RedeemAmount redeemAmount, User user) throws StripeException;
 }
