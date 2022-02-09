@@ -88,10 +88,11 @@ public class AuthController {
         User user = null;
         try {
             user = authService.register(signUpRequest);
-            ResponseEntity response = GenericResponseEntity.create(StatusMessageDTO.builder()
-                    .message(AuthConstants.REGISTRATION_SUCCESSFUL)
-                    .status(0)
-                    .build(), HttpStatus.CREATED);
+            
+            ResponseEntity response = GenericResponseEntity.create(
+                    StatusCode.SUCCESS,
+                    UserMapper.createUserDTOLazy(user),
+                    HttpStatus.CREATED);
 
             loggingService.createLog(user, signUpRequest.getIp(), response, signUpRequest);
             return response;
