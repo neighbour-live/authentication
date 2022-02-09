@@ -16,6 +16,7 @@ import com.app.middleware.security.CurrentUser;
 import com.app.middleware.security.UserPrincipal;
 import com.app.middleware.utility.AuthConstants;
 import com.app.middleware.utility.StatusCode;
+import com.app.middleware.utility.id.PublicIdGenerator;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,6 +54,20 @@ public class UserController {
             Optional<User> user = Optional.ofNullable(userService.findById(userPrincipal.getId())
                     .orElseThrow(() -> new ResourceNotFoundException("User", "id", userPrincipal.getId())));
             return GenericResponseEntity.create(StatusCode.SUCCESS, UserMapper.createUserDTOLazy(user.get()), HttpStatus.OK);
+        } catch (Exception e) {
+            return ExceptionUtil.handleException(e);
+        }
+
+    }
+
+    @GetMapping("/check-user")
+    @PreAuthorize("hasRole('USER')")
+    @ApiOperation(value = "This operation is used to fetch details of a user.")
+    public ResponseEntity<?> getUserMinimalDetails(@RequestParam("currentUserPublicId") String currentUserPublicId, @RequestParam("requiredUserPublicId") String requiredUserPublicId) throws Exception {
+        try {
+            User user = authorizationService.isCurrentUser(currentUserPublicId);
+            User requiredUser = userService.findByPublicId(PublicIdGenerator.decodePublicId(requiredUserPublicId));
+            return GenericResponseEntity.create(StatusCode.SUCCESS, UserMapper.createUserMinimalDetailsDTOLazy(requiredUser), HttpStatus.OK);
         } catch (Exception e) {
             return ExceptionUtil.handleException(e);
         }
