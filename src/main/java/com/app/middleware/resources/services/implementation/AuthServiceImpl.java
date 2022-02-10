@@ -535,6 +535,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public User findByPublicId(Long decodePublicId) {
+        return userRepository.findByPublicId(decodePublicId);
+    }
+
+    @Override
     public HashMap<Object, Boolean> getUserVerificationStatus(String publicId) throws ResourceNotFoundException {
         User user = userRepository.findByPublicId(PublicIdGenerator.decodePublicId(publicId));
         if(user == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_PUBLIC_ID, publicId);
