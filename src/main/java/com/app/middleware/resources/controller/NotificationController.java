@@ -200,11 +200,12 @@ public class NotificationController {
     public ResponseEntity sendEmailNotification() throws Exception {
 
         Map<String, String> placeHolders = new HashMap<String, String>();
-        placeHolders.put("dynamic_url", "http://www.neighbour.live/verify-using-link");
+        placeHolders.put("first_name", "test");
         //sending Welcome Email
         EmailNotificationDto emailNotificationDto = EmailNotificationDto.builder()
-                .to(emailFrom)
-                .template(Constants.EmailTemplate.GENERIC_EMAIL.value())
+                .to("afinitisami@gmail.com")
+                .template(Constants.EmailTemplate.WELCOME_TEMPLATE.value())
+                .subject("Test Welcome!")
                 .placeHolders(placeHolders)
                 .build();
         emailService.sendEmailFromExternalApi(emailNotificationDto);

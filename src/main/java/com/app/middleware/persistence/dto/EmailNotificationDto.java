@@ -12,6 +12,5 @@ public class EmailNotificationDto {
     private String to;
     private Map<String, String> placeHolders;
     private String template;
-
-
+    private String subject;
 }

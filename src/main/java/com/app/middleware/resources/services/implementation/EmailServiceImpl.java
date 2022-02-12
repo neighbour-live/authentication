@@ -20,6 +20,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.rmi.server.ExportException;
+import java.util.logging.Handler;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -43,17 +45,20 @@ public class EmailServiceImpl implements EmailService {
     public void sendEmailFromExternalApi(EmailNotificationDto emailNotificationDto) throws IOException {
 
 
-        Mail mail = new Mail();
+
         Email from = new Email();
-
         from.setEmail(emailFrom);
-        mail.setFrom(from);
-
-        Personalization personalization = new Personalization();
 
         Email to = new Email();
         to.setEmail(emailNotificationDto.getTo());
+
+
+        Mail mail = new Mail();
+        mail.setFrom(from);
+
+        Personalization personalization = new Personalization();
         personalization.addTo(to);
+        personalization.setSubject(emailNotificationDto.getSubject());
 
         if(!ObjectUtils.isNull(emailNotificationDto.getPlaceHolders())){
             for(String placeHolder : emailNotificationDto.getPlaceHolders().keySet()){
@@ -64,7 +69,7 @@ public class EmailServiceImpl implements EmailService {
 
         Content content = new Content();
         content.setType("text/html");
-        content.setValue("Something");
+        content.setValue(" "); // <- must be a string with at least one character
         mail.addContent(content);
         mail.setTemplateId(emailNotificationDto.getTemplate());
 
@@ -80,7 +85,7 @@ public class EmailServiceImpl implements EmailService {
             System.out.println(response.getBody());
             System.out.println(response.getHeaders());
         } catch (IOException ex) {
-            throw ex;
+            throw new IOException(ex);
         }
     }
 }
