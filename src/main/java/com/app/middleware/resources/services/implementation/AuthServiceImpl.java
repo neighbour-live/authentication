@@ -8,6 +8,7 @@ import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserAddress;
 import com.app.middleware.persistence.domain.UserNotification;
 import com.app.middleware.persistence.domain.UserTemporary;
+import com.app.middleware.persistence.dto.EmailNotificationDto;
 import com.app.middleware.persistence.repository.RoleRepository;
 import com.app.middleware.persistence.repository.UserRepository;
 import com.app.middleware.persistence.request.*;
@@ -15,6 +16,7 @@ import com.app.middleware.persistence.type.*;
 import com.app.middleware.resources.services.*;
 import com.app.middleware.security.TokenProvider;
 import com.app.middleware.utility.AuthConstants;
+import com.app.middleware.utility.Constants;
 import com.app.middleware.utility.ObjectUtils;
 import com.app.middleware.utility.Utility;
 import com.app.middleware.utility.id.PublicIdGenerator;
@@ -296,14 +298,15 @@ public class AuthServiceImpl implements AuthService {
         user = userRepository.save(user);
         userTemporaryService.delete(userTemporary);
 
-//        sending Welcome Email
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(user.getEmail());
-        mailMessage.setSubject("Welcome to Neighbour Live! ");
-        mailMessage.setFrom(EMAIL_FROM);
-
-        // Welcome Email
-        emailService.sendEmail(mailMessage);
+        Map<String, String> placeHolders = new HashMap<String, String>();
+        placeHolders.put("dynamic_url", "http://www.neighbour.live/verify-using-link");
+        //sending Welcome Email
+        EmailNotificationDto emailNotificationDto = EmailNotificationDto.builder()
+                .to(EMAIL_FROM)
+                .template(Constants.EmailTemplate.WELCOME_TEMPLATE.value())
+                .placeHolders(placeHolders)
+                .build();
+        emailService.sendEmailFromExternalApi(emailNotificationDto);
 
         return user;
     }

@@ -27,8 +27,11 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     public JavaMailSender javaMailSender;
 
+    @Value("${email.from}")
+    private String emailFrom;
+
     @Value("${email.api-key}")
-    private String sendGridApiKey;
+    private String sendgridAPIKey;
 
     @Override
     @Async
@@ -39,10 +42,11 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendEmailFromExternalApi(EmailNotificationDto emailNotificationDto) throws IOException {
 
+
         Mail mail = new Mail();
         Email from = new Email();
 
-        from.setEmail(Constants.SEND_GRID_FROM_EMAIL);
+        from.setEmail(emailFrom);
         mail.setFrom(from);
 
         Personalization personalization = new Personalization();
@@ -64,7 +68,7 @@ public class EmailServiceImpl implements EmailService {
         mail.addContent(content);
         mail.setTemplateId(emailNotificationDto.getTemplate());
 
-        SendGrid sg = new SendGrid(sendGridApiKey);
+        SendGrid sg = new SendGrid(sendgridAPIKey);
 
         Request request = new Request();
         try {
