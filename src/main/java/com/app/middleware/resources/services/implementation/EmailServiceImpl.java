@@ -44,14 +44,11 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendEmailFromExternalApi(EmailNotificationDto emailNotificationDto) throws IOException {
 
-
-
         Email from = new Email();
         from.setEmail(emailFrom);
 
         Email to = new Email();
         to.setEmail(emailNotificationDto.getTo());
-
 
         Mail mail = new Mail();
         mail.setFrom(from);
