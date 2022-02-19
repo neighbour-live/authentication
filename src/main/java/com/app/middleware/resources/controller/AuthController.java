@@ -1,6 +1,7 @@
 package com.app.middleware.resources.controller;
 
 import com.app.middleware.exceptions.ExceptionUtil;
+import com.app.middleware.exceptions.error.ResourceNotFoundErrorType;
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserTemporary;
 import com.app.middleware.persistence.dto.StatusMessageDTO;
@@ -101,6 +102,19 @@ public class AuthController {
             loggingService.createLog(null, signUpRequest.getIp(), e, signUpRequest);
             return ExceptionUtil.handleException(e);
         }
+    }
+
+    @GetMapping("/check-user")
+    @ApiOperation(value = "This operation is used to fetch details of a user.")
+    public ResponseEntity<?> getUserMinimalDetails(@RequestParam("userPublicId") String userPublicId) throws Exception {
+        try {
+            User user = authService.findByPublicId(PublicIdGenerator.decodePublicId(userPublicId));
+            if(user == null) throw new com.app.middleware.exceptions.type.ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_PUBLIC_ID, userPublicId);
+            return GenericResponseEntity.create(StatusCode.SUCCESS, UserMapper.createUserMinimalDetailsDTOLazy(user), HttpStatus.OK);
+        } catch (Exception e) {
+            return ExceptionUtil.handleException(e);
+        }
+
     }
 
     @PatchMapping("/forgot-password")

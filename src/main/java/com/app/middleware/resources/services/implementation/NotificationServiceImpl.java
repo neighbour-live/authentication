@@ -625,7 +625,7 @@ public class NotificationServiceImpl implements NotificationService {
             try {
                 emailService.sendEmailFromExternalApi(EmailNotificationDto.builder()
                         .to(user.getEmail())
-                        .template(Constants.EmailTemplate.EMAIL_VERIFICATION_TEMPLATE.value())
+                        .template(Constants.EmailTemplate.GENERIC_EMAIL.value())
                         .build());
             } catch (IOException e) {
                 e.printStackTrace();

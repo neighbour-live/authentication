@@ -16,6 +16,7 @@ import com.app.middleware.utility.Constants;
 import com.app.middleware.utility.StatusCode;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/notification")
 public class NotificationController {
+
+    @Value("${email.from}")
+    private String emailFrom;
 
     @Autowired
     private AuthorizationService authorizationService;
@@ -196,11 +200,12 @@ public class NotificationController {
     public ResponseEntity sendEmailNotification() throws Exception {
 
         Map<String, String> placeHolders = new HashMap<String, String>();
-        placeHolders.put("dynamic_url", "http://www.google.com");
+        placeHolders.put("first_name", "test");
         //sending Welcome Email
         EmailNotificationDto emailNotificationDto = EmailNotificationDto.builder()
                 .to("afinitisami@gmail.com")
-                .template(Constants.EmailTemplate.DYNAMIC_EMAIL_VERIFICATION_TEMPLATE.value())
+                .template(Constants.EmailTemplate.WELCOME_TEMPLATE.value())
+                .subject("Test Welcome!")
                 .placeHolders(placeHolders)
                 .build();
         emailService.sendEmailFromExternalApi(emailNotificationDto);

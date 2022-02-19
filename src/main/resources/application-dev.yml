@@ -89,8 +89,8 @@ app:
 
 email:
   redirection: https://ec2-35-156-85-34.eu-central-1.compute.amazonaws.com:8443
-  api-key: B0RSG.Abzf8Ozws-lJsrl1NjuWbIvww9j94bWesvysZIYfBg.SlUGaqMovZnAy7qbvmS1
-  from: neighbourlivemal@gmail.com
+  api-key: ${SENDGRIDAPIKEY:test}
+  from: social@neighbour.live
 firebase:
   config: confidential/firebase-configuration.json
   database: https://neighbor-live.firebaseio.com
