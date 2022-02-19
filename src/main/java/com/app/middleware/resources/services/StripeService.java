@@ -1,14 +1,11 @@
 package com.app.middleware.resources.services;
 
 import com.app.middleware.exceptions.type.UnauthorizedException;
+import com.app.middleware.persistence.domain.Charge;
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserBankAccount;
 import com.app.middleware.persistence.domain.UserPaymentCard;
-import com.app.middleware.persistence.domain.UserTransactions;
-import com.app.middleware.persistence.request.AddBankAccountRequest;
-import com.app.middleware.persistence.request.AddPaymentCardRequest;
-import com.app.middleware.persistence.request.CreateStripeConnectRequest;
-import com.app.middleware.persistence.request.RedeemAmount;
+import com.app.middleware.persistence.request.*;
 import com.stripe.exception.StripeException;
 import com.stripe.model.*;
 
@@ -54,4 +51,6 @@ public interface StripeService {
 //    UserTransactions transferMoneyFromPlatformToTasker(Task task) throws StripeException;
 
     Payout subtractMoneyAndSendItToUserPaymentOption(RedeemAmount redeemAmount, User user) throws StripeException;
+
+    Charge chargeMoney(Charge charge, User user, PayAmountRequest payAmountRequest) throws UnauthorizedException, StripeException;
 }

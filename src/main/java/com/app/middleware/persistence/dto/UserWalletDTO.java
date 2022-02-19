@@ -17,7 +17,7 @@ public class UserWalletDTO {
 
     private String publicId;
     private String currency;
-    private BigDecimal amount;
+    private Double amount;
     private UserPaymentCardsDTO userPaymentCard;
     private UserBankAccountDTO userBankAccount;
     private String userPublicId;

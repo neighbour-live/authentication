@@ -6,9 +6,11 @@ import com.app.middleware.persistence.domain.UserTransactions;
 import com.app.middleware.persistence.domain.UserWallet;
 import com.app.middleware.persistence.dto.UserTransactionBreakdownDTO;
 import com.app.middleware.persistence.mapper.BalanceMapper;
+import com.app.middleware.persistence.mapper.ChargeMapper;
 import com.app.middleware.persistence.mapper.UserTransactionMapper;
 import com.app.middleware.persistence.mapper.UserWalletMapper;
 import com.app.middleware.persistence.repository.UserRepository;
+import com.app.middleware.persistence.request.PayAmountRequest;
 import com.app.middleware.persistence.request.RedeemAmount;
 import com.app.middleware.persistence.response.GenericResponseEntity;
 import com.app.middleware.resources.services.AuthorizationService;
@@ -55,29 +57,29 @@ public class UserWalletController {
         }
     }
 
-//    @PostMapping("/pay-in")
-//    @PreAuthorize("hasRole('USER')")
-//    @ApiOperation(value = "This operation is used to charge amount from user's card")
-//    public ResponseEntity<?> chargeMoneyFromUser(@Valid @RequestBody RedeemAmount redeemAmount) throws Exception {
-//        try {
-//            User user = authorizationService.isCurrentUser(redeemAmount.getUserPublicId());
-//            return GenericResponseEntity.create(StatusCode.SUCCESS, userWalletService.subtractMoneyAndSendItToUserPaymentOption(redeemAmount, user), HttpStatus.OK);
-//        } catch (Exception e) {
-//            return ExceptionUtil.handleException(e);
-//        }
-//    }
-//
-//    @PostMapping("/pay-out")
-//    @PreAuthorize("hasRole('USER')")
-//    @ApiOperation(value = "This operation is used to transfer amount to user's bank")
-//    public ResponseEntity<?> sendMoneyToUser(@Valid @RequestBody RedeemAmount redeemAmount) throws Exception {
-//        try {
-//            User user = authorizationService.isCurrentUser(redeemAmount.getUserPublicId());
-//            return GenericResponseEntity.create(StatusCode.SUCCESS, userWalletService.subtractMoneyAndSendItToUserPaymentOption(redeemAmount, user), HttpStatus.OK);
-//        } catch (Exception e) {
-//            return ExceptionUtil.handleException(e);
-//        }
-//    }
+    @PostMapping("/pay-in")
+    @PreAuthorize("hasRole('USER')")
+    @ApiOperation(value = "This operation is used to charge amount from user's card")
+    public ResponseEntity<?> chargeMoneyFromUser(@Valid @RequestBody PayAmountRequest payAmountRequest) throws Exception {
+        try {
+            User user = authorizationService.isCurrentUser(payAmountRequest.getPayerPublicId());
+            return GenericResponseEntity.create(StatusCode.SUCCESS, ChargeMapper.createChargeDTOLazy(userWalletService.payMoney(payAmountRequest, user)), HttpStatus.OK);
+        } catch (Exception e) {
+            return ExceptionUtil.handleException(e);
+        }
+    }
+
+    @PostMapping("/pay-out")
+    @PreAuthorize("hasRole('USER')")
+    @ApiOperation(value = "This operation is used to transfer amount to user's bank")
+    public ResponseEntity<?> sendMoneyToUser(@Valid @RequestBody RedeemAmount redeemAmount) throws Exception {
+        try {
+            User user = authorizationService.isCurrentUser(redeemAmount.getUserPublicId());
+            return GenericResponseEntity.create(StatusCode.SUCCESS, userWalletService.subtractMoneyAndSendItToUserPaymentOption(redeemAmount, user), HttpStatus.OK);
+        } catch (Exception e) {
+            return ExceptionUtil.handleException(e);
+        }
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('USER')")
@@ -151,21 +153,6 @@ public class UserWalletController {
             return ExceptionUtil.handleException(e);
         }
     }
-
-
-
-
-//    @PostMapping("/account")
-//    @PreAuthorize("hasRole('USER')")
-//    @ApiOperation(value = "This operation is used to create connect account.")
-//    public ResponseEntity<?> createConnectAccount(@RequestParam("userPublicId") String userPublicId) throws Exception {
-//        try {
-//            User user = authorizationService.isCurrentUser(userPublicId);
-//            return GenericResponseEntity.create(StatusCode.SUCCESS, userWalletService.createConnectAccount(user), HttpStatus.OK);
-//        } catch (Exception e) {
-//            return ExceptionUtil.handleException(e);
-//        }
-//    }
 
     //Stripe connect pay-in and payout
     @GetMapping("/account/{accountId}/user/{userPublicId}")

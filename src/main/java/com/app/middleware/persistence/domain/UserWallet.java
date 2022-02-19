@@ -28,7 +28,7 @@ public class UserWallet extends BaseEntity {
     private String currency;
 
     @Column(nullable = false, name ="amount")
-    private BigDecimal amount;
+    private Double amount;
 
     @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @Builder.Default

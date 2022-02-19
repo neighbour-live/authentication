@@ -86,9 +86,14 @@ public class AuthorizationAspect {
             "/notification/read-all",
             "/faq/([a-zA-Z0-9]+)",
 
+            "/charge",
+            "/user-wallet/([a-zA-Z0-9]+)",
+
             "/user-wallet",
             "/user-wallet/([a-zA-Z0-9]+)",
             "/user-wallet/redeem",
+            "/user-wallet/pay-in",
+            "/user-wallet/pay-out",
             "/user-wallet/transactions",
             "/user-wallet/balance",
             "/user-wallet/frequency",
@@ -152,10 +157,14 @@ public class AuthorizationAspect {
             "/faq/([a-zA-Z0-9]+)",
             "/faq/([a-zA-Z0-9]+)/user/([a-zA-Z0-9]+)",
 
+            "/charge",
+            "/user-wallet/([a-zA-Z0-9]+)",
+
             "/user-wallet",
             "/user-wallet/([a-zA-Z0-9]+)",
             "/user-wallet/redeem",
-
+            "/user-wallet/pay-in",
+            "/user-wallet/pay-out",
             "/user-wallet/balance",
             "/user-wallet/frequency",
             "/user-wallet/account",

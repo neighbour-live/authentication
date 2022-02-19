@@ -2,19 +2,11 @@ package com.app.middleware.resources.services.implementation;
 
 import com.app.middleware.exceptions.error.UnauthorizedExceptionErrorType;
 import com.app.middleware.exceptions.type.UnauthorizedException;
-import com.app.middleware.persistence.domain.User;
-import com.app.middleware.persistence.domain.UserBankAccount;
-import com.app.middleware.persistence.domain.UserPaymentCard;
-import com.app.middleware.persistence.domain.UserTransactions;
-import com.app.middleware.persistence.repository.UserBankAccountRepository;
-import com.app.middleware.persistence.repository.UserPaymentCardsRepository;
-import com.app.middleware.persistence.repository.UserRepository;
-import com.app.middleware.persistence.repository.UserTransactionsRepository;
-import com.app.middleware.persistence.request.AddBankAccountRequest;
-import com.app.middleware.persistence.request.AddPaymentCardRequest;
-import com.app.middleware.persistence.request.CreateStripeConnectRequest;
-import com.app.middleware.persistence.request.RedeemAmount;
+import com.app.middleware.persistence.domain.*;
+import com.app.middleware.persistence.repository.*;
+import com.app.middleware.persistence.request.*;
 import com.app.middleware.persistence.type.Intervals;
+import com.app.middleware.persistence.type.PaymentStatus;
 import com.app.middleware.persistence.type.TransactionType;
 import com.app.middleware.resources.services.StripeService;
 import com.app.middleware.utility.id.PublicIdGenerator;
@@ -23,6 +15,7 @@ import com.google.gson.GsonBuilder;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.*;
+import com.stripe.model.Charge;
 import com.stripe.net.RequestOptions;
 import com.stripe.param.PayoutCreateParams;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +39,12 @@ public class StripeServiceImpl implements StripeService {
 
     @Autowired
     private UserBankAccountRepository userBankAccountRepository;
+
+    @Autowired
+    private UserWalletRepository userWalletRepository;
+
+    @Autowired
+    private ChargeRepository chargeRepository;
 
     @Value("${stripe.keys.secret}")
     private String API_SECRET_KEY;
@@ -438,9 +437,9 @@ public class StripeServiceImpl implements StripeService {
 
         return true;
     }
-//
+
 //    @Override
-//    public UserTransactions chargeMoneyFromTaskPoster(Task task) throws StripeException {
+//    public UserTransactions chargeMoneyFromTaskPoster(Charge charge) throws StripeException {
 //        Stripe.apiKey = API_SECRET_KEY;
 //        Stripe.clientId = API_CLIENT_KEY;
 //
@@ -492,7 +491,7 @@ public class StripeServiceImpl implements StripeService {
 //        taskRepository.save(task);
 //        return userTransaction;
 //    }
-//
+
 //    @Override
 //    public UserTransactions transferMoneyFromPlatformToTasker(Task task) throws StripeException {
 //
@@ -698,5 +697,86 @@ public class StripeServiceImpl implements StripeService {
         Payout payout = Payout.create(params, requestOptions);
 
         return payout;
+    }
+
+    @Override
+    public com.app.middleware.persistence.domain.Charge chargeMoney(com.app.middleware.persistence.domain.Charge charge, User user, PayAmountRequest payAmountRequest) throws UnauthorizedException, StripeException {
+
+        Stripe.apiKey = API_SECRET_KEY;
+        Stripe.clientId = API_CLIENT_KEY;
+
+        if(!charge.getIsActive() && charge.getIsPaid()){
+            throw new UnauthorizedException(UnauthorizedExceptionErrorType.UNAUTHORIZED_ACTION, "Cannot pay for already paid charges");
+        }
+
+        if(!charge.getPayer().getPublicId().equals(user.getPublicId())){
+            throw new UnauthorizedException(UnauthorizedExceptionErrorType.UNAUTHORIZED_ACTION, "User is not authorized to pay these charges");
+        }
+
+        if(charge.getCreator().getPublicId().equals(user.getPublicId())){
+            throw new UnauthorizedException(UnauthorizedExceptionErrorType.UNAUTHORIZED_ACTION, "User is not authorized to pay these charges");
+        }
+
+
+        if(payAmountRequest.getPayByWallet()){
+            UserWallet userWallet = userWalletRepository.findByUserPublicId(user.getPublicId());
+
+            int temp = (int) Math.ceil(payAmountRequest.getAmount());
+            if(userWallet.getAmount() < temp){
+                throw new UnauthorizedException(UnauthorizedExceptionErrorType.UNAUTHORIZED_ACTION, "User does not have enough amount in wallet");
+            }
+        }
+
+        Customer customer = retrieveStripeCustomer(user.getStripeId());
+        List<UserPaymentCard> customerPaymentCards = userPaymentCardsRepository.findAllByUser(user);
+        Card customerCard = (Card) customer.getSources().retrieve(customerPaymentCards.get(0).getStripeSourceId());
+
+        Long amount = Long.valueOf(Math.round((payAmountRequest.getAmount()) * CURRENCY_FACTOR));
+
+        // `source` is obtained with Stripe.js; see https://stripe.com/docs/payments/accept-a-payment-charges#web-create-token
+        // Charging from a payment "source"
+        // "source" to be charged. This can be the ID of a card (i.e., credit or debit card), a bank account,
+        // a source, a token, or a connected account. For certain sources—namely, cards, bank accounts, and attached
+        // sources—you must also pass the ID of the associated customer.
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("amount", amount);
+        params.put("currency", "usd");
+        params.put("source", customerCard.getId());
+
+        params.put("description", "Reserved Payment: \n" +
+                "Item: " + payAmountRequest.getReason()+"\n" +
+                "description: " + payAmountRequest.getDescription()+"\n"+
+                "Amount: " + payAmountRequest.getAmount()+"\n"+
+                "Service: " + payAmountRequest.getServiceType()
+        );
+
+        //Optional
+        params.put("customer", customer.getId());
+        params.put("receipt_email", user.getEmail());
+        params.put("capture", "true");
+
+        Charge stripeCharge = Charge.create(params);
+
+        //Creating Receipt
+        UserTransactions userTransaction = new UserTransactions();
+        userTransaction.setPublicId(PublicIdGenerator.generatePublicId());
+        userTransaction.setUser(user);
+
+        userTransaction.setPurpose(charge.getTitle());
+        userTransaction.setDescription(charge.getDescription());
+        userTransaction.setCategory(charge.getServiceType());
+
+        userTransaction.setAmount(BigDecimal.valueOf(amount));
+        userTransaction.setPaymentId(stripeCharge.getId());
+        userTransaction.setTransactionType(TransactionType.DEBIT.toString());
+        userTransaction = userTransactionsRepository.save(userTransaction);
+
+
+        charge.setIsPaid(true);
+        charge.setIsActive(false);
+        charge.setPaymentStatus(PaymentStatus.PAID.toString());
+        charge = chargeRepository.save(charge);
+        return charge;
     }
 }

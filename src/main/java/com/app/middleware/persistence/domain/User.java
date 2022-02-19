@@ -225,6 +225,14 @@ public class User extends BaseEntity  implements Serializable{
     @Builder.Default
     private Collection<UserAward> userAwards = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.PERSIST , mappedBy = "creator", fetch = FetchType.LAZY)
+    @Builder.Default
+    private Collection<Charge> createdCharges = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.PERSIST , mappedBy = "payer", fetch = FetchType.LAZY)
+    @Builder.Default
+    private Collection<Charge> paidCharges = new ArrayList<>();
+
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name="role_id",  referencedColumnName="id")
     private Role role;

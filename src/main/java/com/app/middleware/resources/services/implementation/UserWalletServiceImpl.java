@@ -2,6 +2,8 @@ package com.app.middleware.resources.services.implementation;
 
 import com.app.middleware.exception.ResourceNotFoundException;
 import com.app.middleware.exceptions.error.ResourceNotFoundErrorType;
+import com.app.middleware.exceptions.type.UnauthorizedException;
+import com.app.middleware.persistence.domain.Charge;
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserTransactions;
 import com.app.middleware.persistence.domain.UserWallet;
@@ -11,8 +13,10 @@ import com.app.middleware.persistence.mapper.UserTransactionMapper;
 import com.app.middleware.persistence.repository.UserTransactionsRepository;
 import com.app.middleware.persistence.repository.UserWalletRepository;
 import com.app.middleware.persistence.request.CreateStripeConnectRequest;
+import com.app.middleware.persistence.request.PayAmountRequest;
 import com.app.middleware.persistence.request.RedeemAmount;
 import com.app.middleware.persistence.type.TransactionType;
+import com.app.middleware.resources.services.ChargeService;
 import com.app.middleware.resources.services.StripeService;
 import com.app.middleware.resources.services.UserWalletService;
 import com.app.middleware.utility.id.PublicIdGenerator;
@@ -36,6 +40,9 @@ public class UserWalletServiceImpl implements UserWalletService {
     private StripeService stripeService;
 
     @Autowired
+    private ChargeService chargeService;
+
+    @Autowired
     private UserWalletRepository userWalletRepository;
 
     @Autowired
@@ -53,7 +60,7 @@ public class UserWalletServiceImpl implements UserWalletService {
         UserWallet userWallet = userWalletRepository.findByUserPublicId(user.getPublicId());
         if(userWallet == null && user.getIsDeleted() == false){
             UserWallet wallet = new UserWallet();
-            wallet.setAmount(BigDecimal.ZERO);
+            wallet.setAmount(0d);
             wallet.setCurrency("USD");
             wallet.setPublicId(PublicIdGenerator.generatePublicId());
             wallet.setUser(user);
@@ -124,6 +131,14 @@ public class UserWalletServiceImpl implements UserWalletService {
     @Override
     public Account setPaymentFrequency(User user, String interval, int weeklyAnchor, int monthlyAnchor, int delayDays) throws StripeException {
         return stripeService.setPaymentFrequency(user, interval, weeklyAnchor, monthlyAnchor,delayDays);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Override
+    public Charge payMoney(PayAmountRequest payAmountRequest, User user) throws com.app.middleware.exceptions.type.ResourceNotFoundException, StripeException, UnauthorizedException {
+        Charge charge = chargeService.getChargeByPublicId(PublicIdGenerator.decodePublicId(payAmountRequest.getChargePublicId()));
+        charge = stripeService.chargeMoney(charge, user, payAmountRequest);
+        return charge;
     }
 
 }

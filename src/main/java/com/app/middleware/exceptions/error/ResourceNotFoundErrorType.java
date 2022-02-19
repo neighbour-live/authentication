@@ -54,6 +54,7 @@ public enum ResourceNotFoundErrorType implements ErrorEnum {
     USER_BANK_ACCOUNT_NOT_FOUND_WITH_PUBLIC_ID_IN_USER_BANK_ACCOUNT(10050, "Bank Account not found with  Bank Account PublicID %s in Bank Account ", "Bank Account not found"),
     USER_PAYMENT_CARD_NOT_FOUND_WITH_PUBLIC_ID_IN_USER_PAYMENT_CARD(10050, "Payment Card  not found with  Payment Card  PublicID %s in Transactions ", "Payment Card  not found"),
     USER_TRANSACTION_NOT_FOUND_WITH_USER_PUBLIC_ID(10050, "Transaction not found with Transaction PublicID %s in Transactions ", "Transaction not found"),
+    CHARGE_NOT_FOUND_WITH_CHARGE_PUBLIC_ID(10050, "Charge not found with Charge PublicID %s in Charges ", "Charge not found"),
     ;
 
     private Integer errorCode;

@@ -771,6 +771,38 @@
         </sql>
     </changeSet>
 
+    <changeSet id="addChargesSchema" author="Sami Haroon Khan">
+        <sql>
+            CREATE TABLE `charge` (
+                                   `id` bigint(20) NOT NULL,
+                                   `create_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                   `update_date_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                   `is_active` bit(1) DEFAULT true,
+                                   `is_deleted` bit(1) DEFAULT false,
+                                   `is_verified` bit(1) DEFAULT false,
+                                   `title` TEXT,
+                                   `internal_notes` TEXT,
+                                   `description` LONGTEXT,
+                                   `public_id` bigint(20) NOT NULL,
+                                   `stripe_charge_id` bigint(20) NOT NULL,
+                                   `payer_id` bigint(20) NOT NULL,
+                                   `creator_id` bigint(20) NOT NULL,
+                                   `transaction_type` ENUM('CREDIT', 'DEBIT', 'ESCROW'),
+                                   `payment_status` ENUM('PAID', 'UNPAID', 'REJECTED'),
+                                   `service_type` ENUM('Identification', 'FreeItems', 'BuySell','Rental', 'Services', 'Events','Tips', 'Volunteer', 'LostFound')
+
+
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+            ALTER TABLE `charge`
+                ADD PRIMARY KEY (`id`),
+                ADD UNIQUE KEY `UK_charge_public_id` (`public_id`) USING BTREE,
+                ADD CONSTRAINT `FK_charge_payer_id` FOREIGN KEY (`payer_id`) REFERENCES `users` (`public_id`),
+                ADD CONSTRAINT `FK_charge_creator_id` FOREIGN KEY (`creator_id`) REFERENCES `users` (`public_id`);
+            COMMIT;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
 
 <!--        Hibernate: alter table user_payment_cards add column cardholder_name varchar(255) not null-->
