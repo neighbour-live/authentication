@@ -64,6 +64,11 @@ public enum ResourceAlreadyExistErrorType implements ErrorEnum {
         return String.format(this.errorMessage,this.value);
     }
 
+    @Override
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
     public String getMessage() {
         if(value == null) return this.errorMessage;
         return String.format(this.errorMessage,this.value);

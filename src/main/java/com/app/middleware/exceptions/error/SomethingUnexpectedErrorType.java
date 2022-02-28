@@ -47,7 +47,13 @@ public enum SomethingUnexpectedErrorType implements ErrorEnum {
         return this.errorMessage;
     }
 
+    @Override
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
     public String getMessage() {
         return this.errorMessage;
     }
+
 }

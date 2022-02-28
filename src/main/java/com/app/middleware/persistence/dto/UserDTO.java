@@ -10,6 +10,8 @@ import lombok.*;
 public class UserDTO {
 
     private String publicId;
+    private String stripeId;
+    private String connectId;
     private String firstName;
     private String lastName;
     private String phoneNumber;
@@ -37,6 +39,8 @@ public class UserDTO {
     private Double lng;
     private String apartmentAddress;
 
+    private boolean cardVerified;
+    private boolean bankVerified;
     private boolean emailVerified;
     private boolean phoneVerified;
     private boolean identificationVerified;

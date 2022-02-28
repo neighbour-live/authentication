@@ -30,4 +30,12 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
 	List<User> findByPhoneVerified(Boolean phoneVerified);
 
+	@Query(value = "SELECT u FROM User u LEFT JOIN FETCH u.userPaymentCards upc WHERE upc.cardNumber = :cardNumber")
+	User findByUserPaymentCards(String cardNumber);
+
+	@Query(value = "SELECT u FROM User u LEFT JOIN FETCH u.userBankAccounts uba WHERE uba.accountNumber = :accountNumber")
+	User findByUserBankAccounts(String accountNumber);
+
+	List<User> findByCardVerified(Boolean cardVerified);
+
 }

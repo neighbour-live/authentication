@@ -31,6 +31,11 @@ public enum ApplicationErrorType implements ErrorEnum {
     public String getErrorMessage() {
         return this.errorMessage;
     }
+
+    @Override
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
 }
 
 

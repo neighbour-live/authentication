@@ -1,5 +1,6 @@
 package com.app.middleware.exception;
 
+import com.app.middleware.exceptions.error.ResourceNotFoundErrorType;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -13,6 +14,12 @@ public class ResourceNotFoundException extends RuntimeException {
         super(String.format("%s not found with %s : '%s'", resourceName, fieldName, fieldValue));
         this.resourceName = resourceName;
         this.fieldName = fieldName;
+        this.fieldValue = fieldValue;
+    }
+
+    public ResourceNotFoundException(ResourceNotFoundErrorType resourceNotFoundErrorType, String fieldValue) {
+        this.resourceName = resourceNotFoundErrorType.getErrorMessage();
+        this.fieldName = "";
         this.fieldValue = fieldValue;
     }
 

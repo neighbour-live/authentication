@@ -11,7 +11,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
       naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
     properties:
       hibernate: org.hibernate.dialect.MySQL8Dialect
@@ -87,3 +87,9 @@ email:
 firebase:
   config: confidential/firebase-configuration.json
   database: https://neighbor-live.firebaseio.com
+
+stripe:
+  keys:
+    public: pk_test_51HX3eOLuBJFQHSxq6tPiRtSs50PoBhhQWyF3h2eloZgpQ9QDm42cDGCmpCmqUHsckNfM08A2n9wo5J2eMH1eQPey00kEIq3KRl
+    secret: sk_test_51HX3eOLuBJFQHSxqf5BjdUrq4G64YNzsNaoUocbvGehjTmoYAx3sLVN1ByzauPGJDqypgd26KzZ6Lf4GKAXgIn5O00Q6gwRlY3
+    client: ca_KxjJAvOvaQa6Mhbae9sBB81VUywcA3I7

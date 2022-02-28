@@ -27,8 +27,11 @@ public class SomethingUnexpectedException extends BaseException {
         this.somethingUnexpectedErrorType = somethingUnexpectedErrorType;
     }
 
+    public SomethingUnexpectedException(Exception e, String errorMessage) {
+        super(e, errorMessage);
+    }
+
     public SomethingUnexpectedException(SomethingUnexpectedErrorType somethingUnexpectedErrorType) {
-        super(ApplicationErrorType.SOMETHING_UNEXPECTED_HAPPENED);
         this.somethingUnexpectedErrorType = somethingUnexpectedErrorType;
     }
 }

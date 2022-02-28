@@ -36,6 +36,11 @@ public enum UnauthorizedExceptionErrorType implements ErrorEnum {
         return String.format(this.errorMessage, this.value);
     }
 
+    @Override
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
     public String getMessage() {
         if (StringUtils.isEmpty(value)) return this.errorMessage;
         return String.format(this.errorMessage, this.value);
