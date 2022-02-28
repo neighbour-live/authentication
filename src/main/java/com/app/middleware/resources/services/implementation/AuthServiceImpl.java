@@ -1,10 +1,14 @@
 package com.app.middleware.resources.services.implementation;
 
+import com.app.middleware.exceptions.error.ResourceAlreadyExistErrorType;
 import com.app.middleware.exceptions.error.ResourceNotFoundErrorType;
+import com.app.middleware.exceptions.type.ResourceAlreadyExistsException;
 import com.app.middleware.exceptions.type.ResourceNotFoundException;
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserAddress;
+import com.app.middleware.persistence.domain.UserNotification;
 import com.app.middleware.persistence.domain.UserTemporary;
+import com.app.middleware.persistence.dto.EmailNotificationDto;
 import com.app.middleware.persistence.repository.RoleRepository;
 import com.app.middleware.persistence.repository.UserRepository;
 import com.app.middleware.persistence.request.*;
@@ -12,9 +16,12 @@ import com.app.middleware.persistence.type.*;
 import com.app.middleware.resources.services.*;
 import com.app.middleware.security.TokenProvider;
 import com.app.middleware.utility.AuthConstants;
+import com.app.middleware.utility.Constants;
 import com.app.middleware.utility.ObjectUtils;
 import com.app.middleware.utility.Utility;
 import com.app.middleware.utility.id.PublicIdGenerator;
+import com.stripe.model.Account;
+import com.stripe.model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -64,6 +71,9 @@ public class AuthServiceImpl implements AuthService {
     private NotificationService notificationService;
 
     @Autowired
+    private StripeService stripeService;
+
+    @Autowired
     private RoleRepository roleRepository;
 
     @Value("${email.from}")
@@ -81,6 +91,9 @@ public class AuthServiceImpl implements AuthService {
     @Value("${email-token-expiry-time}")
     private String EMAIL_TOKEN_EXPIRY_TIME;
 
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
+
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public User login(LoginRequest loginRequest) throws Exception {
@@ -92,14 +105,14 @@ public class AuthServiceImpl implements AuthService {
         }
 
         if(loginRequest.isUserNameLogin()){
-            user = userRepository.findByUserName(loginRequest.getUsername());
-            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, loginRequest.getUsername());
+            user = userRepository.findByUserName(loginRequest.getUserName());
+            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, loginRequest.getUserName());
         } else if(loginRequest.isEmailLogin()){
             user = userRepository.findByEmailIgnoreCase(loginRequest.getEmail().toLowerCase());
-            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, loginRequest.getEmail());
+            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, loginRequest.getEmail());
         } else if(loginRequest.isPhoneLogin()){
-            user = userRepository.findByPhoneNumber(loginRequest.getPhone());
-            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, loginRequest.getPhone());
+            user = userRepository.findByPhoneNumber(loginRequest.getPhoneNumber());
+            if(user==null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, loginRequest.getPhoneNumber());
         }
 
         Authentication authentication = authenticationManager.authenticate(
@@ -125,6 +138,36 @@ public class AuthServiceImpl implements AuthService {
             user.setRefreshToken(tokenProvider.createRefreshToken(user.getId(), permissions, roleType));
             user.setFirebaseKey(loginRequest.getFirebaseKey());
             user = userRepository.save(user);
+
+
+            /**
+             * Sending Push notifications Test Code
+             * START
+             * */
+
+            Map<String,String> actionsInfo =  new HashMap<>();
+            actionsInfo.put("userPublicId", PublicIdGenerator.encodedPublicId(user.getPublicId()));
+
+            UserNotificationRequest userNotificationRequest = UserNotificationRequest.builder()
+                    .notificationType(NotificationEnum.DEFAULT.toString())
+                    .target("INDIVIDUAL")
+                    .title("We Welcome Our Neighbour!")
+                    .body("Connect, add value, share and grow together!")
+                    .imageUrl("https://drive.google.com/file/d/1Hs7IDWaYbjWYiUQS9bQFsXQ6IhUGJ1E9/view")
+                    .actions(NotificationAction.HOME.name())
+                    .actionsInfo(actionsInfo)
+                    .firebaseKey(loginRequest.getFirebaseKey())
+                    .build();
+
+            UserNotification userNotification = notificationService.postUserNotification(userNotificationRequest, user);
+
+
+            /**
+             * Sending Push notifications Test Code
+             * ENDS
+             * */
+
+
             return user;
         }
         throw new Exception("cannot login!");
@@ -140,11 +183,13 @@ public class AuthServiceImpl implements AuthService {
         user.setPublicId(userTemporary.getPublicId());
         user.setPhoneNumber(userTemporary.getPhoneNumber());
         user.setUserName(userTemporary.getUserName());
-        user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
         if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.LOCAL)){
 
             user.setProvider(AuthProvider.LOCAL);
+            user.setProviderId(AuthProvider.LOCAL.name());
+            user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+
             if(!userTemporary.getEmail().isEmpty() && userTemporary.getEmail() !=null){
                 user.setEmail(userTemporary.getEmail());
                 user.setFbId("");
@@ -156,10 +201,13 @@ public class AuthServiceImpl implements AuthService {
                 user.setEmailVerified(userTemporary.getEmailVerified());
             } else throw new Exception("For LOCAL Provider a verified email and phone number is required");
 
-        } else if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.FACEBOOK)) {
+        }
+        else if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.FACEBOOK)) {
 
             user.setProvider(AuthProvider.FACEBOOK);
+            user.setProviderId(AuthProvider.FACEBOOK.name());
             user.setGgId("");
+
             if(!signUpRequest.getFbId().isEmpty() && signUpRequest.getFbId() !=null){
                 user.setFbId(signUpRequest.getFbId());
                 user.setEmail(signUpRequest.getFbId() + "@fb.com");
@@ -170,21 +218,28 @@ public class AuthServiceImpl implements AuthService {
                 user.setEmailVerified(true);
             } else throw new Exception("For FACEBOOK Provider a verified phone number is required");
 
-        } else if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.GOOGLE)) {
+            user.setPassword(passwordEncoder.encode(user.getFbId()));
+
+        }
+        else if(AuthProvider.valueOf(signUpRequest.getProvider()).equals(AuthProvider.GOOGLE)) {
 
             user.setProvider(AuthProvider.GOOGLE);
+            user.setProviderId(AuthProvider.GOOGLE.name());
             user.setFbId("");
-            if(!signUpRequest.getGgId().isEmpty() && signUpRequest.getGgId() != null){
+
+            if(!signUpRequest.getGgId().isEmpty() && signUpRequest.getGgId() != null && !signUpRequest.getEmail().isEmpty() && signUpRequest.getEmail() !=null){
                 user.setGgId(signUpRequest.getGgId());
-                user.setEmail(signUpRequest.getGgId());
-            } else throw new Exception("For GOOGLE Provider fbId is required");
+                user.setEmail(signUpRequest.getEmail());
+            } else throw new Exception("For GOOGLE Provider ggId  & email is required");
 
             if(userTemporary.getPhoneVerified()){
                 user.setPhoneVerified(userTemporary.getPhoneVerified());
                 user.setEmailVerified(true);
             } else throw new Exception("For GOOGLE Provider a verified phone number is required");
 
-        } else {
+            user.setPassword(passwordEncoder.encode(user.getGgId()));
+        }
+        else {
             throw new Exception("Provider can only be LOCAL, FACEBOOK or GOOGLE");
         }
 
@@ -210,9 +265,19 @@ public class AuthServiceImpl implements AuthService {
         user.setLat(signUpRequest.getLat());
         user.setLng(signUpRequest.getLng());
 
+        user.setIdDocFrontUrl("");
+        user.setIdDocBackUrl("");
+        user.setNationality(signUpRequest.getNationality() == null ? "": signUpRequest.getNationality());
+        user.setEthnicity(signUpRequest.getEthnicity() == null ? "": signUpRequest.getEthnicity());
+        user.setIdentificationVerified(false);
         user.setIsBlocked(false);
         user.setIsDeleted(false);
         user.setIsSuspended(false);
+        user.setCardVerified(false);
+        user.setBankVerified(false);
+
+        user.setCountry_short(signUpRequest.getCountry());
+        user.setCurrency("USD");
 
         user.setRole(roleRepository.findByRoleType(RoleType.USER));
 
@@ -230,17 +295,50 @@ public class AuthServiceImpl implements AuthService {
                 .user(user)
                 .build();
 
+
+        List<UserAddress> userAddresses = new ArrayList<>();
+        userAddresses.add(userAddressService.saveAddress(userAddress));
+
+        user.setUserAddresses(userAddresses);
+
+        /**
+         *
+         */
+        //creating stripe customer account
+        Customer stripeCustomer = stripeService.createStripeCustomer(user);
+        user.setStripeId(stripeCustomer.getId());
+
+        //creating stripe connect user account
+        CreateStripeConnectRequest stripeConnectRequest = new CreateStripeConnectRequest();
+        stripeConnectRequest.setIp(signUpRequest.getIp());
+        stripeConnectRequest.setDob(signUpRequest.getDob());
+        stripeConnectRequest.setAddressLine(signUpRequest.getAddressLine());
+        stripeConnectRequest.setPostalCode(signUpRequest.getPostalCode());
+        stripeConnectRequest.setCity(signUpRequest.getCity());
+        stripeConnectRequest.setState(signUpRequest.getState());
+        stripeConnectRequest.setCountry(signUpRequest.getCountry());
+        stripeConnectRequest.setFirstName(signUpRequest.getFirstName());
+        stripeConnectRequest.setLastName(signUpRequest.getLastName());
+        stripeConnectRequest.setEmail(signUpRequest.getEmail().toLowerCase());
+        stripeConnectRequest.setPhoneNumber(signUpRequest.getPhoneNumber());
+        stripeConnectRequest.setUserPublicId(user.getPublicId());
+
+        Account connectAccount = stripeService.createStripeCustomConnectAccount(stripeConnectRequest);
+
+        user.setConnectId(connectAccount.getId());
         user = userRepository.save(user);
-        userAddress = userAddressService.saveAddress(userAddress);
+
         userTemporaryService.delete(userTemporary);
 
+        Map<String, String> placeHolders = new HashMap<String, String>();
+        placeHolders.put("dynamic_url", "http://www.neighbour.live/verify-using-link");
         //sending Welcome Email
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(user.getEmail());
-        mailMessage.setSubject("Welcome to Neighbour Live! ");
-        mailMessage.setFrom(EMAIL_FROM);
-        mailMessage.setText("Welcome " + user.getFirstName() + " " + user.getLastName() + "\n" +"We really Appreciate the valuable addition of you into our growing community. \n");
-        emailService.sendEmail(mailMessage);
+        EmailNotificationDto emailNotificationDto = EmailNotificationDto.builder()
+                .to(EMAIL_FROM)
+                .template(Constants.EmailTemplate.WELCOME_TEMPLATE.value())
+                .placeHolders(placeHolders)
+                .build();
+        emailService.sendEmailFromExternalApi(emailNotificationDto);
 
         return user;
     }
@@ -257,6 +355,7 @@ public class AuthServiceImpl implements AuthService {
 
         String token = Utility.generateSafeToken() + UUID.randomUUID();
         String otp = Utility.generateOTP();
+        otp = "0000";
         userTemporary.setEmail(email);
         userTemporary.setEmailCode(otp);
         userTemporary.setEmailToken(token);
@@ -271,10 +370,11 @@ public class AuthServiceImpl implements AuthService {
         return userTemporary;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public UserTemporary confirmEmailPreRegister(String email, String emailToken, String emailCode) throws Exception {
         UserTemporary userTemporary = userTemporaryService.findByEmailIgnoreCase(email);
-        if(userTemporary == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, email);
+        if(userTemporary == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, email);
         if(userTemporary.getEmailToken().equals(emailToken) && userTemporary.getEmailCode().equals(emailCode))
         {
             //check if OTP is expired
@@ -289,7 +389,7 @@ public class AuthServiceImpl implements AuthService {
             userTemporary = userTemporaryService.save(userTemporary);
             return userTemporary;
         }
-        return null;
+        throw new Exception("Email Code and Token are not matching.");
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -323,7 +423,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public User confirmEmail(String email, String emailCode) throws Exception {
         User user = userRepository.findByEmailIgnoreCase(email);
-        if(user == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, email);
+        if(user == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, email);
         if(user.getEmailVerificationToken().equals(emailCode))
         {
             //check if OTP is expired
@@ -343,7 +443,7 @@ public class AuthServiceImpl implements AuthService {
             return user;
         }
 
-        return null;
+        throw new Exception("Email Token is not matching.");
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -357,12 +457,23 @@ public class AuthServiceImpl implements AuthService {
         userTemporary.setPhoneNumber(phoneNumber);
 
         String otp = Utility.generateOTP();
-        otp = "0000"; //temporary
         String token = Utility.generateSafeToken() + UUID.randomUUID();
+
+
+        // only set OTP on Prod
+        if(activeProfile != AuthConstants.PROFILE_PROD){
+            otp = "0000";
+        }
+
         userTemporary.setPhoneCode(otp);
         userTemporary.setPhoneToken(token);
         userTemporary = userTemporaryService.save(userTemporary);
-        smsService.sendOTPMessage(otp, phoneNumber);
+
+        // only send OTP on Prod
+        if(activeProfile == AuthConstants.PROFILE_PROD){
+            smsService.sendOTPMessageByTwilio(otp, phoneNumber);
+        }
+
         return userTemporary;
     }
 
@@ -370,7 +481,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UserTemporary confirmPhonePreRegister(String phoneNumber, String token, String otp) throws Exception {
         UserTemporary userTemporary = userTemporaryService.findByPhoneNumber(phoneNumber);
-        if(userTemporary == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, phoneNumber);
+        if(userTemporary == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, phoneNumber);
         if(userTemporary.getPhoneToken().equals(token) && userTemporary.getPhoneCode().equals(otp))
         {
             //check if OTP is expired
@@ -385,7 +496,7 @@ public class AuthServiceImpl implements AuthService {
             userTemporary = userTemporaryService.save(userTemporary);
             return userTemporary;
         }
-        return null;
+        throw new Exception("Phone Code and Token is not matching.");
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -401,21 +512,33 @@ public class AuthServiceImpl implements AuthService {
 
         if(user.getPhoneNumber().equals(phoneNumber)){
             String otp = Utility.generateOTP();
-            otp = "0000"; //temporary
-            user.setPhoneVerificationToken(otp);
+            String token = Utility.generateSafeToken() + UUID.randomUUID();
+
+            // only set OTP on Prod
+            if(activeProfile != AuthConstants.PROFILE_PROD){
+                otp = "0000";
+            }
+
+            user.setPhoneVerificationToken(token);
             user.setPhoneVerificationOTP(otp);
             user = userRepository.save(user);
-            smsService.sendOTPMessage(otp, phoneNumber);
+
+
+            // only send OTP on Prod
+            if(activeProfile == AuthConstants.PROFILE_PROD){
+                smsService.sendOTPMessageByTwilio(otp, phoneNumber);
+            }
+
             return user.getPhoneVerificationToken();
         }
-        return null;
+        throw new Exception("Phone Code is not matching.");
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public User confirmPhoneNumber(String phoneNumber, String otp) throws Exception {
         User user = userRepository.findByPhoneNumber(phoneNumber);
-        if(user == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, otp);
+        if(user == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, otp);
         if(user.getPhoneVerificationOTP().equals(otp))
         {
             //check if OTP is expired
@@ -433,6 +556,7 @@ public class AuthServiceImpl implements AuthService {
         return null;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public UserTemporary confirmUserNamePreRegister(String userName, String publicId) throws Exception {
         if(checkUserNameExist(userName)){
@@ -443,6 +567,11 @@ public class AuthServiceImpl implements AuthService {
         } else {
             throw new Exception("UserName does not exist, please try again");
         }
+    }
+
+    @Override
+    public User findByPublicId(Long decodePublicId) {
+        return userRepository.findByPublicId(decodePublicId);
     }
 
     @Override
@@ -501,6 +630,8 @@ public class AuthServiceImpl implements AuthService {
             user.setFirstName(editProfileRequest.getFirstName() == null ? user.getFirstName() : editProfileRequest.getFirstName());
             user.setLastName(editProfileRequest.getLastName() == null ? user.getLastName() : editProfileRequest.getLastName());
             user.setImageUrl(editProfileRequest.getImageUrl() == null ? user.getImageUrl() : editProfileRequest.getImageUrl());
+            user.setNationality(editProfileRequest.getNationality() == null ? user.getNationality() : editProfileRequest.getNationality());
+            user.setEthnicity(editProfileRequest.getEthnicity() == null ? user.getEthnicity() : editProfileRequest.getEthnicity());
             user.setDob(editProfileRequest.getDob() == null ? user.getDob() : editProfileRequest.getDob());
             if(editProfileRequest.getGender().equals(Gender.M.name()) || editProfileRequest.getGender().equals(Gender.F.name())){
                 user.setGender(Gender.valueOf(editProfileRequest.getGender()));
@@ -517,7 +648,7 @@ public class AuthServiceImpl implements AuthService {
                 user.setPhoneVerificationToken(null);
                 user.setPhoneVerificationOTP(null);
                 user.setPhoneNumber(editProfileRequest.getPhoneNumber());
-            } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_ALREADY_EXIST_WITH_PHONE);
+            } else throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_PHONE_NUMBER);
 
             String response = AuthConstants.VERIFICATION_OTP_SENT;
             return response;
@@ -530,7 +661,7 @@ public class AuthServiceImpl implements AuthService {
                 user.setEmailVerificationToken(null);
                 user.setEmailVerified(false);
                 user.setEmail(editProfileRequest.getEmail());
-            } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_ALREADY_EXIST_WITH_EMAIL);
+            } else throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_EMAIL);
 
             sendEmailVerification(user.getEmail(), user);
             String response = AuthConstants.VERIFICATION_EMAIL_SENT + editProfileRequest.getEmail();
@@ -619,6 +750,7 @@ public class AuthServiceImpl implements AuthService {
         return response;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public boolean forgotPasswordRequest(String email) throws Exception {
         if(!checkEmailExist(email)){
@@ -627,6 +759,7 @@ public class AuthServiceImpl implements AuthService {
                 throw new Exception("Cannot change your "+user.getProvider().toString()+" password using Neighbour.");
             }
             String otp = Utility.generateOTP();
+            otp = "0000"; //temporary
 
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setTo(user.getEmail());
@@ -641,9 +774,10 @@ public class AuthServiceImpl implements AuthService {
             emailService.sendEmail(mailMessage);
                 smsService.sendOTPMessage(otp, user.getPhoneNumber());
             return true;
-        } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, email);
+        } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, email);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public boolean changePassword(String email, String newPassword, BigInteger otp) throws Exception {
         if(!checkEmailExist(email)){
@@ -675,7 +809,7 @@ public class AuthServiceImpl implements AuthService {
                 throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_OTP);
             }
 
-        } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH, email);
+        } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, email);
     }
 
     @Override
@@ -684,7 +818,7 @@ public class AuthServiceImpl implements AuthService {
 
         //If Valid user - score +20
         if(user.getProvider().equals(AuthProvider.GOOGLE) || user.getProvider().equals(AuthProvider.LOCAL) || user.getProvider().equals(AuthProvider.FACEBOOK)){
-            profileCompletionPercentage += 40;
+            profileCompletionPercentage += 20;
         }
 
         //If Email Verified - score +20
@@ -697,6 +831,11 @@ public class AuthServiceImpl implements AuthService {
             profileCompletionPercentage += 20;
         }
 
+        //If Phone Verified - score +15
+        if(user.getIdentificationVerified()){
+            profileCompletionPercentage += 20;
+        }
+
         //If address added - score +10
         if(!user.getAddressLine().equals(null) && !user.getApartmentAddress().equals(null)){
             profileCompletionPercentage += 20;
@@ -704,6 +843,7 @@ public class AuthServiceImpl implements AuthService {
         return profileCompletionPercentage;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public boolean logout(User user) {
         user.setAccessToken(null);

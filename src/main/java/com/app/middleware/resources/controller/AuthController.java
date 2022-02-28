@@ -1,6 +1,7 @@
 package com.app.middleware.resources.controller;
 
 import com.app.middleware.exceptions.ExceptionUtil;
+import com.app.middleware.exceptions.error.ResourceNotFoundErrorType;
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserTemporary;
 import com.app.middleware.persistence.dto.StatusMessageDTO;
@@ -51,11 +52,14 @@ public class AuthController {
         request.add(req.getRemoteAddr());
 
         try {
-            //Do Login
             user = authService.login(loginRequest);
             //Send Response and save Log
-            ResponseEntity response = GenericResponseEntity.create(StatusCode.SUCCESS, UserMapper.createUserDTOLazy(user), HttpStatus.OK);
+            ResponseEntity response = GenericResponseEntity.create(
+                    StatusCode.SUCCESS,
+                    UserMapper.createUserDTOLazy(user),
+                    HttpStatus.OK);
             loggingService.createLog(user, req.getRemoteAddr(), response, loginRequest);
+
             return response;
 
         } catch (Exception e) {
@@ -85,10 +89,11 @@ public class AuthController {
         User user = null;
         try {
             user = authService.register(signUpRequest);
-            ResponseEntity response = GenericResponseEntity.create(StatusMessageDTO.builder()
-                    .message(AuthConstants.REGISTRATION_SUCCESSFUL)
-                    .status(0)
-                    .build(), HttpStatus.CREATED);
+            
+            ResponseEntity response = GenericResponseEntity.create(
+                    StatusCode.SUCCESS,
+                    UserMapper.createUserDTOLazy(user),
+                    HttpStatus.CREATED);
 
             loggingService.createLog(user, signUpRequest.getIp(), response, signUpRequest);
             return response;
@@ -99,6 +104,19 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/check-user")
+    @ApiOperation(value = "This operation is used to fetch details of a user.")
+    public ResponseEntity<?> getUserMinimalDetails(@RequestParam("userPublicId") String userPublicId) throws Exception {
+        try {
+            User user = authService.findByPublicId(PublicIdGenerator.decodePublicId(userPublicId));
+            if(user == null) throw new com.app.middleware.exceptions.type.ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_PUBLIC_ID, userPublicId);
+            return GenericResponseEntity.create(StatusCode.SUCCESS, UserMapper.createUserMinimalDetailsDTOLazy(user), HttpStatus.OK);
+        } catch (Exception e) {
+            return ExceptionUtil.handleException(e);
+        }
+
+    }
+
     @PatchMapping("/forgot-password")
     @ApiOperation(value = "This operation is used when User forgets his password.")
     public ResponseEntity<?> forgotPassword(@RequestParam("email") String email) throws Exception {
@@ -107,8 +125,6 @@ public class AuthController {
         List<String> request = new ArrayList<>();
         request.add(email);
         request.add(req.getRemoteAddr());
-
-
 
         try {
             authService.forgotPasswordRequest(email);
@@ -208,10 +224,14 @@ public class AuthController {
 
     @PostMapping("/send-phone-code")
     @ApiOperation(value = "This operation is used to send phone verification.")
-    public ResponseEntity<?> sendPhoneCodePreRegister(@RequestParam("phoneNumber") String phoneNumber) throws Exception {
+    public ResponseEntity<?> sendPhoneCodePreRegister(@RequestParam("phoneNumber") String phoneNumber, @RequestParam(name = "publicId", required = false) String publicId) throws Exception {
         try {
             User user = new User();
-            user.setPublicId(PublicIdGenerator.generatePublicId());
+            if(publicId == null){
+                user.setPublicId(PublicIdGenerator.generatePublicId());
+            } else {
+                user.setPublicId(PublicIdGenerator.decodePublicId(publicId));
+            }
             UserTemporary userTemporary = authService.sendPhoneCodePreRegister(phoneNumber, user);
             return GenericResponseEntity.create(StatusMessageDTO.builder()
                     .message(AuthConstants.VERIFICATION_OTP_SENT)

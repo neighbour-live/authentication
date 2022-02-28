@@ -6,6 +6,7 @@ public interface ErrorEnum<E extends Enum<E>> {
 
     String getErrorMessage();
 
+    void setErrorMessage(String errorMessage);
 
 }
 

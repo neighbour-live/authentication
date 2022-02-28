@@ -1,10 +1,6 @@
 package com.app.middleware.persistence.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import java.util.Map;
 
 @Data
@@ -16,6 +12,5 @@ public class EmailNotificationDto {
     private String to;
     private Map<String, String> placeHolders;
     private String template;
-
-
+    private String subject;
 }

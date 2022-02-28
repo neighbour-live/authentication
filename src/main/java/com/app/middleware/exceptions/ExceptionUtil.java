@@ -1,11 +1,9 @@
 package com.app.middleware.exceptions;
 
-import com.app.middleware.exceptions.constants.ExceptionConstants;
-import com.app.middleware.exceptions.constants.ForeignKeyExceptionConstants;
-import com.app.middleware.exceptions.constants.NotNullExceptionConstants;
-import com.app.middleware.exceptions.constants.UniqueKeyExceptionConstants;
+import com.app.middleware.exceptions.constants.*;
 import com.app.middleware.exceptions.error.ResourceAlreadyExistErrorType;
 import com.app.middleware.exceptions.error.ResourceNotFoundErrorType;
+import com.app.middleware.exceptions.error.SomethingUnexpectedErrorType;
 import com.app.middleware.exceptions.type.*;
 import com.app.middleware.persistence.domain.*;
 import com.app.middleware.persistence.response.PageableResponseEntity;
@@ -22,20 +20,23 @@ public class ExceptionUtil {
 
         String constraintName = ((ConstraintViolationException) exception.getCause()).getConstraintName();
 
-        if(constraintName.startsWith(ExceptionConstants.UNIQUE_KEY_EXCEPTION_CONSTANT)) {
-            handleUniqueKeyException(constraintName, baseEntity);
-        }
-        else if(constraintName.startsWith(ExceptionConstants.FOREIGN_KEY_EXCEPTION_CONSTANT)) {
-            handleForeignKeyException(constraintName, baseEntity);
-        }
-        else if(constraintName.endsWith(ExceptionConstants.CHECK_EXCEPTION_CONSTANT)) {
-            handleCheckException(constraintName, baseEntity);
-        }
-        else {
-            handleNotNullException(constraintName, baseEntity);
+        if(constraintName != null){
+            if(constraintName.startsWith(ExceptionConstants.UNIQUE_KEY_EXCEPTION_CONSTANT)) {
+                handleUniqueKeyException(constraintName, baseEntity);
+            }
+            else if(constraintName.startsWith(ExceptionConstants.FOREIGN_KEY_EXCEPTION_CONSTANT)) {
+                handleForeignKeyException(constraintName, baseEntity);
+            }
+            else if(constraintName.endsWith(ExceptionConstants.CHECK_EXCEPTION_CONSTANT)) {
+                handleCheckException(constraintName, baseEntity);
+            }
+            else {
+                handleNotNullException(constraintName, baseEntity);
+            }
         }
 
-        throw new SomethingUnexpectedException(exception);
+
+        throw new SomethingUnexpectedException(exception, exception.getMessage());
     }
 
     private static void validateConstraintViolationException(DataIntegrityViolationException exception) throws SomethingUnexpectedException {
@@ -48,56 +49,21 @@ public class ExceptionUtil {
         switch (constraintName) {
 
             // User
-            case UniqueKeyExceptionConstants.UK_public_id_users: {
-                ResourceAlreadyExistErrorType resourceAlreadyExistErrorType = ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_PUBLIC_ID;
-                if (baseEntity instanceof User)
-                    resourceAlreadyExistErrorType.setValue(PublicIdGenerator.encodedPublicId(((User) baseEntity).getPublicId()));
-                throw new ResourceAlreadyExistsException(resourceAlreadyExistErrorType);
-            }
-
-            case UniqueKeyExceptionConstants.UK_stripe_id_users: {
-                ResourceAlreadyExistErrorType resourceAlreadyExistErrorType = ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_STRIPE_ID;
-                if (baseEntity instanceof User)
-                    resourceAlreadyExistErrorType.setValue(PublicIdGenerator.encodedPublicId(((User) baseEntity).getPublicId()));
-                throw new ResourceAlreadyExistsException(resourceAlreadyExistErrorType);
-            }
-
-            case UniqueKeyExceptionConstants.UK_connect_id_users: {
-                ResourceAlreadyExistErrorType resourceAlreadyExistErrorType = ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_CONNECT_ID;
-                if (baseEntity instanceof User)
-                    resourceAlreadyExistErrorType.setValue(PublicIdGenerator.encodedPublicId(((User) baseEntity).getPublicId()));
-                throw new ResourceAlreadyExistsException(resourceAlreadyExistErrorType);
-            }
-
-            case UniqueKeyExceptionConstants.UK_access_token_users: {
-                ResourceAlreadyExistErrorType resourceAlreadyExistErrorType = ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_ACCESS_TOKEN;
-                if (baseEntity instanceof User)
-                    resourceAlreadyExistErrorType.setValue(((User) baseEntity).getPhoneNumber());
-                throw new ResourceAlreadyExistsException(resourceAlreadyExistErrorType);
-            }
-
-            case UniqueKeyExceptionConstants.UK_phone_verification_token_users: {
-                ResourceAlreadyExistErrorType resourceAlreadyExistErrorType = ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_PHONE_VERIFICATION_TOKEN;
+            case UniqueKeyExceptionConstants.UK_user_email: {
+                ResourceAlreadyExistErrorType resourceAlreadyExistErrorType = ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_EMAIL;
                 if (baseEntity instanceof User)
                     resourceAlreadyExistErrorType.setValue(((User) baseEntity).getEmail());
                 throw new ResourceAlreadyExistsException(resourceAlreadyExistErrorType);
             }
 
-            case UniqueKeyExceptionConstants.UK_email_verification_token_users: {
-                ResourceAlreadyExistErrorType resourceAlreadyExistErrorType = ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_EMAIL_VERIFICATION_TOKEN;
+            case UniqueKeyExceptionConstants.UK_user_user_name: {
+                ResourceAlreadyExistErrorType resourceAlreadyExistErrorType = ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_USERNAME;
                 if (baseEntity instanceof User)
-                    resourceAlreadyExistErrorType.setValue(((User) baseEntity).getAccessToken());
+                    resourceAlreadyExistErrorType.setValue(((User) baseEntity).getUserName());
                 throw new ResourceAlreadyExistsException(resourceAlreadyExistErrorType);
             }
 
-            case UniqueKeyExceptionConstants.UK_email_users: {
-                ResourceAlreadyExistErrorType resourceAlreadyExistErrorType = ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_EMAIL;
-                if (baseEntity instanceof User)
-                    resourceAlreadyExistErrorType.setValue(PublicIdGenerator.encodedPublicId(((User) baseEntity).getPublicId()));
-                throw new ResourceAlreadyExistsException(resourceAlreadyExistErrorType);
-            }
-
-            case UniqueKeyExceptionConstants.UK_phone_number_users: {
+            case UniqueKeyExceptionConstants.UK_user_phone: {
                 ResourceAlreadyExistErrorType resourceAlreadyExistErrorType = ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_PHONE_NUMBER;
                 if (baseEntity instanceof User)
                     resourceAlreadyExistErrorType.setValue(((User) baseEntity).getPhoneNumber());
@@ -105,88 +71,82 @@ public class ExceptionUtil {
             }
 
 
-            case UniqueKeyExceptionConstants.UK_public_id_awards: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.AWARD_ALREADY_EXIST_WITH_PUBLIC_ID);
+            case UniqueKeyExceptionConstants.UK_user_public_id: {
+                ResourceAlreadyExistErrorType resourceAlreadyExistErrorType = ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_PUBLIC_ID;
+                if (baseEntity instanceof User)
+                    resourceAlreadyExistErrorType.setValue(PublicIdGenerator.encodedPublicId(((User) baseEntity).getPublicId()));
+                throw new ResourceAlreadyExistsException(resourceAlreadyExistErrorType);
             }
 
-            case UniqueKeyExceptionConstants.UK_public_id_user_awards: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_AWARD_ALREADY_EXIST_WITH_PUBLIC_ID);
+            case UniqueKeyExceptionConstants.UK_user_phone_verification_token: {
+                ResourceAlreadyExistErrorType resourceAlreadyExistErrorType = ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_PHONE_VERIFICATION_TOKEN;
+                if (baseEntity instanceof User)
+                    resourceAlreadyExistErrorType.setValue(((User) baseEntity).getPhoneVerificationToken());
+                throw new ResourceAlreadyExistsException(resourceAlreadyExistErrorType);
             }
 
-            case UniqueKeyExceptionConstants.UK_public_id_user_skills: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.SKILL_EXIST_WITH_PUBLIC_ID);
+            case UniqueKeyExceptionConstants.UK_user_email_verification_token: {
+                ResourceAlreadyExistErrorType resourceAlreadyExistErrorType = ResourceAlreadyExistErrorType.USER_ALREADY_EXIST_WITH_EMAIL_VERIFICATION_TOKEN;
+                if (baseEntity instanceof User)
+                    resourceAlreadyExistErrorType.setValue(((User) baseEntity).getEmailVerificationToken());
+                throw new ResourceAlreadyExistsException(resourceAlreadyExistErrorType);
             }
 
-            case UniqueKeyExceptionConstants.UK_public_id_skills: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_SKILL_ALREADY_EXIST_WITH_PUBLIC_ID);
-            }
 
-            case UniqueKeyExceptionConstants.UK_public_id_user_payment_cards: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.PAYMENT_CARD_EXIST_WITH_PUBLIC_ID);
-            }
-
-            case UniqueKeyExceptionConstants.UK_card_number_user_payment_cards: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.PAYMENT_CARD_NUMBER_ALREADY_EXIST);
-            }
-
-            case UniqueKeyExceptionConstants.UK_public_id_user_addresses: {
+            case UniqueKeyExceptionConstants.UK_user_address_public_id: {
                 throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_ADDRESS_ALREADY_EXIST_WITH_PUBLIC_ID);
             }
 
-            case UniqueKeyExceptionConstants.UK_public_id_reviews: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.REVIEW_AWARD_ALREADY_EXIST_WITH_PUBLIC_ID);
+            case UniqueKeyExceptionConstants.UK_user_awards_public_id: {
+                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_AWARD_ALREADY_EXIST_WITH_PUBLIC_ID);
             }
 
-            case UniqueKeyExceptionConstants.UK_public_id_tasks: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.TASK_EXIST_WITH_PUBLIC_ID);
+            case UniqueKeyExceptionConstants.UK_awards_public_id: {
+                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.AWARD_ALREADY_EXIST_WITH_PUBLIC_ID);
             }
 
-            case UniqueKeyExceptionConstants.UK_public_id_task_categories: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.TASK_CATEGORY_EXIST_WITH_PUBLIC_ID);
+            case UniqueKeyExceptionConstants.UK_user_chats_public_id: {
+                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_CHAT_ALREADY_EXIST_WITH_PUBLIC_ID);
             }
 
-            case UniqueKeyExceptionConstants.UK_public_id_user_bids: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.BID_EXIST_WITH_PUBLIC_ID);
+            case UniqueKeyExceptionConstants.UK_conversations_public_id: {
+                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_CONVERSATION_EXIST_WITH_PUBLIC_ID);
             }
 
-            case UniqueKeyExceptionConstants.UK_public_id_user_bank_account: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_BANK_EXIST_WITH_PUBLIC_ID);
+            case UniqueKeyExceptionConstants.UK_user_temporary_phone: {
+                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_TEMPORARY_EXIST_WITH_PHONE);
             }
 
-            case UniqueKeyExceptionConstants.UK_account_user_bank_account: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_BANK_EXIST_WITH_ACCOUNT_NUMBER);
+            case UniqueKeyExceptionConstants.UK_user_temporary_email: {
+                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_TEMPORARY_EXIST_WITH_EMAIL);
             }
 
-            case UniqueKeyExceptionConstants.UK_public_id_user_transactions: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_TRANSACTION_EXIST_WITH_PUBLIC_ID);
+            case UniqueKeyExceptionConstants.UK_user_temporary_user_name: {
+                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_TEMPORARY_EXIST_WITH_USERNAME);
             }
 
-            case UniqueKeyExceptionConstants.UK_payment_id_user_transactions: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_TRANSACTION_EXIST_WITH_PAYMENT_ID);
+            case UniqueKeyExceptionConstants.UK_user_temporary_public_id: {
+                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_TEMPORARY_EXIST_WITH_PUBLIC_ID);
             }
 
-            case UniqueKeyExceptionConstants.UK_public_id_user_wallet: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_WALLET_EXIST_WITH_PUBLIC_ID);
+            case UniqueKeyExceptionConstants.UK_user_temporary_email_verification_code: {
+                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_TEMPORARY_EXIST_WITH_EMAIL_VERIFICATION_CODE);
             }
 
-            case UniqueKeyExceptionConstants.UK_public_id_support_user: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.SUPPORT_TICKET_EXIST_WITH_PUBLIC_ID);
+            case UniqueKeyExceptionConstants.UK_user_temporary_phone_verification_code: {
+                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_TEMPORARY_EXIST_WITH_PHONE_VERIFICATION_CODE);
             }
 
-            case UniqueKeyExceptionConstants.UK_public_id_report_user: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.REPORT_TICKET_EXIST_WITH_PUBLIC_ID);
+            case UniqueKeyExceptionConstants.UK_user_upload_public_id: {
+                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.USER_UPLOAD_ALREADY_EXIST_WITH_PUBLIC_ID);
             }
 
-            case UniqueKeyExceptionConstants.UK_reporter_and_reported_user_cannot_be_same: {
-                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.REPORTER_AND_REPORTED_USER_CANNOT_BE_SAME);
+            case UniqueKeyExceptionConstants.UK_faq_public_id: {
+                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.FAQ_ALREADY_EXIST_WITH_PUBLIC_ID);
             }
-
-//            case UniqueKeyExceptionConstants.UK_public_id_user_payment_cards: {
-//                throw new SomethingUnexpectedException(SomethingUnexpectedErrorType.DUPLICATE_PUBLIC_KEY);
-//            }
 
             default:
-                break;
+                throw new ResourceAlreadyExistsException(ResourceAlreadyExistErrorType.RESOURCE_ALREADY_EXIST);
         }
     }
 
@@ -217,14 +177,13 @@ public class ExceptionUtil {
             case NotNullExceptionConstants.IS_ACTIVE :
                 throw new ValidationException(new FieldError("is_active","is_active","is_active Time can not be null"));
 
-            //Separate
+            // Separate
             case NotNullExceptionConstants.AWARD_ICON :
                 throw new ValidationException(new FieldError("award_icon","award_icon","award_icon can not be null"));
 
             case NotNullExceptionConstants.AWARD_TYPE :
                 throw new ValidationException(new FieldError("award_type","award_type","award_type can not be null"));
 
-            // Reviews
             case NotNullExceptionConstants.IS_DELETED_BY_POSTER :
                 throw new ValidationException(new FieldError("is_deleted_by_poster","is_deleted_by_poster","is_deleted_by_poster can not be null"));
 
@@ -255,11 +214,9 @@ public class ExceptionUtil {
             case NotNullExceptionConstants.TASKER_NAME:
                 throw new ValidationException(new FieldError("tasker_name","tasker_name","tasker_name can not be null"));
 
-            //Skills
             case NotNullExceptionConstants.NAME:
                 throw new ValidationException(new FieldError("name","name","name can not be null"));
 
-            //Tasks
             case NotNullExceptionConstants.IS_ASSIGNED:
                 throw new ValidationException(new FieldError("is_assigned","is_assigned","is_assigned can not be null"));
 
@@ -269,21 +226,18 @@ public class ExceptionUtil {
             case NotNullExceptionConstants.IS_PENDING:
                 throw new ValidationException(new FieldError("is_pending","is_pending","is_pending can not be null"));
 
-            //User_addresses
             case NotNullExceptionConstants.ADDRESS_TYPE:
                 throw new ValidationException(new FieldError("address_type","address_type","address_type can not be null"));
 
             case NotNullExceptionConstants.ADDRESS_LINE:
                 throw new ValidationException(new FieldError("address_line","address_line","address_line can not be null"));
 
-            //User_awards
             case NotNullExceptionConstants.IS_UNLOCKED:
                 throw new ValidationException(new FieldError("is_unlocked","is_unlocked","is_unlocked can not be null"));
 
             case NotNullExceptionConstants.PROGRESS:
                 throw new ValidationException(new FieldError("progress","progress","progress can not be null"));
 
-            //User_payment_cards
             case NotNullExceptionConstants.CARD_EXPIRY_DATE:
                 throw new ValidationException(new FieldError("card_expiry_date","card_expiry_date","card_expiry_date can not be null"));
 
@@ -308,8 +262,6 @@ public class ExceptionUtil {
             case NotNullExceptionConstants.SKILL_PROFICIENCY:
                 throw new ValidationException(new FieldError("skill_proficiency","skill_proficiency","skill_proficiency can not be null"));
 
-
-
             case NotNullExceptionConstants.STRIPE_SOURCE_ID:
                 throw new ValidationException(new FieldError("stripe_source_id","stripe_source_id","stripe_source_id can not be null"));
 
@@ -324,8 +276,6 @@ public class ExceptionUtil {
 
             case NotNullExceptionConstants.PAYMENT_TYPE:
                 throw new ValidationException(new FieldError("payment_type","payment_type","payment_type can not be null"));
-
-
 
             case NotNullExceptionConstants.BUDGET:
                 throw new ValidationException(new FieldError("budget","budget","budget can not be null"));
@@ -342,7 +292,6 @@ public class ExceptionUtil {
             case NotNullExceptionConstants.ACCOUNT_HOLDER_NAME:
                 throw new ValidationException(new FieldError("account_holder_name","account_holder_name","account_holder_name can not be null"));
 
-
             case NotNullExceptionConstants.BANK_NAME:
                 throw new ValidationException(new FieldError("bank_name","bank_name","bank_name can not be null"));
 
@@ -357,7 +306,6 @@ public class ExceptionUtil {
 
             case NotNullExceptionConstants.CURRENCY:
                 throw new ValidationException(new FieldError("currency","currency","currency can not be null"));
-
 
             case NotNullExceptionConstants.SUBJECT:
                 throw new ValidationException(new FieldError("subject","subject","subject can not be null"));
@@ -374,8 +322,6 @@ public class ExceptionUtil {
             case NotNullExceptionConstants.ICON_URL:
                 throw new ValidationException(new FieldError("icon_url","icon_url","icon_url can not be null"));
 
-
-
             case NotNullExceptionConstants.HOURS:
                 throw new ValidationException(new FieldError("hours","hours","hours can not be null"));
 
@@ -388,48 +334,136 @@ public class ExceptionUtil {
     private static void handleCheckException(String constraintName, BaseEntity baseEntity) throws ValidationException {
         switch (constraintName) {
 
-//            case CheckExceptionConstants.CIRCLE_MEMBERS_GENDER_CHECK :
-//                throw new ValidationException(new FieldError("gender", "gender", "Gender must be M, F or O"));
+            case CheckExceptionConstants.CHECK_gender :
+                throw new ValidationException(new FieldError("gender", "gender", "Gender must be M, F or O"));
 
             default:
-                break;
+                throw new ValidationException(new FieldError("check", "check", "check failed for: " + constraintName));
         }
     }
 
     private static void handleForeignKeyException (String constraintName, BaseEntity baseEntity) throws ResourceNotFoundException {
         switch (constraintName) {
-            case ForeignKeyExceptionConstants.FK_user_id_user_addresses: {
-                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_PUBLIC_ID_IN_USER_ADDRESS;
+
+            case ForeignKeyExceptionConstants.FK_user_awards_award_id: {
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.AWARD_NOT_FOUND_WITH_AWARD_ID_IN_USER_AWARD;
+                if (baseEntity instanceof UserAward)
+                resourceNotFoundErrorType.setValue(((UserAward) baseEntity).getAward().getPublicId() != null ?  PublicIdGenerator.encodedPublicId(((UserAward) baseEntity).getAward().getPublicId()) : "");
+                throw new ResourceNotFoundException(resourceNotFoundErrorType);
+            }
+
+            case ForeignKeyExceptionConstants.FK_user_awards_user_id: {
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_USER_ID_IN_USER_AWARD;
+                if (baseEntity instanceof UserAward)
+                    resourceNotFoundErrorType.setValue(((UserAward) baseEntity).getUser().getPublicId() != null ?  PublicIdGenerator.encodedPublicId(((UserAward) baseEntity).getUser().getPublicId()) : "");
+                throw new ResourceNotFoundException(resourceNotFoundErrorType);
+            }
+
+            case ForeignKeyExceptionConstants.FK_user_notifications_user_id: {
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_USER_ID_IN_USER_NOTIFICATION;
+                if (baseEntity instanceof UserNotification)
+                    resourceNotFoundErrorType.setValue(((UserNotification) baseEntity).getUser().getPublicId() != null ?  PublicIdGenerator.encodedPublicId(((UserNotification) baseEntity).getUser().getPublicId()) : "");
+                throw new ResourceNotFoundException(resourceNotFoundErrorType);
+            }
+
+            case ForeignKeyExceptionConstants.FK_user_notifications_notification_type_id: {
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.NOTIFICATION_TYPE_NOT_FOUND_WITH_NOTIFICATION_TYPE_ID_IN_USER_NOTIFICATION;
+                if (baseEntity instanceof UserNotification)
+                    resourceNotFoundErrorType.setValue(((UserNotification) baseEntity).getNotificationType().getId() != null ? ((UserNotification) baseEntity).getNotificationType().getId().toString(): "");
+                throw new ResourceNotFoundException(resourceNotFoundErrorType);
+            }
+
+            case ForeignKeyExceptionConstants.FK_user_temporary_user_public_id: {
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_USER_PUBLIC_ID_IN_USER_TEMPORARY;
+                if (baseEntity instanceof UserTemporary)
+                    resourceNotFoundErrorType.setValue(((UserTemporary) baseEntity).getPublicId() != null ?  PublicIdGenerator.encodedPublicId(((UserTemporary) baseEntity).getPublicId()) : "");
+                throw new ResourceNotFoundException(resourceNotFoundErrorType);
+            }
+
+            case ForeignKeyExceptionConstants.FK_conversations_first_user_id: {
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.FIRST_USER_NOT_FOUND_WITH_FIRST_USER_ID_IN_CONVERSATION;
+                if (baseEntity instanceof Conversation)
+                    resourceNotFoundErrorType.setValue(((Conversation) baseEntity).getFirstUser().getPublicId() != null ?  PublicIdGenerator.encodedPublicId(((Conversation) baseEntity).getFirstUser().getPublicId()) : "");
+                throw new ResourceNotFoundException(resourceNotFoundErrorType);
+            }
+
+            case ForeignKeyExceptionConstants.FK_conversations_second_user_id: {
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.SECOND_USER_NOT_FOUND_WITH_SECOND_USER_ID_IN_CONVERSATION;
+                if (baseEntity instanceof Conversation)
+                    resourceNotFoundErrorType.setValue(((Conversation) baseEntity).getSecondUser().getPublicId() != null ?  PublicIdGenerator.encodedPublicId(((Conversation) baseEntity).getSecondUser().getPublicId()) : "");
+                throw new ResourceNotFoundException(resourceNotFoundErrorType);
+            }
+
+            case ForeignKeyExceptionConstants.FK_conversations_user_id: {
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.USER_CONVERSATION_NOT_FOUND_WITH_USER_ID_IN_FIREBASE_LOGS;
+                if (baseEntity instanceof FirebaseLog)
+                    resourceNotFoundErrorType.setValue(((FirebaseLog) baseEntity).getUser().getPublicId() != null ?  PublicIdGenerator.encodedPublicId(((FirebaseLog) baseEntity).getUser().getPublicId()) : "");
+                throw new ResourceNotFoundException(resourceNotFoundErrorType);
+            }
+
+            case ForeignKeyExceptionConstants.FK_conversations_user_notification_id: {
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.USER_NOTIFICATION_NOT_FOUND_WITH_USER_NOTIFICATION_ID_IN_FIREBASE_LOGS;
+                if (baseEntity instanceof FirebaseLog)
+                    resourceNotFoundErrorType.setValue(((FirebaseLog) baseEntity).getUserNotification().getPublicId() != null ?  PublicIdGenerator.encodedPublicId(((FirebaseLog) baseEntity).getUserNotification().getPublicId()) : "");
+                throw new ResourceNotFoundException(resourceNotFoundErrorType);
+            }
+
+            case ForeignKeyExceptionConstants.FK_conversations_request_type_id: {
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.REQUEST_TYPE_NOT_FOUND_WITH_REQUEST_TYPE_ID_IN_FIREBASE_LOGS;
+                if (baseEntity instanceof FirebaseLog)
+                    resourceNotFoundErrorType.setValue(((FirebaseLog) baseEntity).getNotificationType().getId() != null ?  PublicIdGenerator.encodedPublicId(((FirebaseLog) baseEntity).getNotificationType().getId()) : "");
+                throw new ResourceNotFoundException(resourceNotFoundErrorType);
+            }
+
+            case ForeignKeyExceptionConstants.FK_role_permission_role_id: {
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.ROLE_NOT_FOUND_WITH_ROLE_ID_IN_ROLE_PERMISSION;
+                throw new ResourceNotFoundException(resourceNotFoundErrorType);
+            }
+
+            case ForeignKeyExceptionConstants.FK_role_permission_permission_id: {
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.PERMISSION_NOT_FOUND_WITH_PERMISSION_ID_IN_ROLE_PERMISSION;
+                throw new ResourceNotFoundException(resourceNotFoundErrorType);
+            }
+
+            case ForeignKeyExceptionConstants.FK_users_role_id: {
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.ROLE_NOT_FOUND_WITH_ROLE_ID_IN_USER;
+                if (baseEntity instanceof User)
+                    resourceNotFoundErrorType.setValue(((User) baseEntity).getRole().getId() != null ?  PublicIdGenerator.encodedPublicId(((User) baseEntity).getRole().getId()) : "");
+                throw new ResourceNotFoundException(resourceNotFoundErrorType);
+            }
+
+            case ForeignKeyExceptionConstants.FK_user_addresses_user_id: {
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_USER_ID_IN_USER_ADDRESS;
                 if (baseEntity instanceof UserAddress)
-                    resourceNotFoundErrorType.setValue(((UserAddress) baseEntity).getPublicId() != null ? ((UserAddress) baseEntity).getUser().getPublicId().toString() : null);
+                    resourceNotFoundErrorType.setValue(((UserAddress) baseEntity).getUser().getPublicId() != null ?  PublicIdGenerator.encodedPublicId(((UserAddress) baseEntity).getUser().getPublicId()) : "");
                 throw new ResourceNotFoundException(resourceNotFoundErrorType);
             }
 
-            case ForeignKeyExceptionConstants.FK_user_id_user_awards: {
-                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_PUBLIC_ID_IN_USER_AWARD;
-                if (baseEntity instanceof UserAward)
-                    resourceNotFoundErrorType.setValue(((UserAward) baseEntity).getPublicId() != null ? ((UserAward) baseEntity).getUser().getPublicId().toString() : null);
+            case ForeignKeyExceptionConstants.FK_user_chats_conversation_public_id: {
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.CONVERSATION_NOT_FOUND_WITH_CONVERSATION_ID_IN_USER_CHAT;
+                if (baseEntity instanceof UserChat)
+                    resourceNotFoundErrorType.setValue(((UserChat) baseEntity).getConversation().getPublicId() != null ?  PublicIdGenerator.encodedPublicId(((UserChat) baseEntity).getConversation().getPublicId()) : "");
                 throw new ResourceNotFoundException(resourceNotFoundErrorType);
             }
 
-
-
-            case ForeignKeyExceptionConstants.FK_award_id_user_awards: {
-                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.AWARD_NOT_FOUND_WITH_PUBLIC_ID_IN_USER_AWARD;
-                if (baseEntity instanceof UserAward)
-                    resourceNotFoundErrorType.setValue(((UserAward) baseEntity).getPublicId() != null ? ((UserAward) baseEntity).getUser().getPublicId().toString() : null);
+            case ForeignKeyExceptionConstants.FK_user_chats_receiver_public_id: {
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.RECEIVER_NOT_FOUND_WITH_RECEIVER_ID_IN_USER_CHAT;
+                if (baseEntity instanceof UserChat)
+                    resourceNotFoundErrorType.setValue(((UserChat) baseEntity).getReceiver().getPublicId() != null ?  PublicIdGenerator.encodedPublicId(((UserChat) baseEntity).getReceiver().getPublicId()) : "");
                 throw new ResourceNotFoundException(resourceNotFoundErrorType);
             }
 
-//            case ForeignKeyExceptionConstants.FK_task_transaction_tasks: {
-//                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.TASK_TRANSACTION_NOT_FOUND_WITH_PUBLIC_ID_IN_TASK;
-//                if (baseEntity instanceof Task)
-//                    resourceNotFoundErrorType.setValue(((Task) baseEntity).getPublicId() != null ? ((Task) baseEntity).getUserTransactions().getPublicId().toString() : null);
-//                throw new ResourceNotFoundException(resourceNotFoundErrorType);
-//            }
+            case ForeignKeyExceptionConstants.FK_user_chats_sender_public_id: {
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.SENDER_NOT_FOUND_WITH_SENDER_ID_IN_USER_CHAT;
+                if (baseEntity instanceof UserChat)
+                    resourceNotFoundErrorType.setValue(((UserChat) baseEntity).getSender().getPublicId() != null ?  PublicIdGenerator.encodedPublicId(((UserChat) baseEntity).getSender().getPublicId()) : "");
+                throw new ResourceNotFoundException(resourceNotFoundErrorType);
+            }
 
             default:
-                break;
+                ResourceNotFoundErrorType resourceNotFoundErrorType = ResourceNotFoundErrorType.RESOURCE_NOT_FOUND;
+                resourceNotFoundErrorType.setValue(constraintName);
+                throw new ResourceNotFoundException(resourceNotFoundErrorType);
         }
     }
 

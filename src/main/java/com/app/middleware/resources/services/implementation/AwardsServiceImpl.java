@@ -14,6 +14,8 @@ import com.app.middleware.resources.services.AwardsService;
 import com.app.middleware.utility.id.PublicIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -42,6 +44,7 @@ public class AwardsServiceImpl implements AwardsService {
         return awardRepository.findAll();
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public boolean deleteAward(String awardPublicId) throws ResourceNotFoundException {
         Award award = awardRepository.findByPublicId(PublicIdGenerator.decodePublicId(awardPublicId));
@@ -56,9 +59,9 @@ public class AwardsServiceImpl implements AwardsService {
         userAward.setPublicId(PublicIdGenerator.generatePublicId());
         userAward.setUser(user);
         userAward.setAward(award);
-        userAward.setProgress(addUserAward.getProgress());
-        userAward.setIsActive(Boolean.valueOf(addUserAward.isActive()));
-        userAward.setIsUnlocked(Boolean.valueOf(addUserAward.isUnlocked()));
+        userAward.setProgress(100);
+        userAward.setIsActive(true);
+        userAward.setIsUnlocked(true);
         return userAwardsRepository.save(userAward);
     }
 
@@ -69,14 +72,12 @@ public class AwardsServiceImpl implements AwardsService {
         return userAward;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public boolean deleteUserAward(String userAwardPublicId) throws ResourceNotFoundException {
         UserAward userAward = userAwardsRepository.findByPublicId(PublicIdGenerator.decodePublicId(userAwardPublicId));
         if(userAward == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.AWARD_NOT_FOUND_WITH_PUBLIC_ID, userAwardPublicId);
-        userAward.setIsUnlocked(false);
-        userAward.setIsActive(false);
-        userAward.setProgress(0);
-        userAwardsRepository.save(userAward);
+        userAwardsRepository.delete(userAward);
         return true;
     }
 
@@ -91,5 +92,17 @@ public class AwardsServiceImpl implements AwardsService {
     public List<UserAward> getAllUserAwards(User user) {
         List<UserAward> userAwards = userAwardsRepository.findAllByUser(user);
         return userAwards;
+    }
+
+    @Override
+    public Award addAward(AddAward addAward, User user) {
+
+        Award award = new Award();
+        award.setAwardIcon(addAward.getAwardIconUrl());
+        award.setAwardType(addAward.getAwardType());
+        award.setDescription(addAward.getDescription());
+        award.setPublicId(PublicIdGenerator.generatePublicId());
+        award.setTitle(addAward.getTitle());
+        return awardRepository.save(award);
     }
 }

@@ -3,61 +3,41 @@ package com.app.middleware.exceptions.constants;
 public class UniqueKeyExceptionConstants {
 
     // Users
-    public static final String UK_public_id_users = "uk_public_id_users";
-    public static final String UK_access_token_users= "uk_access_token_users";
-    public static final String UK_email_verification_token_users = "uk_email_verification_token_users";
-    public static final String UK_phone_verification_token_users = "uk_phone_verification_token_users";
-    public static final String UK_phone_number_users= "uk_phone_number_users";
-    public static final String UK_email_users = "uk_email_users";
-    public static final String UK_stripe_id_users= "uk_stripe_id_users";
-    public static final String UK_connect_id_users= "uk_connect_id_users";
-
-    //User Awards
-    public static final String UK_public_id_awards = "uk_public_id_awards";
-
-    //Awards
-    public static final String UK_public_id_user_awards = "uk_public_id_user_awards";
-
-    //User Skills
-    public static final String UK_public_id_user_skills = "uk_public_id_user_skills";
-
-    //Skill
-    public static final String UK_public_id_skills = "uk_public_id_skills";
-
-    //User Payment Cards
-    public static final String UK_public_id_user_payment_cards = "uk_public_id_user_payment_cards";
-    public static final String UK_card_number_user_payment_cards = "uk_card_number_user_payment_cards";
+    public static final String UK_user_email = "UK_user_email";
+    public static final String UK_user_user_name= "UK_user_user_name";
+    public static final String UK_user_phone = "UK_user_phone";
+    public static final String UK_user_public_id = "UK_user_public_id";
+    public static final String UK_user_phone_verification_token= "UK_user_phone_verification_token";
+    public static final String UK_user_email_verification_token= "UK_user_email_verification_token";
 
     //User Address
-    public static final String UK_public_id_user_addresses = "uk_public_id_user_addresses";
+    public static final String UK_user_address_public_id = "UK_user_address_public_id";
 
-    //Reviews
-    public static final String UK_public_id_reviews = "uk_public_id_reviews";
+    //User Awards
+    public static final String UK_user_awards_public_id = "UK_user_awards_publid_id";
 
-    //Task
-    public static final String UK_public_id_tasks = "uk_public_id_tasks";
-    public static final String UK_public_id_task_categories = "uk_public_id_task_categories";
+    //Awards
+    public static final String UK_awards_public_id = "UK_awards_public_id";
 
-    //User Bids
-    public static final String UK_public_id_user_bids = "uk_public_id_user_bids";
+    //Chats
+    public static final String UK_user_chats_public_id = "UK_user_chats_public_id";
 
-    //User Bank Account
-    public static final String UK_public_id_user_bank_account = "uk_public_id_user_bank_account";
-    public static final String UK_account_user_bank_account = "uk_account_user_bank_account";
+    //Conversation
+    public static final String UK_conversations_public_id = "UK_conversations_publid_id";
 
-    //User Transactions
-    public static final String UK_public_id_user_transactions = "uk_public_id_user_transactions";
-    public static final String UK_payment_id_user_transactions = "uk_payment_id_user_transactions";
+    //User Temporary
+    public static final String UK_user_temporary_phone = "UK_user_temporary_phone";
+    public static final String UK_user_temporary_email = "UK_user_temporary_email";
+    public static final String UK_user_temporary_user_name = "UK_user_temporary_user_name";
+//    @TODO add these UK exceptions
+    public static final String UK_user_temporary_public_id = "UK_user_temporary_public_id";
+    public static final String UK_user_temporary_email_verification_code = "UK_user_temporary_email_verification_code";
+    public static final String UK_user_temporary_phone_verification_code = "UK_user_temporary_phone_verification_code";
 
-    // User Wallet
-    public static final String UK_public_id_user_wallet = "uk_public_id_user_wallet";
+    //User Uploads
+    public static final String UK_user_upload_public_id = "UK_user_upload_public_id";
 
-    //Support
-    public static final String UK_public_id_support_user = "uk_public_id_support_user";
-
-    //Report
-    public static final String UK_public_id_report_user = "uk_public_id_report_user";
-    public static final String UK_reporter_and_reported_user_cannot_be_same = "uk_reporter_and_reported_user_cannot_be_same";
-
+    // Faq
+    public static final String UK_faq_public_id = "UK_faq_public_id";
 }
 

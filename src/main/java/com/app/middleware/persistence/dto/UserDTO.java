@@ -1,9 +1,6 @@
 package com.app.middleware.persistence.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
@@ -13,6 +10,8 @@ import lombok.NoArgsConstructor;
 public class UserDTO {
 
     private String publicId;
+    private String stripeId;
+    private String connectId;
     private String firstName;
     private String lastName;
     private String phoneNumber;
@@ -33,13 +32,18 @@ public class UserDTO {
     private String city;
     private String state;
     private String country;
+    private String nationality;
+    private String ethnicity;
     private String ip;
     private Double lat;
     private Double lng;
     private String apartmentAddress;
 
+    private boolean cardVerified;
+    private boolean bankVerified;
     private boolean emailVerified;
     private boolean phoneVerified;
+    private boolean identificationVerified;
 
     private String createDateTime;
     private String updatedDateTime;

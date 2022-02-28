@@ -22,21 +22,22 @@ public class Scheduler {
 
     @Autowired
     private UserTemporaryService userTemporaryService;
-    //Running every 5 minutes
-//    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-//    @Scheduled(cron = "0/30 * * * * ?")
-//    public void resetTemporaryUsers() {
-//        ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.systemDefault());
-//        System.out.println("\n\nReset Users Cron Started:: " + now.toString());
-//        ZonedDateTime yesterday = now.minusDays(1);
-//        Collection<UserTemporary> userTemporaryCollection = userTemporaryService.findAllByUpdateDateTimeBefore(yesterday);
-//        for (UserTemporary userTemp: userTemporaryCollection) {
-//            User user = userService.findByPublicId(userTemp.getPublicId());
-//            user.setEmail(userTemp.getEmail());
-//            userTemporaryService.save(userTemp);
-//            userService.save(user);
-//        }
-//        System.out.println("\n\nReset Users Cron Ended:: " + now.toString());
-//    }
+
+    //Running every 10 minutes
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Scheduled(cron = "0/10 * * * * ?")
+    public void resetTemporaryUsers() {
+        ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.systemDefault());
+        System.out.println("\n\nReset Users Cron Started:: " + now.toString());
+        ZonedDateTime yesterday = now.minusDays(1);
+        Collection<UserTemporary> userTemporaryCollection = userTemporaryService.findAllByUpdateDateTimeBefore(yesterday);
+        for (UserTemporary userTemp: userTemporaryCollection) {
+            User user = userService.findByPublicId(userTemp.getPublicId());
+            user.setEmail(userTemp.getEmail());
+            userTemporaryService.save(userTemp);
+            userService.save(user);
+        }
+        System.out.println("\n\nReset Users Cron Ended:: " + now.toString());
+    }
 
 }

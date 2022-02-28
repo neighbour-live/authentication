@@ -4,7 +4,6 @@ public enum AppErrorType implements ErrorEnum {
 
 
     INVALID_APP_VERSION(2001, "You are using an outdated version of the app, please update."),
-
     ;
 
 
@@ -34,6 +33,11 @@ public enum AppErrorType implements ErrorEnum {
         if (this.frontEndMessage != null) return this.frontEndMessage;
         if (value == null) return this.errorMessage;
         return String.format(this.errorMessage, this.value);
+    }
+
+    @Override
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 
     public void setValue(String value) {

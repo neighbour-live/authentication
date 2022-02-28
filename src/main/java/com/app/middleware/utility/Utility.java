@@ -1,7 +1,6 @@
 package com.app.middleware.utility;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.primitives.Longs;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.util.StringUtils;
@@ -84,6 +83,12 @@ public class Utility {
 
     public static String generateOTP() {
         return RandomStringUtils.randomNumeric(6);
+    }
+
+    public static String generatePassword() {
+        StringBuilder tokenBuilder = new StringBuilder();
+        tokenBuilder.append(RandomStringUtils.randomAlphanumeric(24));
+        return tokenBuilder.toString();
     }
 
     public static String generateSafeToken() {

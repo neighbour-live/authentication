@@ -20,7 +20,6 @@ public class Constants {
     public static final String ENV_DEV = "dev";
     public static final String ENV_QA = "qa";
     public static final String ENV_PROD = "prod";
-    public static final String SEND_GRID_FROM_EMAIL = "test@test.com";
 
     public enum Sort {
         ASCENDING("asc"),
@@ -39,9 +38,9 @@ public class Constants {
 
     public enum EmailTemplate {
         TEST_TEMPLATE("d-1ec49b198a1f7aaaa904e34b84548243"),
-        WELCOME_TEMPLATE("d-c2b4ec8abb2d74ae2e9e8446dad084e7"),
-        EMAIL_VERIFICATION_TEMPLATE("d-74a83d9d1a471f0a9546576081ee3d93"),
-        DYNAMIC_EMAIL_VERIFICATION_TEMPLATE("d-2261ca6b5273f1dbedc43228d6c51bed");
+        WELCOME_TEMPLATE("d-d24badf1e961410f86a974a6d51b9758"),
+        GENERIC_EMAIL("d-74a83d9d1a471f0a9546576081ee3d93"),
+        EMAIL_OTP_TEMPLATE("d-2261ca6b5273f1dbedc43228d6c51bed");
 
         private final String value;
 

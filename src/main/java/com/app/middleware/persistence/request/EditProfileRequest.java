@@ -1,14 +1,9 @@
 package com.app.middleware.persistence.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.Range;
-
+import lombok.*;
 import javax.validation.constraints.*;
+import org.hibernate.validator.constraints.Length;
 
 @Data
 @NoArgsConstructor
@@ -53,6 +48,9 @@ public class EditProfileRequest {
     private String country;
     private String addressLine;
     private String apartmentAddress;
+
+    private String nationality;
+    private String ethnicity;
 
     @Length(max = 15, min = 7)
     @Pattern(regexp = "((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)", message = "i.p. should be in format abc.efg.uvw.xyz")

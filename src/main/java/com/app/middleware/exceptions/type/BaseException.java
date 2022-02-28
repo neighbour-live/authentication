@@ -35,6 +35,13 @@ public class BaseException extends Exception {
         log.error("Exception : " + errorEnum.toString() + ". Error Detail : ", exception);
     }
 
+    public BaseException(Exception exception, String exceptionMessage) {
+        super(exception);
+        this.errorCode = 500;
+        this.errorMessage = exceptionMessage;
+        log.error("Exception : " + exceptionMessage + ". Error Detail : ", exception);
+    }
+
     public BaseException(ErrorEnum<? extends Enum<?>> errorEnum) {
         this.errorCode = errorEnum.getErrorCode();
         this.errorMessage = errorEnum.getErrorMessage();

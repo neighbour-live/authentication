@@ -2,10 +2,7 @@ package com.app.middleware.persistence.mapper;
 
 import com.app.middleware.persistence.domain.User;
 import com.app.middleware.persistence.domain.UserTemporary;
-import com.app.middleware.persistence.dto.ChatRecipientDTO;
-import com.app.middleware.persistence.dto.UserDTO;
-import com.app.middleware.persistence.dto.UserMinimalDetailsDTO;
-import com.app.middleware.persistence.dto.UserTemporaryDTO;
+import com.app.middleware.persistence.dto.*;
 import com.app.middleware.utility.id.PublicIdGenerator;
 
 import java.time.format.DateTimeFormatter;
@@ -26,10 +23,15 @@ public class UserMapper {
                 .userName(user.getUserName())
                 .fbId((user.getFbId() == null) ? "": user.getFbId())
                 .ggId((user.getGgId() == null) ? "": user.getGgId())
+                .stripeId((user.getStripeId() == null) ? "": user.getStripeId())
+                .connectId((user.getConnectId() == null) ? "": user.getConnectId())
                 .phoneNumber(user.getPhoneNumber())
                 .imageUrl(user.getImageUrl())
-                .emailVerified(user.getEmailVerified())
-                .phoneVerified(user.getPhoneVerified())
+                .cardVerified(user.getCardVerified() == null ? false: user.getCardVerified())
+                .bankVerified(user.getBankVerified() == null ? false: user.getBankVerified())
+                .emailVerified(user.getEmailVerified() == null ? false: user.getEmailVerified())
+                .phoneVerified(user.getPhoneVerified() == null ? false: user.getPhoneVerified())
+                .identificationVerified(user.getIdentificationVerified() == null ? false: user.getIdentificationVerified())
                 .provider(user.getProvider().toString())
                 .providerId(user.getProviderId())
                 .dob((user.getDob() == null) ? "": user.getDob())
@@ -41,6 +43,8 @@ public class UserMapper {
                 .city((user.getCity() == null) ? "": user.getCity())
                 .state((user.getState() == null) ? "": user.getState())
                 .country((user.getCountry() == null) ? "": user.getCountry())
+                .nationality((user.getNationality() == null) ? "": user.getNationality())
+                .ethnicity((user.getEthnicity() == null) ? "": user.getEthnicity())
                 .createDateTime(user.getCreateDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 .updatedDateTime(user.getUpdateDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 .build();
@@ -86,6 +90,25 @@ public class UserMapper {
 
         return userTemporaryDTO;
     }
+
+    public static List<UserIdentificationDTO> createUserIdentificationDTOListLazy(Collection<User> users) {
+        List<UserIdentificationDTO> userIdentificationDTOS = new ArrayList<>();
+        users.forEach(user -> userIdentificationDTOS.add(createUserIdentificationDTOLazy(user)));
+        return userIdentificationDTOS;
+    }
+
+    public static UserIdentificationDTO createUserIdentificationDTOLazy(User user) {
+        UserIdentificationDTO userIdentificationDTO = UserIdentificationDTO.builder()
+                .publicId(PublicIdGenerator.encodedPublicId(user.getPublicId()))
+                .userName(user.getUserName() == null ? "" : user.getUserName() )
+                .identificationVerified(user.getIdentificationVerified())
+                .idDocBackUrl(user.getIdDocBackUrl() == null ? "" : user.getIdDocBackUrl())
+                .idDocFrontUrl(user.getIdDocFrontUrl() == null ? "" : user.getIdDocFrontUrl())
+                .build();
+
+        return userIdentificationDTO;
+    }
+
 
     public static ChatRecipientDTO createChatRecipientDTOLazy(User user) {
         ChatRecipientDTO chatRecipientDTO = ChatRecipientDTO.builder()

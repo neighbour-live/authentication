@@ -2,20 +2,47 @@ server:
   error:
     whitelabel:
       enabled: false
+
 spring:
   profiles:
-    active: dev
+    active: local
   output:
     ansi:
       enabled: always
+
 logging:
   file:
     path: /var/log/app/
     name: /var/log/app/app.log
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
 
 logo-url: www.google.com
 otp-expiry-time: 300
 email-token-expiry-time: 86400
 
 
+cloud:
+  aws:
+    region:
+      static: eu-central-1
+    stack:
+      auto: false
+    bucket-public: neighborlive-public
+    bucket-name: neighborlive-users
+    credentials:
+      access-key: ${S3-BUCKET-ACCESS-KEY:test}
+      secret-key: ${S3-BUCKET-SECRET-KEY:test}
+      profile-name: neighbour
 
+
+twilio-sid: ${TWILIO-SID:test}
+twilio-token: ${TWILIO-TOKEN:test}
+twilio-sender: ${TWILIO-SENDER:test}
+
+service-fees-factor: 0.1
+minimum-charge-amount: 10
+currency-factor: 100

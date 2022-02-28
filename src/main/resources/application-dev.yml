@@ -18,7 +18,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
       naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
     properties:
       hibernate: org.hibernate.dialect.MySQL8Dialect
@@ -30,15 +30,15 @@ spring:
       client:
         registration:
           google:
-            clientId: 8335880asmg0kiufbrgtm-m24301smd0e4faeijtlldq3asmg0kiufbrgtm.apps.googleusercontent.com
-            clientSecret: qUAKXrAANqapJr83v0EFZWNa
+            clientId: 488450560768-nr9o0rac9vk1nb17vrrmu08vvargf91b.apps.googleusercontent.com
+            clientSecret: q92qvt2WDsjwShcfRaskul1u
             redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - email
               - profile
           facebook:
-            clientId: 1629390323803242
-            clientSecret: e510999563496c087cffd42b6ebfb2b1
+            clientId: 1049023432348515
+            clientSecret: d224eac6e099e2d0ea2aa902d3a40e22
             redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - email
@@ -87,13 +87,16 @@ app:
       - myandroidapp://oauth2/redirect
       - myiosapp://oauth2/redirect
 
-
 email:
   redirection: https://ec2-35-156-85-34.eu-central-1.compute.amazonaws.com:8443
-  api-key: B0RSG.Abzf8Ozws-lJsrl1NjuWbIvww9j94bWesvysZIYfBg.SlUGaqMovZnAy7qbvmS1
-  from: neighbourlivemal@gmail.com
+  api-key: ${SENDGRIDAPIKEY:test}
+  from: social@neighbour.live
 firebase:
   config: confidential/firebase-configuration.json
   database: https://neighbor-live.firebaseio.com
 
-
+stripe:
+  keys:
+    public: pk_test_51HX3eOLuBJFQHSxq6tPiRtSs50PoBhhQWyF3h2eloZgpQ9QDm42cDGCmpCmqUHsckNfM08A2n9wo5J2eMH1eQPey00kEIq3KRl
+    secret: sk_test_51HX3eOLuBJFQHSxqf5BjdUrq4G64YNzsNaoUocbvGehjTmoYAx3sLVN1ByzauPGJDqypgd26KzZ6Lf4GKAXgIn5O00Q6gwRlY3
+    client: ca_KxjJAvOvaQa6Mhbae9sBB81VUywcA3I7

@@ -1,11 +1,8 @@
 package com.app.middleware.persistence.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
+import lombok.*;
 import javax.validation.constraints.*;
 
 @Data
@@ -31,6 +28,10 @@ public class SignUpRequest {
     private String state;
     @NotBlank
     private String country;
+    @NotBlank
+    private String nationality;
+    @NotBlank
+    private String ethnicity;
     @NotBlank
     private String gender;
 

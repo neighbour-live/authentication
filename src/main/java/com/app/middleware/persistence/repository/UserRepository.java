@@ -1,8 +1,6 @@
 package com.app.middleware.persistence.repository;
 
 import com.app.middleware.persistence.domain.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -31,5 +29,13 @@ public interface UserRepository extends JpaRepository<User,Long> {
 	List<User> findByEmailVerified(Boolean emailVerified);
 
 	List<User> findByPhoneVerified(Boolean phoneVerified);
+
+	@Query(value = "SELECT u FROM User u LEFT JOIN FETCH u.userPaymentCards upc WHERE upc.cardNumber = :cardNumber")
+	User findByUserPaymentCards(String cardNumber);
+
+	@Query(value = "SELECT u FROM User u LEFT JOIN FETCH u.userBankAccounts uba WHERE uba.accountNumber = :accountNumber")
+	User findByUserBankAccounts(String accountNumber);
+
+	List<User> findByCardVerified(Boolean cardVerified);
 
 }

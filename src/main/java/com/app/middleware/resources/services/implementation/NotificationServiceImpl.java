@@ -22,6 +22,7 @@ import com.app.middleware.resources.services.EmailService;
 import com.app.middleware.resources.services.FCMService;
 import com.app.middleware.resources.services.NotificationService;
 import com.app.middleware.resources.services.NotificationTypeService;
+import com.app.middleware.utility.AuthConstants;
 import com.app.middleware.utility.Constants;
 import com.app.middleware.utility.StatusCode;
 import com.app.middleware.utility.id.PublicIdGenerator;
@@ -84,9 +85,9 @@ public class NotificationServiceImpl implements NotificationService {
     private final String CONTENT = "content";
     private final String MESSAGE = "message";
     private final String IMAGE = "image";
-    private final String BOT_TOPIC_PREFIX = "Bot-broadcast-";
-    private String getBotTopic() {
-        return BOT_TOPIC_PREFIX + env;
+    private final String APP_TOPIC_PREFIX = "App-broadcast-";
+    private String getAppTopic() {
+        return APP_TOPIC_PREFIX + env;
     }
 
     /**
@@ -220,11 +221,6 @@ public class NotificationServiceImpl implements NotificationService {
      * */
 
 
-
-
-
-
-
     @Override
     public void sendSync(User user, String registrationToken, NotificationType notificationType, String message, Map<String, ?> contentMap) {
         sendNotification(user, registrationToken, notificationType, message, contentMap);
@@ -302,7 +298,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private String getNotificationTitle(String env) {
-        return env.equals("prod") ? "Bot" : "Bot - " + StringUtils.capitalize(env);
+        return env.equals("prod") ? "App" : "App - " + StringUtils.capitalize(env);
     }
 
     private ApnsConfig getApnsConfig(UserNotification userNotification, Map<String, String> notificationMap) {
@@ -357,9 +353,9 @@ public class NotificationServiceImpl implements NotificationService {
     private void broadcastNotification(List<UserNotification> userNotifications) {
         try {
             if (CollectionUtils.isNotEmpty(userNotifications)) {
-                String BotTopic = getBotTopic();
-                log.cronLogger("Sending Message to topic: " + BotTopic);
-                subscribeToTopic(userNotifications.stream().map(UserNotification::getUser).collect(Collectors.toList()), BotTopic);
+                String AppTopic = getAppTopic();
+                log.cronLogger("Sending Message to topic: " + AppTopic);
+                subscribeToTopic(userNotifications.stream().map(UserNotification::getUser).collect(Collectors.toList()), AppTopic);
 
                 UserNotification userNotification = userNotifications.get(0);
                 Map<String, String> notificationMap = new HashMap<>();
@@ -372,7 +368,7 @@ public class NotificationServiceImpl implements NotificationService {
                 Message message = Message.builder()
                         .setApnsConfig(apnsConfig)
                         .putAllData(notificationMap)
-                        .setTopic(BotTopic)
+                        .setTopic(AppTopic)
                         .build();
                 FirebaseMessaging.getInstance().send(message);
             }
@@ -469,7 +465,7 @@ public class NotificationServiceImpl implements NotificationService {
         List<UserNotificationDTO> userNotificationDTOList = UserNotificationMapper.createUserNotificationDTOListLazy(userNotificationsPage.getContent());
         PageableResponseEntity<Object> pageableResponseEntity = new PageableResponseEntity<Object>(
                 StatusCode.SUCCESS,
-                "Paginated response",
+                AuthConstants.PAGE_RETRIEVED_SUCCESSFULLY,
                 userNotificationDTOList,
                 userNotificationsPage.getTotalElements(),
                 userNotificationsPage.getSize(),
@@ -491,7 +487,7 @@ public class NotificationServiceImpl implements NotificationService {
         List<UserNotificationDTO> userNotificationDTOList = UserNotificationMapper.createUserNotificationDTOListLazy(userNotificationsPage.getContent());
         PageableResponseEntity<Object> pageableResponseEntity = new PageableResponseEntity<Object>(
                 StatusCode.SUCCESS,
-                "Paginated response",
+                AuthConstants.PAGE_RETRIEVED_SUCCESSFULLY,
                 userNotificationDTOList,
                 userNotificationsPage.getTotalElements(),
                 userNotificationsPage.getSize(),
@@ -513,7 +509,7 @@ public class NotificationServiceImpl implements NotificationService {
         List<UserNotificationDTO> userNotificationDTOList = UserNotificationMapper.createUserNotificationDTOListLazy(userNotificationsPage.getContent());
         PageableResponseEntity<Object> pageableResponseEntity = new PageableResponseEntity<Object>(
                 StatusCode.SUCCESS,
-                "Paginated response",
+                AuthConstants.PAGE_RETRIEVED_SUCCESSFULLY,
                 userNotificationDTOList,
                 userNotificationsPage.getTotalElements(),
                 userNotificationsPage.getSize(),
@@ -532,7 +528,7 @@ public class NotificationServiceImpl implements NotificationService {
         List<UserNotificationDTO> userNotificationDTOList = UserNotificationMapper.createUserNotificationDTOListLazy(userNotificationsPage.getContent());
         PageableResponseEntity<Object> pageableResponseEntity = new PageableResponseEntity<Object>(
                 StatusCode.SUCCESS,
-                "Paginated response",
+                AuthConstants.PAGE_RETRIEVED_SUCCESSFULLY,
                 userNotificationDTOList,
                 userNotificationsPage.getTotalElements(),
                 userNotificationsPage.getSize(),
@@ -629,7 +625,7 @@ public class NotificationServiceImpl implements NotificationService {
             try {
                 emailService.sendEmailFromExternalApi(EmailNotificationDto.builder()
                         .to(user.getEmail())
-                        .template(Constants.EmailTemplate.EMAIL_VERIFICATION_TEMPLATE.value())
+                        .template(Constants.EmailTemplate.GENERIC_EMAIL.value())
                         .build());
             } catch (IOException e) {
                 e.printStackTrace();

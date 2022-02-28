@@ -7,10 +7,7 @@ import com.app.middleware.persistence.dto.ChatDTO;
 import com.app.middleware.persistence.mapper.ChatMapper;
 import com.app.middleware.persistence.repository.UserChatRepository;
 import com.app.middleware.persistence.request.AddChatRequest;
-import com.app.middleware.persistence.request.UserNotificationRequest;
 import com.app.middleware.persistence.response.PageableResponseEntity;
-import com.app.middleware.persistence.type.NotificationAction;
-import com.app.middleware.persistence.type.NotificationEnum;
 import com.app.middleware.resources.services.ChatService;
 import com.app.middleware.resources.services.ConversationService;
 import com.app.middleware.resources.services.NotificationService;
@@ -24,9 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ChatServiceImpl implements ChatService {

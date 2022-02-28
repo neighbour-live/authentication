@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 public class AuthorizationServiceImpl implements AuthorizationService {
 
     @Autowired
-    private static UserRepository userRepository;
+    private UserRepository userRepository;
 
     public User isCurrentUser(String userPublicId) throws ResourceNotFoundException, UnauthorizedException {
         User user = userRepository.findByPublicId(PublicIdGenerator.decodePublicId(userPublicId));

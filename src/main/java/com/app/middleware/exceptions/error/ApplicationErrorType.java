@@ -11,7 +11,7 @@ public enum ApplicationErrorType implements ErrorEnum {
     VALIDATION_ERROR(StatusCode.VALIDATION_ERROR, "Validation Error"),
     UNAUTHORIZED(StatusCode.UNAUTHORIZED, "Unauthorized Error"),
     INVALID_FORMAT_EXCEPTION(StatusCode.PARSING_ERROR, "Invalid Input"),
-    ALADDIN(StatusCode.OK, "GENERAL Error");
+    GENERAL(StatusCode.OK, "Server Error");
 
 
     private Integer errorCode;
@@ -30,6 +30,11 @@ public enum ApplicationErrorType implements ErrorEnum {
     @Override
     public String getErrorMessage() {
         return this.errorMessage;
+    }
+
+    @Override
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }
 

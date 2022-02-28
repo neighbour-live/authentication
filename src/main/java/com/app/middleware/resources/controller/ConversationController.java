@@ -27,58 +27,58 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/conversation")
+@RequestMapping("/offline-conversation")
 public class ConversationController {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ConversationService conversationService;
-
-    @GetMapping
-    @PreAuthorize("hasRole('USER')")
-    @ApiOperation(value = "This operation is used to fetch conversation.")
-    public ResponseEntity getConversation(@RequestParam("userPublicId") String userPublicId,
-                                          @RequestParam("taskPublicId") String taskPublicId) throws Exception {
-        try {
-            User user = isCurrentUser(userPublicId);
-            Conversation conversation = conversationService.getConversation(taskPublicId, user);
-            return GenericResponseEntity.create(StatusCode.SUCCESS, ConversationMapper.createConversationDTOLazy(conversation, user), HttpStatus.OK);
-        } catch (Exception e) {
-            return ExceptionUtil.handleException(e);
-        }
-    }
-
-
-    @GetMapping("/page")
-    @PreAuthorize("hasRole('USER')")
-    @ApiOperation(value = "This operation is used to fetch conversation by pagination.")
-    public PageableResponseEntity<Object> getConversationPage(@RequestParam("userPublicId") String userPublicId,
-                                                              @RequestParam(value = "pageNo") String pageNo,
-                                                              @RequestParam(value = "pageSize") String pageSize
-                                                              ) throws Exception {
-        try {
-            User user = isCurrentUser(userPublicId);
-            if(Integer.valueOf(pageNo) < 0 || Integer.valueOf(pageSize) < 0){
-                throw new Exception("PageNo and PageSize must be positive numbers.");
-            }
-
-            PageableResponseEntity<Object> pageableResponseEntity = conversationService.getConversationPage(Integer.valueOf(pageNo), Integer.valueOf(pageSize), user);
-            return pageableResponseEntity;
-
-        } catch (Exception e) {
-            return ExceptionUtil.handlePaginatedException(e);
-        }
-    }
-
-    public User isCurrentUser(String userPublicId) throws ResourceNotFoundException, UnauthorizedException {
-        User user = userRepository.findByPublicId(PublicIdGenerator.decodePublicId(userPublicId));
-        if(user == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_PUBLIC_ID, userPublicId);
-
-        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(!userPrincipal.getEmail().equals(user.getEmail())) throw new UnauthorizedException(UnauthorizedExceptionErrorType.UNAUTHORIZED_ACTION);
-
-        return user;
-    }
+//    @Autowired
+//    private AuthorizationService authorizationService;
+//
+//    @Autowired
+//    private ConversationService conversationService;
+//
+//    @GetMapping
+//    @PreAuthorize("hasRole('USER')")
+//    @ApiOperation(value = "This operation is used to fetch conversation.")
+//    public ResponseEntity getConversation(@RequestParam("userPublicId") String userPublicId,
+//                                          @RequestParam("taskPublicId") String taskPublicId) throws Exception {
+//        try {
+//            User user = isCurrentUser(userPublicId);
+//            Conversation conversation = conversationService.getConversation(taskPublicId, user);
+//            return GenericResponseEntity.create(StatusCode.SUCCESS, ConversationMapper.createConversationDTOLazy(conversation, user), HttpStatus.OK);
+//        } catch (Exception e) {
+//            return ExceptionUtil.handleException(e);
+//        }
+//    }
+//
+//
+//    @GetMapping("/page")
+//    @PreAuthorize("hasRole('USER')")
+//    @ApiOperation(value = "This operation is used to fetch conversation by pagination.")
+//    public PageableResponseEntity<Object> getConversationPage(@RequestParam("userPublicId") String userPublicId,
+//                                                              @RequestParam(value = "pageNo") String pageNo,
+//                                                              @RequestParam(value = "pageSize") String pageSize
+//                                                              ) throws Exception {
+//        try {
+//            User user = isCurrentUser(userPublicId);
+//            if(Integer.valueOf(pageNo) < 0 || Integer.valueOf(pageSize) < 0){
+//                throw new Exception("PageNo and PageSize must be positive numbers.");
+//            }
+//
+//            PageableResponseEntity<Object> pageableResponseEntity = conversationService.getConversationPage(Integer.valueOf(pageNo), Integer.valueOf(pageSize), user);
+//            return pageableResponseEntity;
+//
+//        } catch (Exception e) {
+//            return ExceptionUtil.handlePaginatedException(e);
+//        }
+//    }
+//
+//    public User isCurrentUser(String userPublicId) throws ResourceNotFoundException, UnauthorizedException {
+//        User user = userRepository.findByPublicId(PublicIdGenerator.decodePublicId(userPublicId));
+//        if(user == null) throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_PUBLIC_ID, userPublicId);
+//
+//        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        if(!userPrincipal.getEmail().equals(user.getEmail())) throw new UnauthorizedException(UnauthorizedExceptionErrorType.UNAUTHORIZED_ACTION);
+//
+//        return user;
+//    }
 }

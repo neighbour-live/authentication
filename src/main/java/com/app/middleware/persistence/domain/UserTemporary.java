@@ -2,7 +2,6 @@ package com.app.middleware.persistence.domain;
 import lombok.*;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @Data
