@@ -10,7 +10,6 @@ import com.app.middleware.persistence.request.SignUpRequest;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.HashMap;
 
 public interface AuthService {
@@ -45,7 +44,7 @@ public interface AuthService {
 
     boolean forgotPasswordRequest(String email) throws Exception;
 
-    boolean changePassword(String email, String newPassword, BigInteger otp) throws Exception;
+    boolean changePassword(String email, String newPassword, String otp) throws Exception;
 
     int calculateProfileCompletionPercentage(User user) throws ResourceNotFoundException;
 

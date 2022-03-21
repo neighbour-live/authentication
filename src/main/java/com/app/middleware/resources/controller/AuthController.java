@@ -146,7 +146,7 @@ public class AuthController {
     @PatchMapping("/change-password")
     @ApiOperation(value = "This operation is used to change Password.")
     public ResponseEntity<?> changePassword(@RequestParam("email") String email, @RequestParam("newPassword") String newPassword,
-                                            @RequestParam("otp") BigInteger otp) throws Exception {
+                                            @RequestParam("otp") String otp) throws Exception {
 
         HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         List<String> request = new ArrayList<>();

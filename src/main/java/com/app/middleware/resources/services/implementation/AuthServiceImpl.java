@@ -36,7 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.*;
 
@@ -781,7 +780,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
-    public boolean changePassword(String email, String newPassword, BigInteger otp) throws Exception {
+    public boolean changePassword(String email, String newPassword, String otp) throws Exception {
         if(!checkEmailExist(email)){
             User user  = userRepository.findUserByEmail(email);
 
@@ -793,7 +792,7 @@ public class AuthServiceImpl implements AuthService {
                 throw new Exception("New password must be different then older password");
             }
 
-            if(user.getPhoneVerificationOTP().equals(String.valueOf(otp))){
+            if(user.getPhoneVerificationOTP().equals(otp)){
                 SimpleMailMessage mailMessage = new SimpleMailMessage();
                 mailMessage.setTo(user.getEmail());
                 mailMessage.setSubject("Neighbour | Change Password Successfully!");
