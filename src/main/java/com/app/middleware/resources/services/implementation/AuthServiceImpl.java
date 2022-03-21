@@ -770,9 +770,11 @@ public class AuthServiceImpl implements AuthService {
                     +"One Time Secret: " + otp + "\n\n\n\n Regards,\nTeam Neighbour");
 
             user.setPhoneVerificationOTP(otp);
+
             userRepository.save(user);
             emailService.sendEmail(mailMessage);
-                smsService.sendOTPMessage(otp, user.getPhoneNumber());
+            smsService.sendOTPMessage(otp, user.getPhoneNumber());
+
             return true;
         } else throw new ResourceNotFoundException(ResourceNotFoundErrorType.RESOURCE_NOT_FOUND, email);
     }
@@ -791,7 +793,7 @@ public class AuthServiceImpl implements AuthService {
                 throw new Exception("New password must be different then older password");
             }
 
-            if(user.getPhoneVerificationOTP().equals(String.valueOf(otp)) && !passwordEncoder.matches(newPassword, user.getPassword())){
+            if(user.getPhoneVerificationOTP().equals(String.valueOf(otp))){
                 SimpleMailMessage mailMessage = new SimpleMailMessage();
                 mailMessage.setTo(user.getEmail());
                 mailMessage.setSubject("Neighbour | Change Password Successfully!");
@@ -805,6 +807,7 @@ public class AuthServiceImpl implements AuthService {
                 userRepository.save(user);
                 emailService.sendEmail(mailMessage);
                 return true;
+
             } else {
                 throw new ResourceNotFoundException(ResourceNotFoundErrorType.USER_NOT_FOUND_WITH_OTP);
             }
